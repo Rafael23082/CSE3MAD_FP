@@ -1,5 +1,7 @@
-import { darkTheme, lightTheme, ThemeColors } from "@/theme/colors";
-import { StyleSheet, Text, useColorScheme, View } from "react-native";
+import { ThemeContext } from "@/context/ThemeProvider";
+import { ThemeColors } from "@/theme/colors";
+import { useContext } from "react";
+import { StyleSheet, Text, View } from "react-native";
 
 type cardProps={
     metric: string;
@@ -8,10 +10,9 @@ type cardProps={
 }
 
 export default function Card({metric, value, maximumWidth}: cardProps){
-    const scheme = useColorScheme();
-    const isDark = scheme === "dark";
-    const colors = isDark ? darkTheme: lightTheme;
-    const styles = createStyles(colors);
+    const theme = useContext(ThemeContext)
+    if (!theme) return null;
+    const styles = createStyles(theme);
     return(
         <View style={[styles.cardContainer, {
             width: maximumWidth ? "100%": "47%"

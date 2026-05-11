@@ -1,3 +1,4 @@
+import { activities } from "@/assets/activities";
 import ActivityGroup from "@/components/activityGroup";
 import { ThemeContext } from "@/context/ThemeProvider";
 import { ThemeColors } from "@/theme/colors";
@@ -14,21 +15,15 @@ export default function ActivitiesScreen() {
     <SafeAreaView style={styles.outerContainer} edges={["top"]}>
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.welcomeMessage}>Select an Activity</Text>
-
-        <ActivityGroup
-          activityName={"Reaction Board Challenge"}
-          description={"Students test their neuromuscular coordination by measuring reaction times under different conditions. The activity uses the phone as a digital 'stimulus and response' board to capture the speed of the brain-to-body signaling pathway."}
-          imagePath={require("@/assets/images/speed_8252022_layout_07.jpg")}
-          onlyImage={false}
-        />
-
-        <ActivityGroup
-          activityName={"Breathing Pace Trainer"}
-          description={"Students explore the relationship between respiration and physical relaxation. By following a digital pacer, they learn to control their breathing rate to observe how conscious regulation affects heart rate or perceived stress levels."}
-          imagePath={require("@/assets/images/rm373batch7-18a.jpg")}
-          onlyImage={false}
-        />
-
+        {activities.map((activity, index) => (
+          <ActivityGroup
+            key={index}
+            activityName={activity.name}
+            description={activity.description}
+            imagePath={activity.imagePath}
+            onlyImage={false}
+          />
+        ))}
       </ScrollView>
     </SafeAreaView>
   );

@@ -1,5 +1,7 @@
-import { darkTheme, lightTheme, ThemeColors } from "@/theme/colors";
-import { Pressable, StyleSheet, Text, useColorScheme } from "react-native";
+import { ThemeContext } from "@/context/ThemeProvider";
+import { ThemeColors } from "@/theme/colors";
+import { useContext } from "react";
+import { Pressable, StyleSheet, Text } from "react-native";
 
 type ButtonProps = {
     text: string;
@@ -7,10 +9,10 @@ type ButtonProps = {
 };
 
 export default function Button({text, action}: ButtonProps){
-    const scheme = useColorScheme();
-    const isDark = scheme === "dark";
-    const colors = isDark ? darkTheme: lightTheme;
-    const styles = createStyles(colors);
+    const theme = useContext(ThemeContext)
+    if (!theme) return null;
+    const styles = createStyles(theme);
+
     return(
         <Pressable 
             style={styles.button}

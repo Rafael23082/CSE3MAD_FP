@@ -1,5 +1,7 @@
-import { darkTheme, lightTheme, ThemeColors } from "@/theme/colors";
-import { StyleSheet, Text, TextInput, useColorScheme, View } from "react-native";
+import { ThemeContext } from "@/context/ThemeProvider";
+import { ThemeColors } from "@/theme/colors";
+import { useContext } from "react";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 
 type InputProps = {
     first: boolean;
@@ -12,10 +14,10 @@ type InputProps = {
 };
 
 export default function InputGroup({first, label, text, setText, placeholder, isPassword, isLabeled}: InputProps){
-    const scheme = useColorScheme();
-    const isDark = scheme === "dark";
-    const colors = isDark ? darkTheme: lightTheme;
-    const styles = createStyles(colors);
+    const theme = useContext(ThemeContext)
+    if (!theme) return null;
+    const styles = createStyles(theme);
+
     return(
         <View>
             {isLabeled && (

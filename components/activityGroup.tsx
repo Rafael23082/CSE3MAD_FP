@@ -1,6 +1,8 @@
-import { ThemeColors, darkTheme, lightTheme } from "@/theme/colors";
+import { ThemeContext } from "@/context/ThemeProvider";
+import { ThemeColors } from "@/theme/colors";
 import { useRouter } from "expo-router";
-import { Image, Pressable, StyleSheet, Text, View, useColorScheme } from "react-native";
+import { useContext } from "react";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 type activityScreenProps = {
   activityName: string,
@@ -10,11 +12,10 @@ type activityScreenProps = {
 }
 
 export default function ActivityGroup({activityName, description, imagePath, onlyImage}: activityScreenProps){
-    const router = useRouter();
-    const theme = useColorScheme();
-    const isDark = theme == "dark";
-    const colors = isDark ? darkTheme: lightTheme;
-    const styles = createStyles(colors);
+    const router = useRouter(); 
+    const theme = useContext(ThemeContext)
+    if (!theme) return null;
+    const styles = createStyles(theme);
 
     return (
         onlyImage ? (
