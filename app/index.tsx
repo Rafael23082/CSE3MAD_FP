@@ -21,8 +21,8 @@ export default function HomeScreen(){
                     style={styles.secondary}>Experiment. Measure. Improve.</Text>
             </View>
             <View style={styles.buttonContainer}>
-                <Button text={"Register"} action={()=>{}} />
-                <Button text={"Login"} action={()=>{}} />
+                <Button text={"Register"} action={()=>{router.push("/signup")}} />
+                <Button text={"Login"} action={()=>{router.push("/login")}} />
             </View>
         </SafeAreaView >
     );
@@ -34,7 +34,7 @@ const createStyles = (colors: ThemeColors) => {
             display: "flex",
             flex: 1,
             backgroundColor: colors.backgroundColor,
-            paddingHorizontal: 24
+            padding: 24
         },  
         top: {
             flex: 1,
@@ -60,7 +60,7 @@ const createStyles = (colors: ThemeColors) => {
             rowGap: 20,
             width: "100%",
             alignItems: "center",
-            marginBottom: 40
+            marginBottom: 16
         }
     })
     return styles;
