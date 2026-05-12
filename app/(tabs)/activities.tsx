@@ -15,15 +15,16 @@ export default function ActivitiesScreen() {
     <SafeAreaView style={styles.outerContainer} edges={["top"]}>
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.welcomeMessage}>Select an Activity</Text>
-        {activities.map((activity, index) => (
-          <ActivityGroup
-            key={index}
-            activityName={activity.name}
-            description={activity.description}
-            imagePath={activity.imagePath}
-            onlyImage={false}
-          />
-        ))}
+          {Object.entries(activities).map(([key, activity], index) => (
+            <ActivityGroup
+              key={index}
+              activityKey={key}
+              activityName={activity.name}
+              description={activity.description}
+              imagePath={activity.image}
+              onlyImage={false}
+            />
+          ))}
       </ScrollView>
     </SafeAreaView>
   );

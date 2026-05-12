@@ -1,0 +1,72 @@
+import { Activity } from "@/context/ActivityContext";
+import { ThemeContext } from "@/context/ThemeProvider";
+import { ThemeColors } from "@/theme/colors";
+import { useContext } from "react";
+import { StyleSheet, Text, View } from "react-native";
+import ActivityGroup from "./activityGroup";
+import EquipmentCard from "./equipmentCard";
+
+type Props = {
+    activity: Activity;
+};
+
+export default function ActivityDetailsContents({ activity }: Props) {
+    const theme = useContext(ThemeContext);
+    if (!theme) return null;
+    const styles = createStyles(theme);
+
+    return (
+        <View>
+            <Text style={styles.welcomeMessage}>
+                {activity.name}
+            </Text>
+            
+            <ActivityGroup
+                activityKey="placeholder"
+                activityName="placeholder"
+                description="placeholder"
+                imagePath={activity.image}
+                onlyImage={true}
+            />
+            <Text style={styles.sectionHeader}>Overview</Text>
+            <Text style={styles.body}>{activity.description}</Text>
+            <Text style={styles.sectionHeader}>Equipments Needed</Text>
+
+            <View style={styles.equipmentContainer}>
+                {activity.equipments.map((equipment, index) => (
+                    <EquipmentCard
+                        key={index}
+                        toolName={equipment.toolName}
+                        description={equipment.description}
+                        image={equipment.image}
+                    />
+                ))}
+            </View>
+        </View>
+    );
+    }
+
+const createStyles = (colors: ThemeColors) => {
+    const styles = StyleSheet.create({
+        welcomeMessage: {
+            fontFamily: "PoppinsBold",
+            fontSize: 22,
+            color: colors.primary,
+            marginBottom: 24
+        },
+        sectionHeader: {
+            fontFamily: "PoppinsRegular",
+            fontSize: 20,
+            color: colors.secondary,
+            marginTop: 24
+        },
+        body: {
+            fontFamily: "InterRegular",
+            color: colors.secondary
+        },
+        equipmentContainer: {
+            marginBottom: 32,
+        }
+    });
+    return styles;
+}
