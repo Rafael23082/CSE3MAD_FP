@@ -6,12 +6,30 @@ export const activities: Record<string, Activity> = {
         description: "Design, build, and test a parachute for a small toy to reduce its landing speed and impact force. Your team will iterate under time and material constraints to achieve the slowest and safest landing within the target area.",
         image: require("@/assets/images/pexels-no-one-knows-me-158523061-10758989.jpg"),
         instructions: [
-            "Drop the toy without a parachute and record the fall (baseline test).",
-            "Build a parachute using provided materials.",
-            "Drop the toy from the same height and record the fall.",
-            "Review speed and landing accuracy results in the app.",
-            "Redesign and test up to three prototypes within 20 minutes.",
-            "Upload videos, results, and team reflections."
+            {
+                instruction: "Drop the toy without a parachute and record the fall (baseline test).",
+                video: require("@/assets/images/placeholder.jpg")
+            },
+            {
+                instruction: "Build a parachute using provided materials.",
+                video: require("@/assets/images/placeholder.jpg")
+            },
+            {
+                instruction: "Drop the toy from the same height and record the fall.",
+                video: require("@/assets/images/placeholder.jpg")
+            },
+            {
+                instruction: "Review speed and landing accuracy results in the app.",
+                video: require("@/assets/images/placeholder.jpg")
+            },
+            {
+                instruction: "Redesign and test up to three prototypes within 20 minutes.",
+                video: require("@/assets/images/placeholder.jpg")
+            },
+            {
+                instruction: "Upload videos, results, and team reflections.",
+                video: require("@/assets/images/placeholder.jpg")
+            }
         ],
         equipments: [
             {
@@ -52,9 +70,18 @@ export const activities: Record<string, Activity> = {
         description: "Students act as environmental investigators to measure and compare sound levels produced by different classroom activities. The goal is to identify how energy and surfaces affect sound intensity and to understand the health risks associated with prolonged noise exposure.",
         image: require("@/assets/images/pexels-splitshire-1534.jpg"),
         instructions: [
-            "Measure noise from different actions (dropping objects (pens, books) talking, walking, stamping your feet).",
-            "Record sound levels and locations.",
-            "Map loud and quiet zones."
+            {
+                instruction: "Measure noise from different actions (dropping objects, talking, walking, stamping your feet).",
+                video: require("@/assets/images/placeholder.jpg")
+            },
+            {
+                instruction: "Record sound levels and locations.",
+                video: require("@/assets/images/placeholder.jpg")
+            },
+            {
+                instruction: "Map loud and quiet zones.",
+                video: require("@/assets/images/placeholder.jpg")
+            }
         ],
         equipments: [
             {
@@ -70,10 +97,22 @@ export const activities: Record<string, Activity> = {
         description: "Students test how air movement applies force to flexible materials. By designing different hand fans and testing them against paper and cardboard targets, teams investigate the relationship between fan design, distance, and material stiffness.",
         image: require("@/assets/images/pexels-cottonbro-8102643.jpg"),
         instructions: [
-            "Stand paper upright on a table.",
-            "Fan air from 30 cm away.",
-            "Observe and record movement.",
-            "Repeat with different fan designs and fan distance (15cm, 30, 45cm)"
+            {
+                instruction: "Stand paper upright on a table.",
+                video: require("@/assets/images/placeholder.jpg")
+            },
+            {
+                instruction: "Fan air from 30 cm away.",
+                video: require("@/assets/images/placeholder.jpg")
+            },
+            {
+                instruction: "Observe and record movement.",
+                video: require("@/assets/images/placeholder.jpg")
+            },
+            {
+                instruction: "Repeat with different fan designs and fan distances (15 cm, 30 cm, 45 cm).",
+                video: require("@/assets/images/placeholder.jpg")
+            }
         ],
         equipments: [
             {
@@ -99,10 +138,22 @@ export const activities: Record<string, Activity> = {
         description: "Students design and build structural prototypes to withstand simulated earthquake vibrations. The goal is to use iterative engineering to create a base that absorbs and distributes energy, protecting the 'building' (the mobile phone) from excessive movement.",
         image: require("@/assets/images/pexels-leon-lawrence-156921555-14491727.jpg"),
         instructions: [
-            "Secures the vertical target to the table so it can bend without falling.",
-            "Place a flat cardboard platform on top.",
-            "Place the phone in the center and activate vibration mode on the STEMM App.",
-            "Modify the structure to reduce movement (e.g. more pillars, more folds, etc)"
+            {
+                instruction: "Secure the vertical target to the table so it can bend without falling.",
+                video: require("@/assets/images/placeholder.jpg")
+            },
+            {
+                instruction: "Place a flat cardboard platform on top.",
+                video: require("@/assets/images/placeholder.jpg")
+            },
+            {
+                instruction: "Place the phone in the center and activate vibration mode on the STEMM App.",
+                video: require("@/assets/images/placeholder.jpg")
+            },
+            {
+                instruction: "Modify the structure to reduce movement (e.g. more pillars, more folds, etc).",
+                video: require("@/assets/images/placeholder.jpg")
+            }
         ],
         equipments: [
             {
@@ -128,11 +179,26 @@ export const activities: Record<string, Activity> = {
         description: "Students investigate human biomechanics by measuring the speed and smoothness of their movements during controlled stretching. Using the phone's vibration sensors, teams analyze how 'gracefully' they can move and how fatigue or speed impacts physical coordination.",
         image: require("@/assets/images/pexels-barbara-olsen-7869576.jpg"),
         instructions: [
-            "Hold the phone firmly in one hand. Activate the App vibration sensor.",
-            "Perform guided movement slowly as shown in the app. Record the vibration.",
-            "Repeat the activity with vibration feedback enabled.",
-            "Review speed, smoothness, and range-of-motion data.",
-            "Upload results and reflect as a group."
+            {
+                instruction: "Hold the phone firmly in one hand. Activate the app vibration sensor.",
+                video: require("@/assets/images/placeholder.jpg")
+            },
+            {
+                instruction: "Perform guided movement slowly as shown in the app. Record the vibration.",
+                video: require("@/assets/images/placeholder.jpg")
+            },
+            {
+                instruction: "Repeat the activity with vibration feedback enabled.",
+                video: require("@/assets/images/placeholder.jpg")
+            },
+            {
+                instruction: "Review speed, smoothness, and range-of-motion data.",
+                video: require("@/assets/images/placeholder.jpg")
+            },
+            {
+                instruction: "Upload results and reflect as a group.",
+                video: require("@/assets/images/placeholder.jpg")
+            }
         ],
         equipments: [
             {
@@ -148,9 +214,18 @@ export const activities: Record<string, Activity> = {
         description: "Students test their neuromuscular coordination by measuring reaction times under different conditions. The activity uses the phone as a digital 'stimulus and response' board to capture the speed of the brain-to-body signaling pathway.",
         image: require("@/assets/images/speed_8252022_layout_07.jpg"),
         instructions: [
-            "Tap the screen as soon as the hidden button appears. Record reaction time.",
-            "Repeat using the non-dominant hand. Compare results.",
-            "Trace a moving shape on the screen. Review accuracy and delay."
+            {
+                instruction: "Tap the screen as soon as the hidden button appears. Record reaction time.",
+                video: require("@/assets/images/placeholder.jpg")
+            },
+            {
+                instruction: "Repeat using the non-dominant hand. Compare results.",
+                video: require("@/assets/images/placeholder.jpg")
+            },
+            {
+                instruction: "Trace a moving shape on the screen. Review accuracy and delay.",
+                video: require("@/assets/images/placeholder.jpg")
+            }
         ],
         equipments: [
             {
@@ -166,10 +241,22 @@ export const activities: Record<string, Activity> = {
         description: "Students explore the relationship between respiration and physical relaxation. By following a digital pacer, they learn to control their breathing rate to observe how conscious regulation affects heart rate or perceived stress levels.",
         image: require("@/assets/images/rm373batch7-18a.jpg"),
         instructions: [
-            "Place the phone gently on the chest",
-            "Record breathing at rest.",
-            "Perform light exercise (Jog one minute on the spot & 100 star jump).",
-            "Record breathing again and compare results."
+            {
+                instruction: "Place the phone gently on the chest.",
+                video: require("@/assets/images/placeholder.jpg")
+            },
+            {
+                instruction: "Record breathing at rest.",
+                video: require("@/assets/images/placeholder.jpg")
+            },
+            {
+                instruction: "Perform light exercise (jog one minute on the spot and do 100 star jumps).",
+                video: require("@/assets/images/placeholder.jpg")
+            },
+            {
+                instruction: "Record breathing again and compare results.",
+                video: require("@/assets/images/placeholder.jpg")
+            }
         ],
         equipments: [
             {

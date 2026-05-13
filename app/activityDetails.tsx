@@ -31,7 +31,7 @@ export default function ActivityDetailsScreen(){
                 <ActivityDetailsContents activity={activity} />
                 <Button 
                     text={"Begin"}
-                    action={()=>{}} 
+                    action={()=>{router.push("/activityAttempt")}} 
                 />
         </ScrollView>
       </SafeAreaView>
