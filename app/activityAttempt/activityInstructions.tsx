@@ -6,7 +6,7 @@ import { useContext } from "react";
 import { KeyboardAvoidingView, ScrollView, StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function ActivityAttemptMainScreen(){
+export default function ActivityAttemptInstructionsScreen(){
     const theme = useContext(ThemeContext);
     if (!theme) return null;
     const styles = createStyles(theme);
