@@ -5,7 +5,8 @@ export type Activity = {
     description: string,
     image: any,
     equipments: any[],
-    instructions: any[]
+    instructions: any[],
+    phases?: string[]
 }
 
 type ActivityContextProps = {

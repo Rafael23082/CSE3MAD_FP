@@ -15,8 +15,8 @@ export default function HomeScreen(){
           <Text style={styles.welcomeMessage}>{"Welcome, Team Name!"}</Text>
           <Text style={styles.subHeader}>{"Ready for your next experiment?"}</Text>
           <View style={styles.cardContainer}>
-              <Card metric={"Metric1"} value="10" maximumWidth={false} />
-              <Card metric={"Metric2"} value="42" maximumWidth={false} />
+              <Card metric={"Metric1"} value={10} maximumWidth={false} />
+              <Card metric={"Metric2"} value={42} maximumWidth={false} />
           </View>
           <Text style={styles.sectionHeader}>{"How STEMMLAB Works"}</Text>
           <Text style={styles.body}>• Choose a Challenge</Text>
