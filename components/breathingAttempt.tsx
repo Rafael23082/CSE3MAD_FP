@@ -93,7 +93,7 @@ export default function BreathingAttemptScreen(){
             interval = setInterval(() => {
                 setTime((prev) => {
                     if (isNaN(time) || prev <= 1) {
-                        const smoothed = whittakerEilersSmooth(zValues.current, 20, 15);
+                        const smoothed = whittakerEilersSmooth(zValues.current, 8, 6); /** Parameters obained from experimentation */
                         const centered = centerSignal(smoothed);
                         const breathCount = detectBreaths(centered);
                         setBreaths(breathCount);
@@ -154,7 +154,7 @@ export default function BreathingAttemptScreen(){
         const min = Math.min(...values);
 
         const amplitude = max - min;
-        const threshold = Math.max(amplitude * 0.18, 0.01); /** Threshold obained from experimentation */
+        const threshold = amplitude * 0.25; /** Threshold obained from experimentation */
 
         const MIN_DISTANCE = 12;
 

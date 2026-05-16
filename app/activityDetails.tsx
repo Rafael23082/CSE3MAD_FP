@@ -20,7 +20,7 @@ export default function ActivityDetailsScreen(){
     const router = useRouter();
 
     return(
-        <SafeAreaView style={styles.outerContainer} edges={["top"]}>
+        <SafeAreaView style={styles.outerContainer}>
             <ScrollView contentContainerStyle={styles.container}>
                 <View style={styles.header}>
                     <Pressable onPress={() => router.back()}>
