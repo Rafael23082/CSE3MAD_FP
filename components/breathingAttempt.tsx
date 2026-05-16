@@ -9,6 +9,7 @@ import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, View } from "react-
 import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "./button";
 import Card from "./card";
+import { LineChart } from "./lineChart";
 
 export type bpmValue = {
     label: string,
@@ -42,8 +43,8 @@ export default function BreathingAttemptScreen(){
     const [bpm, setBpm] = useState(0);
 
     const bpmValues = useRef<bpmValue[]>([]);
-
     const [time, setTime] = useState(30)
+    const [centered, setCentered] = useState<number[]>([]);
 
     const router = useRouter();
 
@@ -94,8 +95,9 @@ export default function BreathingAttemptScreen(){
                 setTime((prev) => {
                     if (isNaN(time) || prev <= 1) {
                         const smoothed = whittakerEilersSmooth(zValues.current, 8, 6); /** Parameters obained from experimentation */
-                        const centered = centerSignal(smoothed);
-                        const breathCount = detectBreaths(centered);
+                        const centeredSignal = centerSignal(smoothed);
+                        setCentered(centeredSignal);
+                        const breathCount = detectBreaths(centeredSignal);
                         setBreaths(breathCount);
                         const calculatedBpm = (breathCount / 30) * 60;
                         setBpm(Math.round(calculatedBpm));
@@ -154,9 +156,9 @@ export default function BreathingAttemptScreen(){
         const min = Math.min(...values);
 
         const amplitude = max - min;
-        const threshold = amplitude * 0.25; /** Threshold obained from experimentation */
+        const threshold = amplitude * 0.2; /** Threshold obained from experimentation */
 
-        const MIN_DISTANCE = 12;
+        const MIN_DISTANCE = 7;
 
         let breaths = 0;
         let lastPeak = -MIN_DISTANCE;
@@ -192,35 +194,56 @@ export default function BreathingAttemptScreen(){
                             </View>
                         </View>
                         <Text style={styles.phaseText}>Phase {currentPhaseIndex + 1} — {currentPhase}</Text>
-                        <Text style={styles.actionName}>Record Breathing</Text>
+                        <Text style={[styles.actionName, {marginTop: 24}]}>Record Breathing</Text>
                         <View style={styles.cardContainer}>
                             <Card metric="Breaths Recorded" value={breaths} maximumWidth={true} />
                         </View>
                         <Card metric="BPM" value={bpm} maximumWidth={true} />
+                        <Text style={styles.actionName}>Breathing Monitor</Text>
+                        <View style={styles.chartContainer}>
+                            {centered.length != 0 ? (
+                                <LineChart
+                                    lineChartData={centered.map((value, index) => ({
+                                        time: index,
+                                        z: value
+                                    }))}
+                                /> 
+                            ): (
+                                <Text style={styles.placeholderText}>
+                                    Start recording to visualize chest movement
+                                </Text>
+                            )}
+                        </View>
                     </View>
-                    {recordingState === "idle" && (
-                        <Button text="Start Recording" action={() => {
-                            setCountdown(3);
-                        }} />
-                    )}
-                    {recordingState === "recording" && (
-                        <Button text="Recording..." action={() => {}} />
-                    )}
-                    {recordingState === "completed" && (
-                        <Button text={currentPhaseIndex == 2 ? "Finish Activity": "Continue"} action={() => {
-                            if (activity.phases && currentPhaseIndex < activity.phases.length - 1) {
-                                setCurrentPhaseIndex(currentPhaseIndex+1);
-                                setRecordingState("idle");
-                            } else {
-                                router.push({
-                                    pathname: "/activityResults",
-                                    params: {
-                                        results: JSON.stringify(bpmValues.current)
-                                    }
-                                });
-                            }
-                        }} />
-                    )}
+                    <View style={styles.buttonContainer}>
+                        {recordingState === "idle" && (
+                            <Button text="Start Recording" action={() => {
+                                setCountdown(3);
+                            }} />
+                        )}
+                        {recordingState === "recording" && (
+                            <Button text="Recording..." action={() => {}} />
+                        )}
+                        {recordingState === "completed" && (
+                            <Button text={currentPhaseIndex == 2 ? "Finish Activity": "Continue"} action={() => {
+                                if (activity.phases && currentPhaseIndex < activity.phases.length - 1) {
+                                    setCurrentPhaseIndex(currentPhaseIndex+1);
+                                    setRecordingState("idle");
+                                    setBreaths(0);
+                                    setBpm(0);
+                                    setCentered([]);
+                                    zValues.current = [];
+                                } else {
+                                    router.push({
+                                        pathname: "/activityResults",
+                                        params: {
+                                            results: JSON.stringify(bpmValues.current)
+                                        }
+                                    });
+                                }
+                            }} />
+                        )}
+                    </View>
                 </ScrollView>
             </KeyboardAvoidingView>
             {countdown !== null && (
@@ -309,6 +332,25 @@ const createStyles = (colors: ThemeColors) => {
         },
         cardContainer: {
             marginBottom: 16
+        },
+        chartContainer: {
+            borderRadius: 20,
+            backgroundColor: colors.card,
+            height: 220,
+            display: "flex",
+            alignItems: "center",
+            flexDirection: "row"
+        },
+        placeholderText: {
+            fontFamily: "PoppinsRegular",
+            fontSize: 14,
+            color: colors.secondary,
+            textAlign: "center",
+            width: "100%",
+            paddingHorizontal: 24
+        },
+        buttonContainer: {
+            marginTop: 32
         }
     });
     return styles;
