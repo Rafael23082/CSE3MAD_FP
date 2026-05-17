@@ -156,7 +156,7 @@ export default function BreathingAttemptScreen(){
         const min = Math.min(...values);
 
         const amplitude = max - min;
-        const threshold = amplitude * 0.2; /** Threshold obained from experimentation */
+        const threshold = amplitude * 0.15; /** Threshold obained from experimentation */
 
         const MIN_DISTANCE = 7;
 
@@ -229,6 +229,7 @@ export default function BreathingAttemptScreen(){
                                 if (activity.phases && currentPhaseIndex < activity.phases.length - 1) {
                                     setCurrentPhaseIndex(currentPhaseIndex+1);
                                     setRecordingState("idle");
+                                    setTime(30);
                                     setBreaths(0);
                                     setBpm(0);
                                     setCentered([]);
