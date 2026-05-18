@@ -233,6 +233,11 @@ export const activities: Record<string, Activity> = {
                 description: "Music, conversation, or physical tasks used to test how cognitive load affects response time.",
                 image: require("@/assets/images/placeholder.jpg")
             }
+        ],
+        phases: [
+            "Dominant Hand Tap Reaction",
+            "Non-Dominant Hand Tap Reaction",
+            "Tracing Challenge"
         ]
     },
 

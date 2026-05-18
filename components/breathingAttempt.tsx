@@ -13,7 +13,7 @@ import { LineChart } from "./lineChart";
 
 export type bpmValue = {
     label: string,
-    value: number
+    value: string
 }
 
 export default function BreathingAttemptScreen(){
@@ -103,7 +103,7 @@ export default function BreathingAttemptScreen(){
                         setBpm(Math.round(calculatedBpm));
                         bpmValues.current.push({
                             label: `Activity ${currentPhaseIndex + 1} BPM`,
-                            value: Math.round(calculatedBpm)
+                            value: String(Math.round(calculatedBpm))
                         });
                         setRecordingState("completed");
 
@@ -196,9 +196,9 @@ export default function BreathingAttemptScreen(){
                         <Text style={styles.phaseText}>Phase {currentPhaseIndex + 1} — {currentPhase}</Text>
                         <Text style={[styles.actionName, {marginTop: 24}]}>Record Breathing</Text>
                         <View style={styles.cardContainer}>
-                            <Card metric="Breaths Recorded" value={breaths} maximumWidth={true} />
+                            <Card metric="Breaths Recorded" value={String(breaths)} maximumWidth={true} />
                         </View>
-                        <Card metric="BPM" value={bpm} maximumWidth={true} />
+                        <Card metric="BPM" value={String(bpm)} maximumWidth={true} />
                         <Text style={styles.actionName}>Breathing Monitor</Text>
                         <View style={styles.chartContainer}>
                             {centered.length != 0 ? (

@@ -1,4 +1,3 @@
-import { bpmValue } from "@/components/breathingAttempt";
 import Button from "@/components/button";
 import Card from "@/components/card";
 import { ActivityContext } from "@/context/ActivityContext";
@@ -8,6 +7,11 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext } from "react";
 import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+export type ActivityResults = {
+        label: string,
+        value: string
+    }
 
 export default function ActivityResultsScreen(){
     const theme = useContext(ThemeContext);
@@ -31,8 +35,8 @@ export default function ActivityResultsScreen(){
                     <Text style={styles.head}>{activity.name}</Text>
                     <Text style={styles.sectionHeader}>Activity Results</Text>
                     <View style={styles.cardContainer}>
-                        {results.map((item: bpmValue, index: number) => (
-                            <Card metric={item.label} value={item.value} maximumWidth={true} key={index} />
+                        {results.map((item: ActivityResults, index: number) => (
+                            <Card metric={item.label} value={String(item.value)} maximumWidth={true} key={index} />
                         ))}
                     </View>
                 </View>
