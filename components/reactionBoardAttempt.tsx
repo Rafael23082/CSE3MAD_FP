@@ -31,6 +31,27 @@ export default function ReactionBoardAttemptScreen(){
     const [reactionTime, setReactionTime] = useState<number | null>(null);
     const [startTime, setStartTime] = useState(0);
     const [time, setTime] = useState(10);
+    const [accuracy, setAccuracy] = useState(0);
+
+    const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+    const buttonSize = useRef(80);
+    const [buttonLocation, setButtonLocation] = useState({ x: 0, y: 0 });
+
+    const fingerPosition = useRef({ x: 0, y: 0 });
+    const isTouching = useRef(false);
+
+    const trackingSamples = useRef<{
+        fingerX: number;
+        fingerY: number;
+        circleX: number;
+        circleY: number;
+        touching: boolean;
+    }[]>([]);
+
+    const router = useRouter();
+    const activityResults = useRef<ActivityResults[]>([]);
+
+    const [circlePosition, setCirclePosition] = useState({ x: 50, y: 50 });
 
     const startChallenge = () => {
         setChallengeState("waiting");
@@ -57,178 +78,137 @@ export default function ReactionBoardAttemptScreen(){
         
         setReactionTime(rounded);
         setChallengeState("finished");
+
+        if (activity.phases) {
+            activityResults.current.push({
+                label: activity.phases[currentPhaseIndex],
+                value: `${rounded} ms`
+            });
+        }
     };
 
-    const [containerSize, setContainerSize] = useState({
-        width: 0,
-        height: 0,
-    });
-
-    const buttonSize = useRef(80);
-    const [buttonLocation, setButtonLocation] = useState({
-        x: 0,
-        y: 0
-    })
-
-    const fingerPosition = useRef({ x: 0, y: 0 });
-    const [accuracy, setAccuracy] = useState(0);
-
     const calculateAccuracy = () => {
-        let totalDistance = 0;
-        
-        if (trackingSamples.current.length === 0) {
-            return 0;
-        
-        }
-        
+        if (trackingSamples.current.length === 0) return 0;
+
+        let totalAccuracy = 0;
+        const targetRadius = 15; 
+        const maxPenaltyDistance = 45; 
+
         trackingSamples.current.forEach((s) => {
+            if (!s.touching) return; 
+
             const dx = s.fingerX - s.circleX;
             const dy = s.fingerY - s.circleY;
-
             const distance = Math.sqrt(dx * dx + dy * dy);
 
-            totalDistance += distance;
+            if (distance <= targetRadius) {
+                totalAccuracy += 100;
+            } else {
+                const distanceOutside = distance - targetRadius;
+                const penaltyRatio = Math.min(1, distanceOutside / maxPenaltyDistance);
+                const accuracyDrop = Math.pow(penaltyRatio, 2) * 100; 
+                
+                const frameAccuracy = Math.max(0, 100 - accuracyDrop);
+                totalAccuracy += frameAccuracy;
+            }
         });
 
-        const avgDistance = totalDistance / trackingSamples.current.length;
-        const maxAllowed = 150;
-        const accuracy = Math.max(0, 100 - (avgDistance / maxAllowed) * 100);
-        
-        return Math.round(accuracy);
+        const finalScore = totalAccuracy / trackingSamples.current.length;
+        return Math.round(finalScore);
     };
 
     const panGesture = Gesture.Pan()
-        .onUpdate((e) => {
-            fingerPosition.current = {
-                x: e.x,
-                y: e.y
-            };
+        .runOnJS(true)
+        .minDistance(0)
+        .onBegin((e) => {
+            isTouching.current = true;
+            fingerPosition.current = { x: e.x, y: e.y };
         })
+        .onUpdate((e) => {
+            fingerPosition.current = { x: e.x, y: e.y };
+        })
+        .onEnd(() => {
+            isTouching.current = false;
+        });
 
-    const [circlePosition, setCirclePosition] = useState({
-        x: 50,
-        y: 50
-    });
-
-    const trackingSamples = useRef<{
-        fingerX: number;
-        fingerY: number;
-        circleX: number;
-        circleY: number;
-    }[]>([]);
-    
     useEffect(() => {
         if (currentPhaseIndex !== 2) return;
-
-        if (
-            containerSize.width === 0 ||
-            containerSize.height === 0
-        ) return;
+        if (containerSize.width === 0 || containerSize.height === 0) return;
+        if (challengeState !== "ready") return; 
 
         const radius = 30;
-
         let x = containerSize.width / 2;
         let y = containerSize.height / 2;
-
         let directionX = 1;
         let directionY = 1;
-
         const speedX = 4;
         const speedY = 3;
 
-        const interval = setInterval(() => {
+        const movementInterval = setInterval(() => {
             x += speedX * directionX;
             y += speedY * directionY;
 
             const minX = radius;
             const maxX = containerSize.width - radius;
-
             const minY = radius;
             const maxY = containerSize.height - radius;
 
-            if (x >= maxX || x <= minX) {
-                directionX *= -1;
+            if (x >= maxX || x <= minX) directionX *= -1;
+            if (y >= maxY || y <= minY) directionY *= -1;
+
+            setCirclePosition({ x, y });
+
+            if (isTouching.current) {
+                trackingSamples.current.push({
+                    fingerX: fingerPosition.current.x,
+                    fingerY: fingerPosition.current.y,
+                    circleX: x,
+                    circleY: y,
+                    touching: isTouching.current
+                });
             }
-
-            if (y >= maxY || y <= minY) {
-                directionY *= -1;
-            }
-
-            setCirclePosition({
-                x, y
-            });
-
         }, 16);
 
-        const interval2 = setInterval(() => {
-            if (challengeStateRef.current !== "ready") return;
+        return () => clearInterval(movementInterval);
+    }, [currentPhaseIndex, containerSize, challengeState]);
 
-            trackingSamples.current.push({
-                fingerX: fingerPosition.current.x,
-                fingerY: fingerPosition.current.y,
-                circleX: circlePositionRef.current.x,
-                circleY: circlePositionRef.current.y
+    useEffect(() => {
+        if (currentPhaseIndex !== 2) return;
+        if (challengeState !== "ready") return;
+
+        const interval = setInterval(() => {
+            setTime((prev) => {
+                if (prev <= 1) {
+                    clearInterval(interval);
+                    return 0;
+                }
+                return prev - 1;
             });
-        }, 50);
+        }, 1000);
 
+        return () => clearInterval(interval);
+    }, [challengeState, currentPhaseIndex]);
 
-        return () => {
-            clearInterval(interval);
-            clearInterval(interval2);
-        };
-    }, [currentPhaseIndex]);
+    useEffect(() => {
+        if (currentPhaseIndex !== 2 || time !== 0 || challengeState !== "ready") return;
+
+        const score = calculateAccuracy();
+        setAccuracy(score);
+        setChallengeState("finished");
+
+        if (activity.phases) {
+            activityResults.current.push({
+                label: activity.phases[currentPhaseIndex],
+                value: `${score}%`
+            });
+        }
+    }, [time, currentPhaseIndex, activity.phases]);
 
     const formatNumber = (s: number) => {
         const min = Math.floor(s / 60);
         const sec = s % 60;
         return `${min}:${sec < 10 ? "0" : ""}${sec}`;
-    }  
-
-    useEffect(() => {
-        if (challengeState == "finished" && activity.phases){
-            activityResults.current.push({
-                label: activity.phases[currentPhaseIndex],
-                value: currentPhaseIndex != 2 ? String(reactionTime): String(accuracy) + "%"
-            })
-        }
-
-        if (currentPhaseIndex != 2) return;
-        if (challengeState != "ready") return;
-
-        const interval = setInterval(() => {
-            setTime((prev) => {
-                if (isNaN(time) || prev <= 1) {
-                    return 0;
-                }
-                return prev - 1;
-            });
-        }, 1000)
-
-        return () => clearInterval(interval);
-    }, [challengeState])
-
-    useEffect(() => {
-        if (time !== 0) return;
-
-        const score = calculateAccuracy();
-        setAccuracy(score);
-
-        setChallengeState("finished");
-    }, [time]);
-
-    const challengeStateRef = useRef(challengeState);
-    const circlePositionRef = useRef(circlePosition);
-
-    useEffect(() => {
-        challengeStateRef.current = challengeState;
-    }, [challengeState]);
-
-    useEffect(() => {
-        circlePositionRef.current = circlePosition;
-    }, [circlePosition]);
-
-    const router = useRouter();
-    const activityResults = useRef<ActivityResults[]>([]);
+    };
 
     return(
         <SafeAreaView style={styles.outerContainer} edges={["top"]}>
@@ -310,6 +290,8 @@ export default function ReactionBoardAttemptScreen(){
                                     startChallenge()
                                 }else{
                                     trackingSamples.current = [];
+                                    setTime(10);
+                                    setAccuracy(0);
                                     setChallengeState("ready");
                                 }
                             }} />
