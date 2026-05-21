@@ -95,7 +95,10 @@ export default function ReactionBoardAttemptScreen(){
         const maxPenaltyDistance = 45; 
 
         trackingSamples.current.forEach((s) => {
-            if (!s.touching) return; 
+            if (!s.touching) {
+                totalAccuracy += 0; 
+                return;
+            }
 
             const dx = s.fingerX - s.circleX;
             const dy = s.fingerY - s.circleY;
@@ -158,15 +161,13 @@ export default function ReactionBoardAttemptScreen(){
 
             setCirclePosition({ x, y });
 
-            if (isTouching.current) {
-                trackingSamples.current.push({
-                    fingerX: fingerPosition.current.x,
-                    fingerY: fingerPosition.current.y,
-                    circleX: x,
-                    circleY: y,
-                    touching: isTouching.current
-                });
-            }
+            trackingSamples.current.push({
+                fingerX: fingerPosition.current.x,
+                fingerY: fingerPosition.current.y,
+                circleX: x,
+                circleY: y,
+                touching: isTouching.current
+            });
         }, 16);
 
         return () => clearInterval(movementInterval);

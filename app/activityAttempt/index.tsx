@@ -1,4 +1,5 @@
 import BreathingAttemptScreen from "@/components/breathingAttempt";
+import HumanPerformanceLabAttemptScreen from "@/components/humanPerformanceLabAttempt";
 import ReactionBoardAttemptScreen from "@/components/reactionBoardAttempt";
 import { ActivityContext } from "@/context/ActivityContext";
 import { useContext } from "react";
@@ -14,5 +15,7 @@ export default function ActivityAttemptMainScreen(){
             return <BreathingAttemptScreen />;
         case "Reaction Board Challenge":
             return <ReactionBoardAttemptScreen />;
+        case "Stretch Speed & Gracefulness":
+            return <HumanPerformanceLabAttemptScreen />;
     }
 } 

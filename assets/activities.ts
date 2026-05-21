@@ -206,6 +206,11 @@ export const activities: Record<string, Activity> = {
                 description: "Provides a safe environment for students to perform full-range-of-motion exercises.",
                 image: require("@/assets/images/placeholder.jpg")
             }
+        ],
+        phases: [
+            "Clockwise Movement",
+            "Vertical Movement",
+            "Horizontal Movement"
         ]
     },
 

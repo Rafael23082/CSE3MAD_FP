@@ -40,7 +40,9 @@ export default function ActivityResultsScreen(){
                         ))}
                     </View>
                 </View>
-                <Button text="Back to Activities" action={()=>{router.push("/(tabs)/activities")}} />
+                <View style={styles.buttonContainer}>
+                    <Button text="Back to Activities" action={()=>{router.push("/(tabs)/activities")}} />
+                </View>
             </ScrollView>
         </KeyboardAvoidingView>
         </SafeAreaView>
@@ -78,6 +80,9 @@ const createStyles = (colors: ThemeColors) => {
         },
         subContainer: {
             flexGrow: 1
+        },
+        buttonContainer: {
+            marginTop: 32
         }
     });
     return styles;
