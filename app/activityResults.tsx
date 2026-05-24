@@ -1,7 +1,7 @@
 import Button from "@/components/button";
 import Card from "@/components/card";
 import { ActivityContext } from "@/context/ActivityContext";
-import { ThemeContext } from "@/context/ThemeProvider";
+import { ThemeContext } from "@/context/ThemeContext";
 import { ThemeColors } from "@/theme/colors";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext } from "react";

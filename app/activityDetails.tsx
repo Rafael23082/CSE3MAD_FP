@@ -1,7 +1,7 @@
 import ActivityDetailsContents from "@/components/activityDetailsContents";
 import Button from "@/components/button";
 import { ActivityContext } from "@/context/ActivityContext";
-import { ThemeContext } from "@/context/ThemeProvider";
+import { ThemeContext } from "@/context/ThemeContext";
 import { ThemeColors } from "@/theme/colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";

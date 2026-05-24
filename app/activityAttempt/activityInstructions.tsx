@@ -1,6 +1,6 @@
 import InstructionGroup from "@/components/InstructionGroup";
 import { ActivityContext } from "@/context/ActivityContext";
-import { ThemeContext } from "@/context/ThemeProvider";
+import { ThemeContext } from "@/context/ThemeContext";
 import { ThemeColors } from "@/theme/colors";
 import { useContext } from "react";
 import { KeyboardAvoidingView, ScrollView, StyleSheet, Text } from "react-native";

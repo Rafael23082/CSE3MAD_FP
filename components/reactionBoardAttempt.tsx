@@ -1,6 +1,6 @@
 import { ActivityResults } from "@/app/activityResults";
 import { ActivityContext } from "@/context/ActivityContext";
-import { ThemeContext } from "@/context/ThemeProvider";
+import { ThemeContext } from "@/context/ThemeContext";
 import { ThemeColors } from "@/theme/colors";
 import { useRouter } from "expo-router";
 import { useContext, useEffect, useRef, useState } from "react";

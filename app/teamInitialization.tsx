@@ -1,6 +1,6 @@
 import Button from "@/components/button";
 import InputGroup from "@/components/inputGroup";
-import { ThemeContext } from "@/context/ThemeProvider";
+import { ThemeContext } from "@/context/ThemeContext";
 import { ThemeColors } from "@/theme/colors";
 import { useRouter } from "expo-router";
 import { useContext, useState } from "react";

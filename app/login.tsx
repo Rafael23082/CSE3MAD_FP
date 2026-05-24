@@ -1,6 +1,6 @@
 import Button from "@/components/button";
 import InputGroup from "@/components/inputGroup";
-import { ThemeContext } from "@/context/ThemeProvider";
+import { ThemeContext } from "@/context/ThemeContext";
 import { auth } from "@/firebase";
 import { ThemeColors } from "@/theme/colors";
 import { useRouter } from "expo-router";

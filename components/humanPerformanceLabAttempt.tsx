@@ -1,5 +1,5 @@
 import { ActivityContext } from "@/context/ActivityContext";
-import { ThemeContext } from "@/context/ThemeProvider";
+import { ThemeContext } from "@/context/ThemeContext";
 import { ThemeColors } from "@/theme/colors";
 import { useRouter } from "expo-router";
 import { Accelerometer } from 'expo-sensors';

@@ -1,6 +1,6 @@
 import { activities } from "@/assets/activities";
 import ActivityGroup from "@/components/activityGroup";
-import { ThemeContext } from "@/context/ThemeProvider";
+import { ThemeContext } from "@/context/ThemeContext";
 import { ThemeColors } from "@/theme/colors";
 import { useContext } from "react";
 import { ScrollView, StyleSheet, Text } from "react-native";

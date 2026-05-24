@@ -1,6 +1,6 @@
 import ActivityDetailsContents from "@/components/activityDetailsContents";
 import { ActivityContext } from "@/context/ActivityContext";
-import { ThemeContext } from "@/context/ThemeProvider";
+import { ThemeContext } from "@/context/ThemeContext";
 import { ThemeColors } from "@/theme/colors";
 import { useContext } from "react";
 import { KeyboardAvoidingView, ScrollView, StyleSheet } from "react-native";

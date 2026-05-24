@@ -1,5 +1,5 @@
 import Button from "@/components/button";
-import { ThemeContext } from "@/context/ThemeProvider";
+import { ThemeContext } from "@/context/ThemeContext";
 import { ThemeColors } from "@/theme/colors";
 import { useRouter } from "expo-router";
 import { useContext } from "react";
