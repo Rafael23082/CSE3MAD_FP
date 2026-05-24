@@ -1,0 +1,17 @@
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCgCIRUyZWx0CSUpr5M_t3bsEwAHP1uNBo",
+  authDomain: "cse3mad-fp.firebaseapp.com",
+  projectId: "cse3mad-fp",
+  storageBucket: "cse3mad-fp.firebasestorage.app",
+  messagingSenderId: "486285605890",
+  appId: "1:486285605890:web:6f7156cbff26df8f88bb1b",
+  measurementId: "G-07E2TNWEEN"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);

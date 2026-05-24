@@ -2,9 +2,12 @@ import Button from "@/components/button";
 import InputGroup from "@/components/inputGroup";
 import { ThemeColors, darkTheme, lightTheme } from "@/theme/colors";
 import { useRouter } from "expo-router";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 import { useState } from "react";
 import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, View, useColorScheme } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { auth, db } from "../firebase";
 
 export default function SignupScreen(){
     const theme = useColorScheme();
@@ -16,6 +19,42 @@ export default function SignupScreen(){
     const [firstName, setFirstName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+
+    const handleSignup = async() => {
+        try{
+            const userCredential = createUserWithEmailAndPassword(auth, email, password);
+            const user = (await userCredential).user;
+
+            await setDoc(doc(db, "users", user.uid), {  
+                uid: user.uid,
+                firstName: firstName,
+                email: email,
+                createdAt: new Date()
+            })
+
+            console.log("User created successfully!");
+            router.push("/teamInitialization");
+        }
+        catch(error: any){
+            switch (error.code) {
+                case "auth/weak-password":
+                    setError("Password should be at least 6 characters");
+                    break;
+
+                case "auth/email-already-in-use":
+                    setError("This email is already registered");
+                    break;
+
+                case "auth/invalid-email":
+                    setError("Please enter a valid email");
+                    break;
+
+                default:
+                    setError("Something went wrong");
+            }
+        }
+    }
 
     return(
         <SafeAreaView style={styles.container}>
@@ -55,8 +94,12 @@ export default function SignupScreen(){
                                 placeholder={"Enter your password"}
                                 isLabeled={true}
                             />
+
+                            {error && (
+                                <Text style={styles.errorMessage}>{error}</Text>
+                            )}
                         </View>
-                        <Button text={"Register"} action={()=>{router.push("/teamInitialization")}} />
+                        <Button text={"Register"} action={handleSignup} />
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>
@@ -104,6 +147,11 @@ const createStyles = (colors: ThemeColors) => {
         topForms: {
             flexGrow: 1,
             paddingBottom: 24
+        },
+        errorMessage: {
+            fontFamily: "InterRegular",
+            marginTop: 16,
+            color: "red"
         }
     })
     return styles;
