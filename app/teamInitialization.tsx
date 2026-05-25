@@ -1,17 +1,14 @@
 import Button from "@/components/button";
 import InputGroup from "@/components/inputGroup";
+import { AuthContext } from "@/context/AuthContext";
 import { ThemeContext } from "@/context/ThemeContext";
+import { db } from "@/firebase";
 import { ThemeColors } from "@/theme/colors";
+import { arrayUnion, collection, doc, getDoc, setDoc, updateDoc } from "@firebase/firestore";
+import { Picker } from "@react-native-picker/picker";
 import { useRouter } from "expo-router";
 import { useContext, useState } from "react";
-import {
-    KeyboardAvoidingView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
-} from "react-native";
+import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function TeamInitializationPage() {
@@ -21,14 +18,93 @@ export default function TeamInitializationPage() {
     const styles = createStyles(theme);
     const router = useRouter();
 
+    const auth = useContext(AuthContext);
+    if (!auth) return null;
+    const { user } = auth;
+
     const [mode, setMode] = useState<"create" | "join">("create");
 
     const [teamName, setTeamName] = useState("");
     const [gradeLevel, setGradeLevel] = useState("");
-    const [members, setMembers] = useState<string[]>([""]);
 
     const [teamID, setTeamID] = useState("");
     const [inviteCode, setInviteCode] = useState("");
+    const [error, setError] = useState("");
+
+    function generateInviteCode(length = 6) {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        let result = "";
+
+        for (let i = 0; i < length; i++) {
+            result += chars.charAt(
+                Math.floor(Math.random() * chars.length)
+            );
+        }
+
+        return result;
+    }
+
+    const handleCreateTeam = async() => {
+        setError("");
+        if (!teamName || !gradeLevel){
+            setError("Please fill in the fields");
+            return;
+        }else{
+            setError("");
+        }
+
+        const teamRef = doc(collection(db, "teams"));
+        const inviteCode = generateInviteCode();
+        await setDoc(teamRef, {
+            teamID: teamRef.id,
+            teamName,
+            gradeLevel,
+            members: [
+                {
+                    uid: user?.uid,
+                    role: "leader"
+                }
+            ],
+            inviteCode
+        })
+        router.push("/(tabs)");
+    }
+    
+    const handleJoinTeam = async() => {
+        try{
+            setError("");
+
+            if (!teamID || !inviteCode){
+                setError("Please fill in the fields");
+                return;
+            }
+
+            const teamRef = doc(db, "teams", teamID);
+
+            const teamDocument = await getDoc(teamRef);
+
+            if (!teamDocument.exists()) {
+                setError("Team does not exist");
+                return;
+            }
+            const teamData = teamDocument.data();
+
+            if (teamData.inviteCode != inviteCode){
+                setError("Invalid invite code");
+                return;
+            }
+
+            await updateDoc(teamRef, {
+                members: arrayUnion({
+                    uid: user?.uid,
+                    role: "member"
+                })
+            })
+            router.push("/(tabs)");
+        }catch(err){
+            setError("Something went wrong");
+        }
+    }
 
     return (
         <SafeAreaView style={styles.container}>
@@ -62,45 +138,38 @@ export default function TeamInitializationPage() {
                                         isLabeled={true}
                                     />
 
-                                    <InputGroup
-                                        first={false}
-                                        label={"Grade Level"}
-                                        text={gradeLevel}
-                                        setText={setGradeLevel}
-                                        isPassword={false}
-                                        placeholder={"Enter grade level"}
-                                        isLabeled={true}
-                                    />
-
-                                    {members.map((member, index) => (
-                                        <InputGroup
-                                            first={index === 0}
-                                            label={"Member Name"}
-                                            key={index}
-                                            text={member}
-                                            setText={(text) => {
-                                                setMembers((prev) => {
-                                                    const updated = [...prev];
-                                                    updated[index] = text;
-                                                    return updated;
-                                                });
-                                            }}
-                                            placeholder={"Enter member name"}
-                                            isPassword={false}
-                                            isLabeled={index === 0}
-                                        />
-                                    ))}
-
-                                    <Text style={styles.addMemberText} onPress={() => {
-                                        setMembers((prev) => [
-                                            ...prev,
-                                            ""
-                                        ]);
-                                    }}>Add Member</Text>
+                                    <View style={styles.pickerContainer}>
+                                        <Text style={styles.pickerLabel}>Grade Level</Text>
+                                        <Picker
+                                            selectedValue={gradeLevel}
+                                            onValueChange={(itemValue) => setGradeLevel(itemValue)}
+                                            dropdownIconColor={theme.secondary}
+                                            style={styles.picker}
+                                        >
+                                            <Picker.Item
+                                                label="Select Grade Level"
+                                                value={""}
+                                                enabled={false}
+                                            />
+                                            {[...Array(12)].map((_, index) => {
+                                                const grade = index + 1;
+                                                return (
+                                                    <Picker.Item 
+                                                        key={grade}
+                                                        label={`Grade ${grade}`}
+                                                        value={grade}
+                                                    />
+                                                )
+                                            })}
+                                        </Picker>
+                                        {error && (
+                                            <Text style={styles.errorMessage}>{error}</Text>
+                                        )}
+                                    </View>
                                 </View>
                                 <Button
                                     text={"Create Team"}
-                                    action={() => router.push("/(tabs)")}
+                                    action={handleCreateTeam}
                                 />
                             </>
                         ) : (
@@ -125,13 +194,19 @@ export default function TeamInitializationPage() {
                                         placeholder={"Enter invite code"}
                                         isLabeled={true}
                                     />
+                                    {error && (
+                                        <Text style={styles.errorMessage}>{error}</Text>
+                                    )}
                                 </View>
                                 <Button
                                     text={"Join Team"}
-                                    action={() => router.push("/(tabs)")}
+                                    action={handleJoinTeam}
                                 />
                             </>
                         )}
+                        <TouchableOpacity onPress={() => router.push("/(tabs)")}>
+                            <Text style={styles.skipText}>Skip for now</Text>
+                        </TouchableOpacity>
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>
@@ -177,12 +252,6 @@ const createStyles = (colors: ThemeColors) => {
         activeToggleText: {
             color: "#fff"
         },
-        addMemberText: {
-            color: colors.primary,
-            marginTop: 15,
-            marginBottom: 24,
-            fontFamily: "InterRegular"
-        },
         growingContainer: {
             flexGrow: 1
         },
@@ -190,6 +259,34 @@ const createStyles = (colors: ThemeColors) => {
             flexGrow: 1,
             paddingHorizontal: 24,
             paddingVertical: 40
+        },
+        skipText: {
+            textAlign: "center",
+            marginTop: 16,
+            color: colors.secondary,
+            fontFamily: "PoppinsRegular",
+            textDecorationLine: "underline"
+        },
+        pickerContainer: {
+            marginTop: 40
+        },
+        pickerLabel: {
+            fontFamily: "InterRegular",
+            color: colors.secondary
+        },
+        picker: {
+            color: "#000000",
+            backgroundColor: "#FFFFFF",
+            borderRadius: 5,
+            borderColor: "#000000",
+            padding: 12,
+            fontSize: 16,
+            marginTop: 16
+        },
+        errorMessage: {
+            fontFamily: "InterRegular",
+            marginTop: 16,
+            color: "red"
         }
     });
 };
