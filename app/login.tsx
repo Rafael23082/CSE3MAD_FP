@@ -21,8 +21,7 @@ export default function LoginScreen(){
     
     const handleSignin = () => {
         signInWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-                const user = userCredential.user;
+            .then(() => {
                 router.push("/(tabs)");
             })
             .catch((error) => {

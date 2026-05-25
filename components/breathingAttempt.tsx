@@ -49,10 +49,6 @@ export default function BreathingAttemptScreen(){
     const router = useRouter();
 
     const _subscribe = () => {
-        /** Phone facing downwards: 
-         *  Moving upwards = positive value
-         *  Moving downwards = negative value
-        */
         Accelerometer.setUpdateInterval(100);
         setSubscription(Accelerometer.addListener(({x, y, z}) => {
             setData({x, y, z});
@@ -94,7 +90,7 @@ export default function BreathingAttemptScreen(){
             interval = setInterval(() => {
                 setTime((prev) => {
                     if (isNaN(time) || prev <= 1) {
-                        const smoothed = whittakerEilersSmooth(zValues.current, 8, 6); /** Parameters obained from experimentation */
+                        const smoothed = whittakerEilersSmooth(zValues.current, 8, 6); {/* Parameters obained from experimentation */}
                         const centeredSignal = centerSignal(smoothed);
                         setCentered(centeredSignal);
                         const breathCount = detectBreaths(centeredSignal);
@@ -156,7 +152,7 @@ export default function BreathingAttemptScreen(){
         const min = Math.min(...values);
 
         const amplitude = max - min;
-        const threshold = amplitude * 0.15; /** Threshold obained from experimentation */
+        const threshold = amplitude * 0.15; {/* Threshold obained from experimentation */}
 
         const MIN_DISTANCE = 7;
 

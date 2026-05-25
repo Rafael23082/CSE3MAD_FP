@@ -58,12 +58,6 @@ export default function HumanPerformanceLabAttemptScreen(){
     const router = useRouter();
 
     const _subscribe = () => {
-        /**
-         * Phone facing downwards:
-         * Moving upwards = positive value
-         * Moving downwards = negative value
-        */
-
         Accelerometer.setUpdateInterval(100);
 
         setSubscription(

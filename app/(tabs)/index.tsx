@@ -1,4 +1,5 @@
 import Card from "@/components/card";
+import { AuthContext } from "@/context/AuthContext";
 import { ThemeContext } from "@/context/ThemeContext";
 import { ThemeColors } from "@/theme/colors";
 import { useContext } from "react";
@@ -10,9 +11,16 @@ export default function HomeScreen(){
   if (!theme) return null;
   const styles = createStyles(theme);
 
+  const auth = useContext(AuthContext);
+  if (!auth) return null;
+  const { userProfile } = auth;
+
+  const firstName = userProfile?.firstName ?? "";
+  const formattedName = firstName?.charAt(0).toUpperCase() + firstName?.slice(1).toLowerCase();
+
   return(
       <SafeAreaView style={styles.container}>
-          <Text style={styles.welcomeMessage}>{"Welcome, Team Name!"}</Text>
+          <Text style={styles.welcomeMessage}>Welcome, {formattedName}!</Text>
           <Text style={styles.subHeader}>{"Ready for your next experiment?"}</Text>
           <View style={styles.cardContainer}>
               <Card metric={"Metric1"} value={"10"} maximumWidth={false} />
