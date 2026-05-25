@@ -10,12 +10,16 @@ export default function ActivityAttemptMainScreen(){
 
     const {activity} = activityContext;
 
-    switch (activity?.name){
-        case "Breathing Pace Trainer":
-            return <BreathingAttemptScreen />;
-        case "Reaction Board Challenge":
-            return <ReactionBoardAttemptScreen />;
-        case "Stretch Speed & Gracefulness":
-            return <HumanPerformanceLabAttemptScreen />;
+    const renderScreen = () => {
+        switch (activity?.name){
+            case "Breathing Pace Trainer":
+                return <BreathingAttemptScreen />;
+            case "Reaction Board Challenge":
+                return <ReactionBoardAttemptScreen />;
+            case "Stretch Speed & Gracefulness":
+                return <HumanPerformanceLabAttemptScreen />;
     }
-} 
+
+    return renderScreen();
+    }
+}
