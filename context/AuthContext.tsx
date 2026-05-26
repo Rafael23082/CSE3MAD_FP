@@ -23,7 +23,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
-            console.log("Auth State Changed");
             setUser(user);
             if (user){
                 const userDocRef = doc(db, "users", user.uid);
@@ -31,7 +30,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 if (userDoc.exists()){
                     setUserProfile(userDoc.data() as UserProfile);
                 }
+                console.log("User is logged in");
             }else{
+                console.log("User is logged out");
                 setUserProfile(null);
             }
             setLoading(false);
