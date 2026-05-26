@@ -3,6 +3,7 @@ import { ThemeContext } from "@/context/ThemeContext";
 import { ThemeColors } from "@/theme/colors";
 import { useRouter } from "expo-router";
 import { useContext } from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -11,18 +12,17 @@ export default function HomeScreen(){
     if (!theme) return null;
     const router = useRouter();
     const styles = createStyles(theme);
+    const {t} = useTranslation();
     
     return(
         <SafeAreaView style={styles.container}>
             <View style={styles.top}>
-                <Text 
-                    style={styles.title}>STEMMLAB</Text>
-                <Text 
-                    style={styles.secondary}>Experiment. Measure. Improve.</Text>
+                <Text style={styles.title}>STEMMLAB</Text>
+                <Text style={styles.secondary}>{t("landing.slogan")}</Text>
             </View>
             <View style={styles.buttonContainer}>
-                <Button text={"Register"} action={()=>{router.push("/signup")}} />
-                <Button text={"Login"} action={()=>{router.push("/login")}} />
+                <Button text={t("buttons.register")} action={()=>{router.push("/signup")}} />
+                <Button text={t("buttons.login")} action={()=>{router.push("/login")}} />
             </View>
         </SafeAreaView >
     );

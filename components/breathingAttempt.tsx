@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import { Accelerometer } from 'expo-sensors';
 import { Subscription } from "expo-sensors/build/Pedometer";
 import { useContext, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "./button";
@@ -47,6 +48,7 @@ export default function BreathingAttemptScreen(){
     const [centered, setCentered] = useState<number[]>([]);
 
     const router = useRouter();
+    const {t} = useTranslation();
 
     const _subscribe = () => {
         Accelerometer.setUpdateInterval(100);
@@ -98,7 +100,7 @@ export default function BreathingAttemptScreen(){
                         const calculatedBpm = (breathCount / 30) * 60;
                         setBpm(Math.round(calculatedBpm));
                         bpmValues.current.push({
-                            label: `Activity ${currentPhaseIndex + 1} BPM`,
+                            label: t("activities.breathingPaceTrainer.activityBPMCount", { index: currentPhaseIndex + 1 }),
                             value: String(Math.round(calculatedBpm))
                         });
                         setRecordingState("completed");
@@ -182,20 +184,20 @@ export default function BreathingAttemptScreen(){
                     <View style={styles.subContainer}>
                         <Text style={styles.head}>{activity.name}</Text>
                         <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
-                            <Text style={styles.sectionHeader}>Attempt</Text>
+                            <Text style={styles.sectionHeader}>{t("activities.attempt")}</Text>
                             <View style={styles.timerContainer}>
                                 <Text style={[styles.sectionHeader, {
                                     lineHeight: 20
                                 }]}>{formatNumber(time)}</Text>
                             </View>
                         </View>
-                        <Text style={styles.phaseText}>Phase {currentPhaseIndex + 1} — {currentPhase}</Text>
-                        <Text style={[styles.actionName, {marginTop: 24}]}>Record Breathing</Text>
+                        <Text style={styles.phaseText}>{t("activities.phase")} {currentPhaseIndex + 1} — {currentPhase}</Text>
+                        <Text style={[styles.actionName, {marginTop: 24}]}>{t("activities.breathingPaceTrainer.recordBreathing")}</Text>
                         <View style={styles.cardContainer}>
-                            <Card metric="Breaths Recorded" value={String(breaths)} maximumWidth={true} />
+                            <Card metric={t("activities.breathingPaceTrainer.breathsRecorded")} value={String(breaths)} maximumWidth={true} />
                         </View>
-                        <Card metric="BPM" value={String(bpm)} maximumWidth={true} />
-                        <Text style={styles.actionName}>Breathing Monitor</Text>
+                        <Card metric={t("activities.breathingPaceTrainer.bpm")} value={String(bpm)} maximumWidth={true} />
+                        <Text style={styles.actionName}>{t("activities.breathingPaceTrainer.breathingMonitor")}</Text>
                         <View style={styles.chartContainer}>
                             {centered.length != 0 ? (
                                 <LineChart
@@ -206,22 +208,22 @@ export default function BreathingAttemptScreen(){
                                 /> 
                             ): (
                                 <Text style={styles.placeholderText}>
-                                    Start recording to visualize chest movement
+                                    {t("activities.breathingPaceTrainer.breathingMonitorPlaceholder")}
                                 </Text>
                             )}
                         </View>
                     </View>
                     <View style={styles.buttonContainer}>
                         {recordingState === "idle" && (
-                            <Button text="Start Recording" action={() => {
+                            <Button text={t("buttons.startRecording")} action={() => {
                                 setCountdown(3);
                             }} />
                         )}
                         {recordingState === "recording" && (
-                            <Button text="Recording..." action={() => {}} />
+                            <Button text={t("buttons.recording")} action={() => {}} />
                         )}
                         {recordingState === "completed" && (
-                            <Button text={currentPhaseIndex == 2 ? "Finish Activity": "Continue"} action={() => {
+                            <Button text={currentPhaseIndex == 2 ? t("buttons.finishActivity"): t("buttons.continue")} action={() => {
                                 if (activity.phases && currentPhaseIndex < activity.phases.length - 1) {
                                     setCurrentPhaseIndex(currentPhaseIndex+1);
                                     setRecordingState("idle");
@@ -245,7 +247,7 @@ export default function BreathingAttemptScreen(){
             </KeyboardAvoidingView>
             {countdown !== null && (
                 <View style={styles.overlay}>
-                    <Text style={styles.readyText}>Get Ready</Text>
+                    <Text style={styles.readyText}>{t("countdown.getReady")}</Text>
                     <Text style={styles.countdownText}>{countdown}</Text>
                 </View>
             )}

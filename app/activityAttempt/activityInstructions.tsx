@@ -3,6 +3,7 @@ import { ActivityContext } from "@/context/ActivityContext";
 import { ThemeContext } from "@/context/ThemeContext";
 import { ThemeColors } from "@/theme/colors";
 import { useContext } from "react";
+import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, ScrollView, StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -16,12 +17,14 @@ export default function ActivityAttemptInstructionsScreen(){
     const { activity } = activityContext;
     if (!activity) return null;
 
+    const {t} = useTranslation();
+
     return(
         <SafeAreaView style={styles.outerContainer} edges={["top"]}>
         <KeyboardAvoidingView style={{flex: 1}} behavior="height">
             <ScrollView contentContainerStyle={styles.container}>
                 <Text style={styles.head}>{activity.name}</Text>
-                <Text style={styles.sectionHeader}>Instructions</Text>
+                <Text style={styles.sectionHeader}>{t("activities.instructions")}</Text>
                 {activity.instructions.map((instruction, index) => (
                     <InstructionGroup 
                         text={instruction.instruction} 

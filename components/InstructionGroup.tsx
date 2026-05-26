@@ -37,6 +37,7 @@ const createStyles = (colors: ThemeColors) => {
             fontFamily: "InterRegular",
             color: colors.secondary,
             paddingTop: 16,
+            fontSize: 16
         },
         container: {
             marginBottom: 24

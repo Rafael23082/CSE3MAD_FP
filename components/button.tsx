@@ -40,7 +40,8 @@ const createStyles = (colors: ThemeColors) => {
             fontFamily: "InterSemiBold",
             width: "100%",
             textAlign: "center",
-            lineHeight: 18
+            lineHeight: 18,
+            fontSize: 16
         }
     })
     return styles;

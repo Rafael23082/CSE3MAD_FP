@@ -1,6 +1,7 @@
 import { createContext, Dispatch, ReactNode, SetStateAction, useState } from "react";
 
 export type Activity = {
+    key: string,
     name: string,
     description: string,
     image: any,

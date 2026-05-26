@@ -6,6 +6,7 @@ import { ThemeColors } from "@/theme/colors";
 import { useRouter } from "expo-router";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useContext, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -18,6 +19,8 @@ export default function LoginScreen(){
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+
+    const {t} = useTranslation();
     
     const handleSignin = () => {
         signInWithEmailAndPassword(auth, email, password)
@@ -27,27 +30,27 @@ export default function LoginScreen(){
             .catch((error) => {
                 switch (error.code) {
                     case "auth/invalid-credential":
-                        setError("Invalid email or password");
+                        setError(t("errorMessages.invalidCredential"));
                         break;
 
                     case "auth/user-not-found":
-                        setError("No account found with this email");
+                        setError(t("errorMessages.userNotFound"));
                         break;
 
                     case "auth/wrong-password":
-                        setError("Incorrect password");
+                        setError(t("errorMessages.wrongPassword"));
                         break;
 
                     case "auth/invalid-email":
-                        setError("Please enter a valid email");
+                        setError(t("errorMessages.invalidEmail"));
                         break;
 
                     case "auth/too-many-requests":
-                        setError("Too many attempts. Please try again later");
+                        setError(t("errorMessages.tooManyRequests"));
                         break;
 
                     default:
-                        setError("Something went wrong");
+                        setError(t("errorMessages.defaultError"));
                 }
             })
     }
@@ -57,34 +60,34 @@ export default function LoginScreen(){
             <KeyboardAvoidingView style={styles.keyboardView} behavior="height">
                 <ScrollView contentContainerStyle={styles.scrollView} keyboardShouldPersistTaps="handled">
                     <View style={styles.top}>
-                        <Text style={styles.welcomeText}>{"Welcome Back!"}</Text>
+                        <Text style={styles.welcomeText}>{t("forms.welcome")}</Text>
                     </View>
                     <View style={styles.formsContainer}>
                         <View style={styles.topForms}>
-                            <Text style={styles.header}>{"User Login"}</Text>
+                            <Text style={styles.header}>{t("forms.userLogin")}</Text>
                             <InputGroup 
                                 first={true} 
-                                label={"Email"}
+                                label={t("forms.email")}
                                 text={email} 
                                 setText={setEmail} 
                                 isPassword={false} 
-                                placeholder={"Enter your email"}
+                                placeholder={t("forms.emailPlaceholder")}
                                 isLabeled={true}
                             />
                             <InputGroup 
                                 first={false} 
-                                label={"Password"}
+                                label={t("forms.password")}
                                 text={password} 
                                 setText={setPassword} 
                                 isPassword={true} 
-                                placeholder={"Enter your password"}
+                                placeholder={t("forms.passwordPlaceholder")}
                                 isLabeled={true}
                             />
                             {error && (
                                 <Text style={styles.errorMessage}>{error}</Text>
                             )}
                         </View>
-                        <Button text={"Login"} action={handleSignin} />
+                        <Button text={t("buttons.login")} action={handleSignin} />
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>
@@ -137,7 +140,8 @@ const createStyles = (colors: ThemeColors) => {
         errorMessage: {
             fontFamily: "InterRegular",
             marginTop: 16,
-            color: "red"
+            color: "red",
+            fontSize: 16
         }
     })
     return styles;

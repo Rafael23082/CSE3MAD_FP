@@ -2,21 +2,20 @@ import { ThemeContext } from "@/context/ThemeContext";
 import { ThemeColors } from '@/theme/colors';
 import { useRouter } from "expo-router";
 import { useContext } from 'react';
+import { useTranslation } from "react-i18next";
 import { ScrollView, StyleSheet, Text } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function AppearanceSettingsScreen() {
   const theme = useContext(ThemeContext);
   if (!theme) return null;
   const styles = createStyles(theme);
   const router = useRouter();
+  const {t} = useTranslation();
 
   return (
-    <SafeAreaView style={styles.outerContainer} edges={["top"]}>
-      <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.welcomeMessage}>Appearance</Text>
-      </ScrollView>
-    </SafeAreaView>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.welcomeMessage}>{t("tabs.appearance")}</Text>
+    </ScrollView>
   );
 }
 
@@ -29,13 +28,14 @@ const createStyles = (colors: ThemeColors) => {
     container: {
       padding: 24,
       flexGrow: 1,
+      backgroundColor: colors.backgroundColor,
     },
     welcomeMessage: {
       fontFamily: "PoppinsBold",
-      fontSize: 18,
+      fontSize: 22,
       color: colors.primary,
       marginBottom: 16,
-    },
+    }
   });
   return styles;
 }

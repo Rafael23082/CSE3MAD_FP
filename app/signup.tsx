@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, View, useColorScheme } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth, db } from "../firebase";
@@ -20,6 +21,8 @@ export default function SignupScreen(){
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+
+    const {t} = useTranslation();
 
     const handleSignup = async() => {
         try{
@@ -47,11 +50,11 @@ export default function SignupScreen(){
                     break;
 
                 case "auth/invalid-email":
-                    setError("Please enter a valid email");
+                    setError(t("errorMessages.invalidEmail"));
                     break;
 
                 default:
-                    setError("Something went wrong");
+                    setError(t("errorMessages.defaultError"));
             }
         }
     }
@@ -61,37 +64,37 @@ export default function SignupScreen(){
             <KeyboardAvoidingView style={styles.keyboardView} behavior="height">
                 <ScrollView contentContainerStyle={styles.scrollView} keyboardShouldPersistTaps="handled">
                     <View style={styles.top}>
-                        <Text style={styles.welcomeText}>{"Hello!"}</Text>
+                        <Text style={styles.welcomeText}>{t("forms.hello")}</Text>
                     </View>
                     <View style={styles.formsContainer}>
                         <View style={styles.topForms}>
-                            <Text style={styles.header}>{"User Register"}</Text>
+                            <Text style={styles.header}>{t("forms.userRegister")}</Text>
                             
                             <InputGroup 
                                 first={true} 
-                                label={"First Name"} 
+                                label={t("forms.firstName")} 
                                 text={firstName} 
                                 setText={setFirstName} 
                                 isPassword={false} 
-                                placeholder={"Enter your first name"}
+                                placeholder={t("forms.firstNamePlaceholder")}
                                 isLabeled={true}
                             />
                             <InputGroup 
                                 first={false} 
-                                label={"Email"}
+                                label={t("forms.email")}
                                 text={email} 
                                 setText={setEmail} 
                                 isPassword={false} 
-                                placeholder={"Enter your email"}
+                                placeholder={t("forms.emailPlaceholder")}
                                 isLabeled={true}
                             />
                             <InputGroup 
                                 first={false} 
-                                label={"Password"} 
+                                label={t("forms.password")} 
                                 text={password} 
                                 setText={setPassword} 
                                 isPassword={true} 
-                                placeholder={"Enter your password"}
+                                placeholder={t("forms.passwordPlaceholder")}
                                 isLabeled={true}
                             />
 
@@ -99,7 +102,7 @@ export default function SignupScreen(){
                                 <Text style={styles.errorMessage}>{error}</Text>
                             )}
                         </View>
-                        <Button text={"Register"} action={handleSignup} />
+                        <Button text={t("buttons.register")} action={handleSignup} />
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>
@@ -151,7 +154,8 @@ const createStyles = (colors: ThemeColors) => {
         errorMessage: {
             fontFamily: "InterRegular",
             marginTop: 16,
-            color: "red"
+            color: "red",
+            fontSize: 16
         }
     })
     return styles;

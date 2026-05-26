@@ -41,7 +41,8 @@ const createStyles = (colors: ThemeColors) => {
         },
         metricText: {
             fontFamily: "InterRegular",
-            color: colors.secondary
+            color: colors.secondary,
+            fontSize: 16
         }
     })
     return styles;

@@ -3,6 +3,7 @@ import { AuthContext } from "@/context/AuthContext";
 import { ThemeContext } from "@/context/ThemeContext";
 import { ThemeColors } from "@/theme/colors";
 import { useContext } from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -18,19 +19,20 @@ export default function HomeScreen(){
   const firstName = userProfile?.firstName ?? "";
   const formattedName = firstName?.charAt(0).toUpperCase() + firstName?.slice(1).toLowerCase();
 
+  const {t} = useTranslation();
+
   return(
       <SafeAreaView style={styles.container}>
-          <Text style={styles.welcomeMessage}>Welcome, {formattedName}!</Text>
-          <Text style={styles.subHeader}>{"Ready for your next experiment?"}</Text>
+          <Text style={styles.welcomeMessage}>{t("home.welcome")}, {formattedName}!</Text>
+          <Text style={styles.subHeader}>{t("home.subtitle")}</Text>
           <View style={styles.cardContainer}>
               <Card metric={"Metric1"} value={"10"} maximumWidth={false} />
               <Card metric={"Metric2"} value={"42"} maximumWidth={false} />
           </View>
-          <Text style={styles.sectionHeader}>{"How STEMMLAB Works"}</Text>
-          <Text style={styles.body}>• Choose a Challenge</Text>
-          <Text style={styles.body}>• Use real-world materials and record your experiment.</Text>
-          <Text style={styles.body}>• Capture data using your phone's sensors and upload results.</Text>
-          <Text style={styles.body}>• Refine your design and climb the leaderboard.</Text>
+          <Text style={styles.sectionHeader}>{t("home.howItWorks")}</Text>
+          {(t("home.howItWorksElements", {returnObjects: true})as string[]).map((instruction, index) => (
+            <Text style={styles.body} key={index}>• {instruction}</Text>
+          ))}
       </SafeAreaView>
   )
 }
@@ -52,7 +54,8 @@ const createStyles = (colors: ThemeColors) => {
     subHeader: {
       fontFamily: "InterRegular",
       color: colors.secondary,
-      marginTop: 5
+      marginTop: 5,
+      fontSize: 16
     },
     cardContainer: {
       display: "flex",
@@ -69,7 +72,8 @@ const createStyles = (colors: ThemeColors) => {
     body: {
       color: colors.secondary,
       fontFamily: "InterRegular",
-      paddingTop: 15
+      paddingTop: 15,
+      fontSize: 16
     }
   });
   return styles;

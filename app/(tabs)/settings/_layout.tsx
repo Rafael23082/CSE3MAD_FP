@@ -1,25 +1,29 @@
 import { ThemeContext } from "@/context/ThemeContext";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { useContext } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function SettingsLayout() {
   const theme = useContext(ThemeContext)
   if (!theme) return null;
 
   const { category } = useLocalSearchParams();
+  const {t} = useTranslation();
 
   const getTitle = () => {
     switch (category) {
       case "account":
-        return "Account";
+        return t("tabs.account");
       case "team":
-        return "Team";
+        return t("tabs.team");
       case "appearance":
-        return "Appearance";
+        return t("tabs.appearance");
       case "about":
-        return "About";
+        return t("tabs.about");
+      case "language":
+        return t("tabs.language");
       default:
-        return "Settings";
+        return t("tabs.settings");
     }
   };
 

@@ -5,6 +5,7 @@ import { ThemeContext } from "@/context/ThemeContext";
 import { ThemeColors } from "@/theme/colors";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext } from "react";
+import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -26,6 +27,7 @@ export default function ActivityResultsScreen(){
     const params = useLocalSearchParams();
     const results = params.results ? JSON.parse(params.results as string): [];
     const router = useRouter();
+    const {t} = useTranslation();
 
     return(
         <SafeAreaView style={styles.outerContainer}>
@@ -33,7 +35,7 @@ export default function ActivityResultsScreen(){
             <ScrollView contentContainerStyle={styles.container}>
                 <View style={styles.subContainer}>
                     <Text style={styles.head}>{activity.name}</Text>
-                    <Text style={styles.sectionHeader}>Activity Results</Text>
+                    <Text style={styles.sectionHeader}>{t("activities.activityResults")}</Text>
                     <View style={styles.cardContainer}>
                         {results.map((item: ActivityResults, index: number) => (
                             <Card metric={item.label} value={String(item.value)} maximumWidth={true} key={index} />
@@ -41,7 +43,7 @@ export default function ActivityResultsScreen(){
                     </View>
                 </View>
                 <View style={styles.buttonContainer}>
-                    <Button text="Back to Activities" action={()=>{router.push("/(tabs)/activities")}} />
+                    <Button text={t("buttons.backToActivities")} action={()=>{router.push("/(tabs)/activities")}} />
                 </View>
             </ScrollView>
         </KeyboardAvoidingView>

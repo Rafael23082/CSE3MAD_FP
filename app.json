@@ -43,7 +43,8 @@
         {
           "motionPermission": "Allow STEMMLAB to access your device motion"
         }
-      ]
+      ],
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true,

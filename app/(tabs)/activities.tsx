@@ -3,6 +3,7 @@ import ActivityGroup from "@/components/activityGroup";
 import { ThemeContext } from "@/context/ThemeContext";
 import { ThemeColors } from "@/theme/colors";
 import { useContext } from "react";
+import { useTranslation } from "react-i18next";
 import { ScrollView, StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -10,11 +11,12 @@ export default function ActivitiesScreen() {
   const theme = useContext(ThemeContext);
   if (!theme) return null;
   const styles = createStyles(theme);
+  const {t} = useTranslation();
 
   return (
     <SafeAreaView style={styles.outerContainer} edges={["top"]}>
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.welcomeMessage}>Select an Activity</Text>
+        <Text style={styles.welcomeMessage}>{t("activities.selectActivity")}</Text>
           {Object.entries(activities).map(([key, activity], index) => (
             <ActivityGroup
               key={index}

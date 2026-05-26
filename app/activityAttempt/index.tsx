@@ -3,6 +3,7 @@ import HumanPerformanceLabAttemptScreen from "@/components/humanPerformanceLabAt
 import ReactionBoardAttemptScreen from "@/components/reactionBoardAttempt";
 import { ActivityContext } from "@/context/ActivityContext";
 import { useContext } from "react";
+import { Text } from "react-native";
 
 export default function ActivityAttemptMainScreen(){
     const activityContext = useContext(ActivityContext);
@@ -11,15 +12,16 @@ export default function ActivityAttemptMainScreen(){
     const {activity} = activityContext;
 
     const renderScreen = () => {
-        switch (activity?.name){
-            case "Breathing Pace Trainer":
+        switch (activity?.key){
+            case "breathing-pace-trainer":
                 return <BreathingAttemptScreen />;
-            case "Reaction Board Challenge":
+            case "reaction-board-challenge":
                 return <ReactionBoardAttemptScreen />;
-            case "Stretch Speed & Gracefulness":
+            case "stretch-speed-and-gracefulness":
                 return <HumanPerformanceLabAttemptScreen />;
-    }
+            default: 
+                return <Text>Bruv</Text>
+    }}
 
     return renderScreen();
-    }
 }

@@ -4,6 +4,7 @@ import { ThemeContext } from "@/context/ThemeContext";
 import { ThemeColors } from "@/theme/colors";
 import { useRouter } from "expo-router";
 import { useContext, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -49,6 +50,7 @@ export default function ReactionBoardAttemptScreen(){
     }[]>([]);
 
     const router = useRouter();
+    const {t} = useTranslation();
     const activityResults = useRef<ActivityResults[]>([]);
 
     const [circlePosition, setCirclePosition] = useState({ x: 50, y: 50 });
@@ -218,7 +220,7 @@ export default function ReactionBoardAttemptScreen(){
                     <View style={styles.subContainer}>
                         <Text style={styles.head}>{activity.name}</Text>
                         <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
-                            <Text style={styles.sectionHeader}>Attempt</Text>
+                            <Text style={styles.sectionHeader}>{t("activities.attempt")}</Text>
                             {currentPhaseIndex == 2 && (
                                 <View style={styles.timerContainer}>
                                     <Text style={[styles.sectionHeader, {
@@ -227,16 +229,16 @@ export default function ReactionBoardAttemptScreen(){
                                 </View>
                             )}
                         </View>
-                        <Text style={styles.phaseText}>Phase {currentPhaseIndex + 1} — {currentPhase}</Text>
-                        <Text style={[styles.actionName, {marginTop: 24}]}>{currentPhaseIndex == 2 ? "Measure Tracing Accuracy": "Record Reaction Time"}</Text>
+                        <Text style={styles.phaseText}>{t("activities.phase")} {currentPhaseIndex + 1} — {currentPhase}</Text>
+                        <Text style={[styles.actionName, {marginTop: 24}]}>{currentPhaseIndex == 2 ? t("activities.reactionBoardChallenge.measureTracingAccuracy"): t("activities.reactionBoardChallenge.recordReactionTime")}</Text>
                         <View style={styles.cardContainer}>
                             {currentPhaseIndex != 2 ? (
                                 <Card metric="ms" value={reactionTime == null ? "0": String(reactionTime)} maximumWidth={true} />
                             ): (
-                                <Card metric="Accuracy Score" value={`${accuracy}%`} maximumWidth={true} />
+                                <Card metric={t("activities.reactionBoardChallenge.accuracyScore")} value={`${accuracy}%`} maximumWidth={true} />
                             )}
                         </View>
-                        <Text style={styles.actionName}>{currentPhaseIndex == 2 ? "Tracing Zone": "Reaction Zone"}</Text>
+                        <Text style={styles.actionName}>{currentPhaseIndex == 2 ? t("activities.reactionBoardChallenge.tracingZone"): t("activities.reactionBoardChallenge.reactionZone")}</Text>
                         {currentPhaseIndex == 2 ? (
                             <GestureDetector gesture={panGesture}>
                                 <View 
@@ -256,7 +258,7 @@ export default function ReactionBoardAttemptScreen(){
                                             />
                                         </Svg>
                                     ): (
-                                        <Text style={styles.placeholderText}>Trace Here</Text>
+                                        <Text style={styles.placeholderText}>{t("activities.reactionBoardChallenge.tracingZonePlaceholder")}</Text>
                                     )}
                                 </View>
                             </GestureDetector>
@@ -276,17 +278,17 @@ export default function ReactionBoardAttemptScreen(){
                                         }]}
                                         onPress={()=> {handleReactionPress()}
                                     }>
-                                        <Text style={styles.buttonText}>TAP!</Text>
+                                        <Text style={styles.buttonText}>{t("activities.reactionBoardChallenge.tap")}</Text>
                                     </Pressable>
                                 ): (
-                                    <Text style={styles.placeholderText}>Tap inside this area when the target appears</Text>
+                                    <Text style={styles.placeholderText}>{t("activities.reactionBoardChallenge.reactionZonePlaceholder")}</Text>
                                 )}
                             </View>
                         )}
                     </View>
                     <View style={styles.buttonContainer}>
                         {challengeState == "idle" && (
-                            <Button text="Start Challenge" action={() => {
+                            <Button text={t("buttons.startChallenge")} action={() => {
                                 if (currentPhaseIndex != 2){
                                     startChallenge()
                                 }else{
@@ -298,10 +300,10 @@ export default function ReactionBoardAttemptScreen(){
                             }} />
                         )}
                         {(challengeState == "waiting" || challengeState == "ready") && (
-                            <Button text={challengeState == "waiting" ? "Wait for the Signal": "TAP NOW!"} action={() => {}} />
+                            <Button text={challengeState == "waiting" ? t("buttons.waitForSignal"): t("buttons.tapNow")} action={() => {}} />
                         )}
                         {challengeState == "finished" && (
-                            <Button text={currentPhaseIndex == 2 ? "Finish Activity": "Continue"} action={() => {
+                            <Button text={currentPhaseIndex == 2 ? t("buttons.finishActivity"): t("buttons.continue")} action={() => {
                                 if (activity.phases && currentPhaseIndex < activity.phases.length - 1) {
                                     setCurrentPhaseIndex(prev => prev + 1);
                                     setChallengeState("idle");
@@ -400,7 +402,8 @@ const createStyles = (colors: ThemeColors) => {
             fontFamily: "InterSemiBold",
             width: "100%",
             textAlign: "center",
-            lineHeight: 18
+            lineHeight: 18,
+            fontSize: 16
         },
         timerContainer: {
             padding: 8,

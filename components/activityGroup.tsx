@@ -66,6 +66,7 @@ const createStyles = (colors: ThemeColors) => {
         body: {
             fontFamily: "InterRegular",
             color: colors.secondary,
+            fontSize: 16
         },
         sectionHeader: {
             color: colors.secondary,

@@ -2,6 +2,7 @@ import { Activity } from "@/context/ActivityContext";
 import { ThemeContext } from "@/context/ThemeContext";
 import { ThemeColors } from "@/theme/colors";
 import { useContext } from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View } from "react-native";
 import ActivityGroup from "./activityGroup";
 import EquipmentCard from "./equipmentCard";
@@ -14,6 +15,8 @@ export default function ActivityDetailsContents({ activity }: Props) {
     const theme = useContext(ThemeContext);
     if (!theme) return null;
     const styles = createStyles(theme);
+
+    const {t} = useTranslation();
 
     return (
         <View>
@@ -28,9 +31,9 @@ export default function ActivityDetailsContents({ activity }: Props) {
                 imagePath={activity.image}
                 onlyImage={true}
             />
-            <Text style={styles.sectionHeader}>Overview</Text>
+            <Text style={styles.sectionHeader}>{t("activities.overview")}</Text>
             <Text style={styles.body}>{activity.description}</Text>
-            <Text style={styles.sectionHeader}>Equipments Needed</Text>
+            <Text style={styles.sectionHeader}>{t("activities.equipmentsNeeded")}</Text>
 
             <View style={styles.equipmentContainer}>
                 {activity.equipments.map((equipment, index) => (
@@ -62,7 +65,8 @@ const createStyles = (colors: ThemeColors) => {
         },
         body: {
             fontFamily: "InterRegular",
-            color: colors.secondary
+            color: colors.secondary,
+            fontSize: 16
         },
         equipmentContainer: {
             marginBottom: 32,

@@ -8,6 +8,7 @@ import { arrayUnion, collection, doc, getDoc, setDoc, updateDoc } from "@firebas
 import { Picker } from "@react-native-picker/picker";
 import { useRouter } from "expo-router";
 import { useContext, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -30,6 +31,8 @@ export default function TeamInitializationPage() {
     const [teamID, setTeamID] = useState("");
     const [inviteCode, setInviteCode] = useState("");
     const [error, setError] = useState("");
+
+    const {t} = useTranslation();
 
     function generateInviteCode(length = 6) {
         const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -111,7 +114,7 @@ export default function TeamInitializationPage() {
             <KeyboardAvoidingView style={styles.keyboardView} behavior="height">
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
                     <View style={styles.subContainer}>
-                        <Text style={styles.title}> {mode === "create" ? "Create Your Team": "Join a Team"}
+                        <Text style={styles.title}> {mode === "create" ? t("teamInitialization.createTitle"): t("teamInitialization.joinTitle")}
                         </Text>
                         <View style={styles.toggleContainer}>
                             <TouchableOpacity
@@ -130,16 +133,16 @@ export default function TeamInitializationPage() {
                                 <View style={styles.growingContainer}>
                                     <InputGroup
                                         first={true}
-                                        label={"Team Name"}
+                                        label={t("teamInitialization.teamName")}
                                         text={teamName}
                                         setText={setTeamName}
                                         isPassword={false}
-                                        placeholder={"Enter team name"}
+                                        placeholder={t("teamInitialization.teamNamePlaceholder")}
                                         isLabeled={true}
                                     />
 
                                     <View style={styles.pickerContainer}>
-                                        <Text style={styles.pickerLabel}>Grade Level</Text>
+                                        <Text style={styles.pickerLabel}>{t("teamInitialization.gradeLevel")}</Text>
                                         <Picker
                                             selectedValue={gradeLevel}
                                             onValueChange={(itemValue) => setGradeLevel(itemValue)}
@@ -147,7 +150,7 @@ export default function TeamInitializationPage() {
                                             style={styles.picker}
                                         >
                                             <Picker.Item
-                                                label="Select Grade Level"
+                                                label={t("teamInitialization.gradeLevelPlaceholder")}
                                                 value={""}
                                                 enabled={false}
                                             />
@@ -168,7 +171,7 @@ export default function TeamInitializationPage() {
                                     </View>
                                 </View>
                                 <Button
-                                    text={"Create Team"}
+                                    text={t("buttons.createTeam")}
                                     action={handleCreateTeam}
                                 />
                             </>
@@ -177,21 +180,21 @@ export default function TeamInitializationPage() {
                                 <View style={styles.growingContainer}>
                                     <InputGroup
                                         first={true}
-                                        label={"Team ID"}
+                                        label={t("teamInitialization.teamID")}
                                         text={teamID}
                                         setText={setTeamID}
                                         isPassword={false}
-                                        placeholder={"Enter team ID"}
+                                        placeholder={t("teamInitialization.teamIDPlaceholder")}
                                         isLabeled={true}
                                     />
 
                                     <InputGroup
                                         first={false}
-                                        label={"Invite Code"}
+                                        label={t("teamInitialization.inviteCode")}
                                         text={inviteCode}
                                         setText={setInviteCode}
                                         isPassword={false}
-                                        placeholder={"Enter invite code"}
+                                        placeholder={t("teamInitialization.inviteCodePlaceholder")}
                                         isLabeled={true}
                                     />
                                     {error && (
@@ -199,13 +202,13 @@ export default function TeamInitializationPage() {
                                     )}
                                 </View>
                                 <Button
-                                    text={"Join Team"}
+                                    text={t("buttons.joinTeam")}
                                     action={handleJoinTeam}
                                 />
                             </>
                         )}
                         <TouchableOpacity onPress={() => router.push("/(tabs)")}>
-                            <Text style={styles.skipText}>Skip for now</Text>
+                            <Text style={styles.skipText}>{t("teamInitialization.skip")}</Text>
                         </TouchableOpacity>
                     </View>
                 </ScrollView>
@@ -265,7 +268,8 @@ const createStyles = (colors: ThemeColors) => {
             marginTop: 16,
             color: colors.secondary,
             fontFamily: "PoppinsRegular",
-            textDecorationLine: "underline"
+            textDecorationLine: "underline",
+            fontSize: 16
         },
         pickerContainer: {
             marginTop: 40
@@ -286,7 +290,8 @@ const createStyles = (colors: ThemeColors) => {
         errorMessage: {
             fontFamily: "InterRegular",
             marginTop: 16,
-            color: "red"
+            color: "red",
+            fontSize: 16
         }
     });
 };

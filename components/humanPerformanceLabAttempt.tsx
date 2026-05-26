@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import { Accelerometer } from 'expo-sensors';
 import { Subscription } from "expo-sensors/build/Pedometer";
 import { useContext, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "./button";
@@ -56,6 +57,7 @@ export default function HumanPerformanceLabAttemptScreen(){
     const [time, setTime] = useState(20);
 
     const router = useRouter();
+    const {t} = useTranslation();
 
     const _subscribe = () => {
         Accelerometer.setUpdateInterval(100);
@@ -137,12 +139,12 @@ export default function HumanPerformanceLabAttemptScreen(){
                         setGraphValues(smoothed);
 
                         vibrationHistory.current.push({
-                            label: `Movement ${currentPhaseIndex + 1} Vibrations`,
+                            label: t("activities.stretchSpeedAndGracefulness.movementVibrations", {index: currentPhaseIndex + 1}),
                             value: String(vibrations)
                         });
 
                         vibrationHistory.current.push({
-                            label: `Movement ${currentPhaseIndex + 1} Smoothness`,
+                            label: t("activities.stretchSpeedAndGracefulness.movementSmoothness", {index: currentPhaseIndex + 1}),
                             value: `${Math.round(smoothness)}%`
                         });
 
@@ -197,7 +199,7 @@ export default function HumanPerformanceLabAttemptScreen(){
                     <View style={styles.subContainer}>
                         <Text style={styles.head}>{activity.name}</Text>
                         <View style={styles.headerContainer}>
-                            <Text style={styles.sectionHeader}>Attempt</Text>
+                            <Text style={styles.sectionHeader}>{t("activities.attempt")}</Text>
                             <View style={styles.timerContainer}>
                                 <Text style={[styles.sectionHeader, {
                                     lineHeight: 20
@@ -205,20 +207,20 @@ export default function HumanPerformanceLabAttemptScreen(){
                             </View>
                         </View>
 
-                        <Text style={styles.phaseText}>Phase {currentPhaseIndex + 1} — {currentPhase}</Text>
+                        <Text style={styles.phaseText}>{t("activities.phase")} {currentPhaseIndex + 1} — {currentPhase}</Text>
 
-                        <Text style={[styles.actionName, {marginTop: 24}]}>Record Movement</Text>
+                        <Text style={[styles.actionName, {marginTop: 24}]}>{t("activities.stretchSpeedAndGracefulness.recordMovement")}</Text>
 
                         <View style={styles.cardContainer}>
-                            <Card metric="Vibrations Detected" value={String(vibrations)} maximumWidth={true} />
+                            <Card metric={t("activities.stretchSpeedAndGracefulness.vibrationsDetected")} value={String(vibrations)} maximumWidth={true} />
                         </View>
 
                         <View style={styles.cardContainer}>
-                            <Card metric="Smoothness Score" value={`${Math.round(smoothness)}%`} maximumWidth={true} />
+                            <Card metric={t("activities.stretchSpeedAndGracefulness.smoothnessScore")} value={`${Math.round(smoothness)}%`} maximumWidth={true} />
                         </View>
 
                         <Text style={styles.actionName}>
-                            Movement Monitor
+                            {t("activities.stretchSpeedAndGracefulness.movementMonitor")}
                         </Text>
 
                         <View style={styles.chartContainer}>
@@ -232,7 +234,7 @@ export default function HumanPerformanceLabAttemptScreen(){
                                 />
                             ): (
                                 <Text style={styles.placeholderText}>
-                                    Start recording to visualize movement smoothness
+                                    {t("activities.stretchSpeedAndGracefulness.movementMonitorPlaceholder")}
                                 </Text>
                             )}
 
@@ -243,18 +245,18 @@ export default function HumanPerformanceLabAttemptScreen(){
                     <View style={styles.buttonContainer}>
 
                         {recordingState === "idle" && (
-                            <Button text="Start Recording" action={() => {
+                            <Button text={t("buttons.startRecording")} action={() => {
                                     setCountdown(3);
                                 }}
                             />
                         )}
 
                         {recordingState === "recording" && (
-                            <Button text="Recording..." action={() => {}} />
+                            <Button text={t("buttons.recording")} action={() => {}} />
                         )}
 
                         {recordingState === "completed" && (
-                            <Button text={currentPhaseIndex == 2 ? "Finish Activity": "Continue"} action={() => {
+                            <Button text={currentPhaseIndex == 2 ? t("buttons.finishActivity"): t("buttons.continue")} action={() => {
                                 if (activity.phases && currentPhaseIndex < activity.phases.length - 1) {
                                     setCurrentPhaseIndex(currentPhaseIndex + 1);
                                     setRecordingState("idle");
@@ -283,7 +285,7 @@ export default function HumanPerformanceLabAttemptScreen(){
 
             {countdown !== null && (
                 <View style={styles.overlay}>
-                    <Text style={styles.readyText}>Get Ready</Text>
+                    <Text style={styles.readyText}>{t("countdown.getReady")}</Text>
 
                     <Text style={styles.countdownText}>
                         {countdown}

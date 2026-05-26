@@ -1,6 +1,7 @@
 import AboutSettingsScreen from "@/components/aboutSettingsScreen";
 import AccountSettingsScreen from "@/components/accountSettingsScreen";
 import AppearanceSettingsScreen from "@/components/appearanceSettingsScreen";
+import LanguageSettingsScreen from "@/components/languageSettingsScreen";
 import TeamSettingsScreen from "@/components/teamSettingsScreen";
 import { useLocalSearchParams } from "expo-router";
 
@@ -20,6 +21,9 @@ export default function SettingsCategoryScreen(){
 
       case "about":
         return <AboutSettingsScreen />;
+
+      case "language":
+        return <LanguageSettingsScreen />;
 
       default:
         return null;

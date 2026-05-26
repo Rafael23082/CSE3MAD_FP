@@ -52,7 +52,8 @@ const createStyles = (colors: ThemeColors) => {
         },
         fieldLabel: {
             fontFamily: "InterRegular",
-            color: colors.secondary
+            color: colors.secondary,
+            fontSize: 16
         }
     })
     return styles;

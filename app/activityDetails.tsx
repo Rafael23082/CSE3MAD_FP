@@ -6,6 +6,7 @@ import { ThemeColors } from "@/theme/colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useContext } from "react";
+import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -18,6 +19,7 @@ export default function ActivityDetailsScreen(){
     const { activity } = activityContext;
     if (!activity) return null;
     const router = useRouter();
+    const {t} = useTranslation();
 
     return(
         <SafeAreaView style={styles.outerContainer}>
@@ -26,11 +28,11 @@ export default function ActivityDetailsScreen(){
                     <Pressable onPress={() => router.back()}>
                         <MaterialCommunityIcons size={24} name="arrow-left" color={theme.secondary} />
                     </Pressable>
-                    <Text style={styles.headerTitle}>Activity Details</Text>
+                    <Text style={styles.headerTitle}>{t("activities.activityDetails")}</Text>
                 </View>
                 <ActivityDetailsContents activity={activity} />
                 <Button 
-                    text={"Begin"}
+                    text={t("buttons.begin")}
                     action={()=>{router.push("/activityAttempt")}} 
                 />
         </ScrollView>
