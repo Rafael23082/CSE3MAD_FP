@@ -1,7 +1,6 @@
-import { ThemeContext } from "@/context/ThemeContext";
+import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { Ionicons } from "@expo/vector-icons";
-import { useContext } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 type settingsSectionProps = {
@@ -11,8 +10,7 @@ type settingsSectionProps = {
 }
 
 export function SettingsSection({label, icon, action}: settingsSectionProps){
-  const theme = useContext(ThemeContext);
-  if (!theme) return null;
+  const {theme} = useTheme();
   const styles = createStyles(theme);
 
     return(

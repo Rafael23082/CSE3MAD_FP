@@ -1,15 +1,13 @@
 import Button from "@/components/button";
-import { ThemeContext } from "@/context/ThemeContext";
+import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { useRouter } from "expo-router";
-import { useContext } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen(){
-    const theme = useContext(ThemeContext);
-    if (!theme) return null;
+    const { theme } = useTheme();
     const router = useRouter();
     const styles = createStyles(theme);
     const {t} = useTranslation();

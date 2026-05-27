@@ -1,15 +1,13 @@
 import { SettingsSection } from "@/components/settingsSection";
-import { ThemeContext } from "@/context/ThemeContext";
+import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from '@/theme/colors';
 import { useRouter } from "expo-router";
-import { useContext } from 'react';
 import { useTranslation } from "react-i18next";
 import { ScrollView, StyleSheet, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SettingsScreen() {
-  const theme = useContext(ThemeContext);
-  if (!theme) return null;
+  const { theme } = useTheme();
   const styles = createStyles(theme);
   const router = useRouter();
   const {t} = useTranslation();
@@ -19,7 +17,6 @@ export default function SettingsScreen() {
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.welcomeMessage}>{t("tabs.settings")}</Text>
         <SettingsSection label={t("tabs.account")} icon="person-outline" action={() => router.push("/settings/account")} />
-        <SettingsSection label={t("tabs.team")} icon="people-outline" action={() => {router.push("/settings/team")}} />
         <SettingsSection label={t("tabs.appearance")} icon="color-palette-outline" action={() => {router.push("/settings/appearance")}} />
         <SettingsSection label={t("tabs.about")} icon="information-circle-outline" action={() => {router.push("/settings/about")}} />
         <SettingsSection label={t("tabs.language")} icon="language-outline" action={() => {router.push("/settings/language")}} />

@@ -1,18 +1,18 @@
 import Button from "@/components/button";
 import InputGroup from "@/components/inputGroup";
-import { ThemeContext } from "@/context/ThemeContext";
 import { auth } from "@/firebase";
+import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { useRouter } from "expo-router";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function LoginScreen(){
-    const theme = useContext(ThemeContext);
-    if (!theme) return null;
+    const { theme } = useTheme();
+
     const styles = createStyles(theme);
     const router = useRouter();
 

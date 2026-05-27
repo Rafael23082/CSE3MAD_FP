@@ -1,6 +1,5 @@
-import { ThemeContext } from "@/context/ThemeContext";
+import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
-import { useContext } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 type cardProps={
@@ -10,8 +9,7 @@ type cardProps={
 }
 
 export default function Card({metric, value, maximumWidth}: cardProps){
-    const theme = useContext(ThemeContext)
-    if (!theme) return null;
+    const {theme} = useTheme();
     const styles = createStyles(theme);
     return(
         <View style={[styles.cardContainer, {

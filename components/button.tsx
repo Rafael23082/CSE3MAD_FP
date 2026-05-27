@@ -1,6 +1,5 @@
-import { ThemeContext } from "@/context/ThemeContext";
+import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
-import { useContext } from "react";
 import { Pressable, StyleSheet, Text } from "react-native";
 
 type ButtonProps = {
@@ -9,8 +8,7 @@ type ButtonProps = {
 };
 
 export default function Button({text, action}: ButtonProps){
-    const theme = useContext(ThemeContext)
-    if (!theme) return null;
+    const {theme} = useTheme();
     const styles = createStyles(theme);
 
     return(

@@ -239,6 +239,25 @@ const resources = {
       },
       countdown: {
         getReady: "Get Ready"
+      },
+      about: {
+        appName: "App Name:",
+        version: "Version:",
+        description: "Description:",
+        descriptionValue: "Interactive STEM learning platform designed for collaborative activities and competitions.",
+        privacyPolicy: "Privacy Policy",
+        termsOfService: "Terms of Service",
+        contactSupport: "Contact Support"
+      },
+      account: {
+        profileInformation: "Profile Information",
+        teamInformation: "Team Information",
+        changePassword: "Change Password",
+        logout: "Logout"
+      },
+      appearance: {
+        lightMode: "Light Mode",
+        darkMode: "Dark Mode"
       }
     }
   },
@@ -478,6 +497,25 @@ const resources = {
       },
       countdown: {
         getReady: "準備をしよう"
+      },
+      about: {
+        appName: "アプリ名：",
+        version: "バージョン：",
+        description: "説明：",
+        descriptionValue: "共同活動やコンテスト向けに設計された、インタラクティブなSTEM学習プラットフォーム。",
+        privacyPolicy: "プライバシーポリシー",
+        termsOfService: "利用規約",
+        contactSupport: "サポートへのお問い合わせ"
+      },
+      account: {
+        profileInformation: "プロフィール情報",
+        teamInformation: "チーム情報",
+        changePassword: "パスワードを変更する",
+        logout: "ログアウト"
+      },
+      appearance: {
+        lightMode: "ライトモード",
+        darkMode: "ダークモード"
       }
     }
   },

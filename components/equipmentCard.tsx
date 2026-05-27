@@ -1,6 +1,5 @@
-import { ThemeContext } from "@/context/ThemeContext";
+import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
-import { useContext } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 
 type equipmentCardProps = {
@@ -10,8 +9,7 @@ type equipmentCardProps = {
 }
 
 export default function EquipmentCard({toolName, description, image}: equipmentCardProps){
-    const theme = useContext(ThemeContext);
-    if (!theme) return null;
+    const {theme} = useTheme();
     const styles = createStyles(theme);
 
     return (

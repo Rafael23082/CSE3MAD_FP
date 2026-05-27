@@ -1,6 +1,6 @@
 import Card from "@/components/card";
 import { AuthContext } from "@/context/AuthContext";
-import { ThemeContext } from "@/context/ThemeContext";
+import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { useContext } from "react";
 import { useTranslation } from "react-i18next";
@@ -8,8 +8,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen(){
-  const theme = useContext(ThemeContext)
-  if (!theme) return null;
+  const { theme } = useTheme();
   const styles = createStyles(theme);
 
   const auth = useContext(AuthContext);

@@ -1,7 +1,7 @@
 import Button from "@/components/button";
 import Card from "@/components/card";
 import { ActivityContext } from "@/context/ActivityContext";
-import { ThemeContext } from "@/context/ThemeContext";
+import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext } from "react";
@@ -15,8 +15,7 @@ export type ActivityResults = {
     }
 
 export default function ActivityResultsScreen(){
-    const theme = useContext(ThemeContext);
-    if (!theme) return null;
+    const { theme } = useTheme();
     const styles = createStyles(theme);
 
     const activityContext = useContext(ActivityContext);

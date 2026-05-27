@@ -1,7 +1,7 @@
 import ActivityDetailsContents from "@/components/activityDetailsContents";
 import Button from "@/components/button";
 import { ActivityContext } from "@/context/ActivityContext";
-import { ThemeContext } from "@/context/ThemeContext";
+import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -11,8 +11,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ActivityDetailsScreen(){
-    const theme = useContext(ThemeContext)
-    if (!theme) return null;
+    const { theme } = useTheme();
     const styles = createStyles(theme);
     const activityContext = useContext(ActivityContext);
     if (!activityContext) return null;

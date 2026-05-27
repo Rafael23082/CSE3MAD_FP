@@ -1,6 +1,6 @@
 import { activities } from "@/assets/activities";
 import { ActivityContext } from "@/context/ActivityContext";
-import { ThemeContext } from "@/context/ThemeContext";
+import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { useRouter } from "expo-router";
 import { useContext } from "react";
@@ -16,8 +16,7 @@ type activityScreenProps = {
 
 export default function ActivityGroup({activityKey, activityName, description, imagePath, onlyImage}: activityScreenProps){
     const router = useRouter(); 
-    const theme = useContext(ThemeContext)
-    if (!theme) return null;
+    const {theme} = useTheme();
     const styles = createStyles(theme);
 
     const activityContext = useContext(ActivityContext);

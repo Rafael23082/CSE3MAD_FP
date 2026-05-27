@@ -1,8 +1,8 @@
 import Button from "@/components/button";
 import InputGroup from "@/components/inputGroup";
 import { AuthContext } from "@/context/AuthContext";
-import { ThemeContext } from "@/context/ThemeContext";
 import { db } from "@/firebase";
+import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { arrayUnion, collection, doc, getDoc, setDoc, updateDoc } from "@firebase/firestore";
 import { Picker } from "@react-native-picker/picker";
@@ -13,8 +13,7 @@ import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, TouchableOpacity, V
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function TeamInitializationPage() {
-    const theme = useContext(ThemeContext);
-    if (!theme) return null;
+    const {theme} = useTheme();
 
     const styles = createStyles(theme);
     const router = useRouter();

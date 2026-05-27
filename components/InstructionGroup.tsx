@@ -1,17 +1,17 @@
-import { darkTheme, lightTheme, ThemeColors } from "@/theme/colors";
-import { Image, StyleSheet, Text, useColorScheme, View } from "react-native";
+import { useTheme } from "@/hooks/useTheme";
+import { ThemeColors } from "@/theme/colors";
+import { Image, StyleSheet, Text, View } from "react-native";
 
-type InputProps = {
+type InputProps =
+ {
     text: string,
     videoPath: any,
     number: number
 };
 
 export default function InstructionGroup({text, videoPath, number}: InputProps){
-    const scheme = useColorScheme();
-    const isDark = scheme === "dark";
-    const colors = isDark ? darkTheme: lightTheme;
-    const styles = createStyles(colors);
+    const {theme} = useTheme();
+    const styles = createStyles(theme);
     return(
         <View style={styles.container}>
             <Text style={styles.body}>{number}. {text}</Text>

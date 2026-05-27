@@ -1,7 +1,6 @@
 import { Activity } from "@/context/ActivityContext";
-import { ThemeContext } from "@/context/ThemeContext";
+import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
-import { useContext } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View } from "react-native";
 import ActivityGroup from "./activityGroup";
@@ -12,8 +11,7 @@ type Props = {
 };
 
 export default function ActivityDetailsContents({ activity }: Props) {
-    const theme = useContext(ThemeContext);
-    if (!theme) return null;
+    const {theme} = useTheme();
     const styles = createStyles(theme);
 
     const {t} = useTranslation();

@@ -1,20 +1,19 @@
 import Button from "@/components/button";
 import InputGroup from "@/components/inputGroup";
-import { ThemeColors, darkTheme, lightTheme } from "@/theme/colors";
+import { useTheme } from "@/hooks/useTheme";
+import { ThemeColors } from "@/theme/colors";
 import { useRouter } from "expo-router";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, View, useColorScheme } from "react-native";
+import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth, db } from "../firebase";
 
 export default function SignupScreen(){
-    const theme = useColorScheme();
-    const isDark = theme === "dark";
-    const colors = isDark ? darkTheme : lightTheme;
-    const styles = createStyles(colors);
+    const { theme } = useTheme();
+    const styles = createStyles(theme);
     const router = useRouter();
 
     const [firstName, setFirstName] = useState("");

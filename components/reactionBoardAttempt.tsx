@@ -1,6 +1,6 @@
 import { ActivityResults } from "@/app/activityResults";
 import { ActivityContext } from "@/context/ActivityContext";
-import { ThemeContext } from "@/context/ThemeContext";
+import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { useRouter } from "expo-router";
 import { useContext, useEffect, useRef, useState } from "react";
@@ -13,8 +13,7 @@ import Button from "./button";
 import Card from "./card";
 
 export default function ReactionBoardAttemptScreen(){
-    const theme = useContext(ThemeContext);
-    if (!theme) return null;
+    const {theme} = useTheme();
     const styles = createStyles(theme);
 
     const activityContext = useContext(ActivityContext);

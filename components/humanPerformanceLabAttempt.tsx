@@ -1,5 +1,5 @@
 import { ActivityContext } from "@/context/ActivityContext";
-import { ThemeContext } from "@/context/ThemeContext";
+import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { useRouter } from "expo-router";
 import { Accelerometer } from 'expo-sensors';
@@ -18,9 +18,7 @@ export type movementValue = {
 }
 
 export default function HumanPerformanceLabAttemptScreen(){
-    const theme = useContext(ThemeContext);
-    if (!theme) return null;
-
+    const {theme} = useTheme();
     const styles = createStyles(theme);
 
     const activityContext = useContext(ActivityContext);

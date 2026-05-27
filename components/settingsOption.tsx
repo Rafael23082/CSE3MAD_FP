@@ -1,22 +1,22 @@
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
-import { useTranslation } from "react-i18next";
-import { ScrollView, StyleSheet, Text } from "react-native";
-import { SettingsOption } from "./settingsOption";
+import { Pressable, StyleSheet, Text } from "react-native";
 
-export default function AppearanceSettingsScreen() {
-  const { theme, changeTheme } = useTheme();
+type settingsOptionProps = {
+    text: string,
+    action: any
+}
+
+export function SettingsOption({text, action}: settingsOptionProps){
+  const {theme} = useTheme();
+
   const styles = createStyles(theme);
-  const { t } = useTranslation();
 
-  return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.welcomeMessage}>{t("tabs.appearance")}</Text>
-
-      <SettingsOption text={t("appearance.lightMode")} action={()=>{changeTheme("light")}} />
-      <SettingsOption text={t("appearance.darkMode")} action={()=>{changeTheme("dark")}} />
-    </ScrollView>
-  );
+  return(
+      <Pressable style={styles.option} onPress={action}>
+          <Text style={styles.text}>{text}</Text>
+      </Pressable>
+  )
 }
 
 const createStyles = (colors: ThemeColors) => {
@@ -25,22 +25,26 @@ const createStyles = (colors: ThemeColors) => {
       flex: 1,
       backgroundColor: colors.backgroundColor,
     },
+
     container: {
       padding: 24,
       flexGrow: 1,
       backgroundColor: colors.backgroundColor,
     },
+
     welcomeMessage: {
       fontFamily: "PoppinsBold",
       fontSize: 22,
       color: colors.primary,
       marginBottom: 16,
     },
+
     option: {
       paddingVertical: 16,
       borderBottomWidth: 1,
       borderBottomColor: colors.card,
     },
+
     text: {
       fontFamily: "PoppinsRegular",
       color: colors.secondary,

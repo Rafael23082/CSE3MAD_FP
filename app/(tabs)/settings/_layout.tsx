@@ -1,11 +1,9 @@
-import { ThemeContext } from "@/context/ThemeContext";
+import { useTheme } from "@/hooks/useTheme";
 import { Stack, useLocalSearchParams } from "expo-router";
-import { useContext } from "react";
 import { useTranslation } from "react-i18next";
 
 export default function SettingsLayout() {
-  const theme = useContext(ThemeContext)
-  if (!theme) return null;
+  const { theme } = useTheme();
 
   const { category } = useLocalSearchParams();
   const {t} = useTranslation();
@@ -14,8 +12,6 @@ export default function SettingsLayout() {
     switch (category) {
       case "account":
         return t("tabs.account");
-      case "team":
-        return t("tabs.team");
       case "appearance":
         return t("tabs.appearance");
       case "about":
