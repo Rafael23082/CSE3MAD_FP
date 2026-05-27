@@ -1,13 +1,13 @@
 import { HapticTab } from '@/components/haptic-tab';
 import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useTheme } from '@/hooks/useTheme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const { isDark } = useTheme();
   const {t} = useTranslation();
 
   return (
@@ -15,11 +15,11 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarButton: HapticTab,
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        tabBarInactiveTintColor: Colors[colorScheme ?? 'light'].tabIconDefault,
+        tabBarActiveTintColor: Colors[isDark ? 'dark' : 'light'].tint,
+        tabBarInactiveTintColor: Colors[isDark ? 'dark' : 'light'].tabIconDefault,
         tabBarStyle: {
-          backgroundColor: Colors[colorScheme ?? 'light'].background,
-          borderTopColor: Colors[colorScheme ?? 'light'].background,
+          backgroundColor: Colors[isDark ? 'dark' : 'light'].background,
+          borderTopColor: Colors[isDark ? 'dark' : 'light'].background,
         },
       }}
     >

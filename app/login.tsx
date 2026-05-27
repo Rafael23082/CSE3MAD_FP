@@ -112,7 +112,7 @@ const createStyles = (colors: ThemeColors) => {
             fontSize: 25,
             fontFamily: "PoppinsBold",
             textAlign: "center",
-            color: colors.secondary
+            color: colors.buttonText
         },
         top: {
             display: "flex",

@@ -8,6 +8,7 @@ type ThemeType = typeof lightTheme;
 type ThemeContextType = {
   theme: ThemeType,
   changeTheme: any;
+  isDark: boolean
 };
 
 export const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -48,7 +49,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [])
 
   return (
-    <ThemeContext.Provider value={{theme: isDark ? darkTheme : lightTheme, changeTheme}}>
+    <ThemeContext.Provider value={{theme: isDark ? darkTheme : lightTheme, changeTheme, isDark}}>
       {children}
     </ThemeContext.Provider>
   );

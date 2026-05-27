@@ -26,7 +26,7 @@ export default function InputGroup({first, label, text, setText, placeholder, is
             <TextInput
                 placeholder={placeholder}
                 style={[styles.input, {
-                    marginTop: isLabeled ? 15: 20
+                    marginTop: isLabeled ? 15: 20,
                 }]}
                 value={text}
                 onChangeText={setText}
@@ -41,12 +41,13 @@ export default function InputGroup({first, label, text, setText, placeholder, is
 const createStyles = (colors: ThemeColors) => {
     const styles = StyleSheet.create({
         input: {
+            borderWidth: 1,
+            borderColor: colors.inputBorderColor,
             color: "#000000",
             backgroundColor: "#FFFFFF",
             borderRadius: 5,
-            borderColor: "#000000",
             padding: 12,
-            fontSize: 16
+            fontSize: 16,
         },
         fieldLabel: {
             fontFamily: "InterRegular",

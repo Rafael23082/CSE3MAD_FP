@@ -4,7 +4,8 @@ export const lightTheme = {
     buttonText: "#FFFFFF",
     backgroundColor: "#FFFFFF",
     card: "#F5F5F5",
-    borderColor: "#E5E5E5"
+    borderColor: "#E5E5E5",
+    inputBorderColor: "#000000"
 }
 
 export const darkTheme = {
@@ -13,7 +14,8 @@ export const darkTheme = {
     buttonText: "#FFFFFF",
     backgroundColor: "#202124",
     card: "#2A2B2F",
-    borderColor: "#2A2A2A"
+    borderColor: "#2A2A2A",
+    inputBorderColor: "#D1D5DB"
 }
 
 export type ThemeColors = typeof darkTheme;
