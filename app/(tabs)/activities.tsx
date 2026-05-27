@@ -1,17 +1,17 @@
-import { activities } from "@/assets/activities";
+import { getActivities } from "@/assets/activities";
 import ActivityGroup from "@/components/activityGroup";
-import { ThemeContext } from "@/context/ThemeContext";
+import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
-import { useContext } from "react";
 import { useTranslation } from "react-i18next";
 import { ScrollView, StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ActivitiesScreen() {
-  const theme = useContext(ThemeContext);
-  if (!theme) return null;
+  const { theme } = useTheme();
   const styles = createStyles(theme);
   const {t} = useTranslation();
+
+  const activities = getActivities();
 
   return (
     <SafeAreaView style={styles.outerContainer} edges={["top"]}>

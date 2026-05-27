@@ -1,5 +1,5 @@
 import { useTheme } from "@/hooks/useTheme";
-import i18n from "@/i18n";
+import { changeLanguage } from "@/i18n";
 import { ThemeColors } from '@/theme/colors';
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -15,8 +15,8 @@ export default function LanguageSettingsScreen() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.welcomeMessage}>{t("tabs.language")}</Text>
-      <SettingsOption text="English" action={()=>{i18n.changeLanguage("en")}} />
-      <SettingsOption text="日本語" action={()=>{i18n.changeLanguage("ja")}} />
+      <SettingsOption text="English" action={()=>{changeLanguage("en")}} />
+      <SettingsOption text="日本語" action={()=>{changeLanguage("ja")}} />
     </ScrollView>
   );
 }

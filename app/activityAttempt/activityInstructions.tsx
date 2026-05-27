@@ -1,6 +1,6 @@
 import InstructionGroup from "@/components/InstructionGroup";
 import { ActivityContext } from "@/context/ActivityContext";
-import { ThemeContext } from "@/context/ThemeContext";
+import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { useContext } from "react";
 import { useTranslation } from "react-i18next";
@@ -8,8 +8,7 @@ import { KeyboardAvoidingView, ScrollView, StyleSheet, Text } from "react-native
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ActivityAttemptInstructionsScreen(){
-    const theme = useContext(ThemeContext);
-    if (!theme) return null;
+    const { theme } = useTheme();
     const styles = createStyles(theme);
 
     const activityContext = useContext(ActivityContext);

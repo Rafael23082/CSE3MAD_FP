@@ -33,10 +33,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const changeTheme = async({newTheme}: {newTheme: string}) => {
+  const changeTheme = async(newTheme: string) => {
     const newThemeIsDark = newTheme == "dark";
     if (newThemeIsDark != isDark){
-      setIsDark(!isDark);
+      console.log("Changed to Dark!");
+      setIsDark(newThemeIsDark);
       await AsyncStorage.setItem(STORAGE_KEY, newThemeIsDark ? "dark": "light");
     }
   }

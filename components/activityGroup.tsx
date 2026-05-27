@@ -1,4 +1,4 @@
-import { activities } from "@/assets/activities";
+import { getActivities } from "@/assets/activities";
 import { ActivityContext } from "@/context/ActivityContext";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
@@ -18,6 +18,7 @@ export default function ActivityGroup({activityKey, activityName, description, i
     const router = useRouter(); 
     const {theme} = useTheme();
     const styles = createStyles(theme);
+    const activities = getActivities();
 
     const activityContext = useContext(ActivityContext);
     if (!activityContext) return null;

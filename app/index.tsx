@@ -1,31 +1,33 @@
 import { AuthContext } from "@/context/AuthContext";
 import { useRouter } from "expo-router";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { ActivityIndicator, View } from "react-native";
 
 export default function Index() {
     const context = useContext(AuthContext);
-    if (!context) return;
     const router = useRouter();
 
-    const {user, loading} = context;
+    if (!context) return null;
+
+    const { user, loading } = context;
+
+    useEffect(() => {
+        if (loading) return;
+
+        if (!user) {
+            router.replace("/home");
+        } else {
+            router.replace("/(tabs)");
+        }
+    }, [user, loading]);
+
     if (loading) {
         return (
-            <View
-                style={{
-                    flex: 1,
-                    justifyContent: "center",
-                    alignItems: "center",
-                }}
-            >
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                 <ActivityIndicator />
             </View>
         );
     }
 
-    if (!user) {
-        return router.push("/home");
-    }
-
-    router.push("/(tabs)");
+    return null;
 }

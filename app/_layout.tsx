@@ -4,9 +4,11 @@ import { ThemeProvider } from '@/context/ThemeContext';
 import { useFonts } from "expo-font";
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import "../i18n";
+import { initI18n } from '../i18n';
 
 export default function RootLayout() {
   useFonts({
@@ -18,6 +20,11 @@ export default function RootLayout() {
     InterSemiBold: require("../assets/fonts/Inter_18pt-SemiBold.ttf"),
     InterBold: require("../assets/fonts/Inter_18pt-Bold.ttf"),
   });
+
+  useEffect(() => {
+    initI18n();
+  }, [])
+
   return (
     <GestureHandlerRootView>
       <AuthProvider>
