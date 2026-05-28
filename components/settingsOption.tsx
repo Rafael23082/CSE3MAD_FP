@@ -4,16 +4,22 @@ import { Pressable, StyleSheet, Text } from "react-native";
 
 type settingsOptionProps = {
     text: string,
-    action: any
+    action: any,
+    paddingTop: boolean
 }
 
-export function SettingsOption({text, action}: settingsOptionProps){
+export function SettingsOption({text, action, paddingTop}: settingsOptionProps){
   const {theme} = useTheme();
 
   const styles = createStyles(theme);
 
   return(
-      <Pressable style={styles.option} onPress={action}>
+      <Pressable 
+        style={[styles.option, {
+          paddingTop: paddingTop ? 16: 0
+        }]} 
+        onPress={action}
+      >
           <Text style={styles.text}>{text}</Text>
       </Pressable>
   )
@@ -21,28 +27,10 @@ export function SettingsOption({text, action}: settingsOptionProps){
 
 const createStyles = (colors: ThemeColors) => {
   return StyleSheet.create({
-    outerContainer: {
-      flex: 1,
-      backgroundColor: colors.backgroundColor,
-    },
-
-    container: {
-      padding: 24,
-      flexGrow: 1,
-      backgroundColor: colors.backgroundColor,
-    },
-
-    welcomeMessage: {
-      fontFamily: "PoppinsBold",
-      fontSize: 22,
-      color: colors.primary,
-      marginBottom: 16,
-    },
-
     option: {
-      paddingVertical: 16,
       borderBottomWidth: 1,
       borderBottomColor: colors.card,
+      paddingBottom: 16
     },
 
     text: {

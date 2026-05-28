@@ -58,7 +58,7 @@ export default function TeamInitializationPage() {
         const teamRef = doc(collection(db, "teams"));
         const inviteCode = generateInviteCode();
         await setDoc(teamRef, {
-            teamID: teamRef.id,
+            teamId: teamRef.id,
             teamName,
             gradeLevel,
             members: [
@@ -82,7 +82,6 @@ export default function TeamInitializationPage() {
             }
 
             const teamRef = doc(db, "teams", teamID);
-
             const teamDocument = await getDoc(teamRef);
 
             if (!teamDocument.exists()) {
@@ -96,12 +95,18 @@ export default function TeamInitializationPage() {
                 return;
             }
 
+            if (!user) return;
+
             await updateDoc(teamRef, {
                 members: arrayUnion({
                     uid: user?.uid,
                     role: "member"
                 })
             })
+            await updateDoc(doc(db, "users", user?.uid), {
+                teamId: teamData.Id
+            })
+
             router.push("/(tabs)");
         }catch(err){
             setError("Something went wrong");

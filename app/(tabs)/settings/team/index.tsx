@@ -1,43 +1,38 @@
-import { auth } from "@/firebase";
+import { SettingsOption } from "@/components/settingsOption";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { useRouter } from "expo-router";
-import { signOut } from "firebase/auth";
 import { useTranslation } from "react-i18next";
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { SettingsOption } from "./settingsOption";
 
-export default function AccountSettingsScreen() {
+export default function TeamSettingsScreen() {
   const { theme } = useTheme();
   const styles = createStyles(theme);
-  const router = useRouter();
   const { t } = useTranslation();
+  const router = useRouter();
 
-  async function handleLogout() {
+  async function handleLeaveTeam() {
     try {
-      await signOut(auth);
-      router.replace("/home");
+
     } catch {
-      Alert.alert("Error", "Failed to logout");
+      Alert.alert("Error", "Failed to leave team");
     }
   }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.welcomeMessage}>
-        {t("tabs.account")}
-      </Text>
-
       <View style={styles.section}>
-        <SettingsOption text={t("account.profileInformation")} action={()=>{}} /> 
-        <SettingsOption text={t("account.changePassword")} action={()=>{}} /> 
-        <SettingsOption text={t("account.teamInformation")} action={()=>{}} /> 
+        <SettingsOption text={t("team.teamInformation")} action={() => {router.push("/(tabs)/settings/team/teamInformation")}} paddingTop={false} />
+        <SettingsOption text={t("team.manageMembers")} action={() => {router.push("/(tabs)/settings/team/manageMembers")}} paddingTop={true} />
+        <SettingsOption text={t("team.teamRoles")} action={() => {router.push("/(tabs)/settings/team/teamRoles")}} paddingTop={true} />
 
         <Pressable
           style={styles.option}
-          onPress={handleLogout}
+          onPress={handleLeaveTeam}
         >
-          <Text style={styles.logoutText}>{t("account.logout")}</Text>
+          <Text style={styles.leaveText}>
+            {t("team.leaveTeam")}
+          </Text>
         </Pressable>
       </View>
     </ScrollView>
@@ -55,7 +50,7 @@ const createStyles = (colors: ThemeColors) => {
       fontFamily: "PoppinsBold",
       fontSize: 22,
       color: colors.primary,
-      marginBottom: 16,
+      marginBottom: 8,
     },
     section: {
       borderRadius: 12,
@@ -71,7 +66,7 @@ const createStyles = (colors: ThemeColors) => {
       color: colors.secondary,
       fontSize: 16,
     },
-    logoutText: {
+    leaveText: {
       fontFamily: "PoppinsRegular",
       color: "#D9534F",
       fontSize: 16,

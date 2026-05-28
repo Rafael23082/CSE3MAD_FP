@@ -1,18 +1,18 @@
+import { SettingsOption } from "@/components/settingsOption";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
+import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
-import { SettingsOption } from "./settingsOption";
 
 export default function AboutScreen() {
   const { theme } = useTheme();
   const styles = createStyles(theme);
   const {t} = useTranslation();
+  const router = useRouter();
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>{t("tabs.about")}</Text>
-
       <View style={styles.infoSection}>
         <View>
           <Text style={styles.label}>{t("about.appName")}</Text>
@@ -28,9 +28,9 @@ export default function AboutScreen() {
         </View>
       </View>
 
-      <SettingsOption text={t("about.privacyPolicy")} action={()=>{}} />
-      <SettingsOption text={t("about.termsOfService")} action={()=>{}} />
-      <SettingsOption text={t("about.contactSupport")} action={()=>{}} />
+      <SettingsOption text={t("about.privacyPolicy")} action={()=>{router.push("/(tabs)/settings/about/privacyPolicy")}} paddingTop={false} />
+      <SettingsOption text={t("about.termsOfService")} action={()=>{router.push("/(tabs)/settings/about/termsOfService")}} paddingTop={true} />
+      <SettingsOption text={t("about.contactSupport")} action={()=>{router.push("/(tabs)/settings/about/contactSupport")}} paddingTop={true} />
 
     </ScrollView>
   );

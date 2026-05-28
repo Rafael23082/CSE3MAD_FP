@@ -18,7 +18,15 @@ const resources = {
         details: "Details",
         attempt: "Attempt",
         instructions: "Instructions",
-        language: "Language"
+        language: "Language",
+        contactSupport: "Contact Support",
+        privacyPolicy: "Privacy Policy",
+        termsOfService: "Term of Service",
+        changePassword: "Change Password",
+        profileInformation: "Profile Information",
+        manageMembers: "Manage Members",
+        teamInformation: "Team Information",
+        teamRoles: "Team Roles"
       },
       buttons: {
         register: "Register",
@@ -33,7 +41,8 @@ const resources = {
         continue: "Continue",
         backToActivities: "Back to Activities",
         waitForSignal: "Wait for the Signal",
-        tapNow: "TAP NOW!"
+        tapNow: "TAP NOW!",
+        changePassword: "Change Password"
       },
       landing: {
         slogan: "Experiment. Measure. Improve."
@@ -230,13 +239,16 @@ const resources = {
       },
       errorMessages: {
         invalidCredential: "Invalid email or password",
+        fillInAllFields: "Please fill in all fields",
         userNotFound: "No account found with this email",
         wrongPassword: "Incorrect password",
         invalidEmail: "Please enter a valid email",
         tooManyRequests: "Too many attempts. Please try again later",
         defaultError: "Something went wrong",
         weakPassword: "Password should be at least 6 characters",
-        emailAlreadyInUse: "This email is already registered"
+        emailAlreadyInUse: "This email is already registered",
+        failedPasswordUpdate: "Password update failed",
+        passwordsDoNotMatch: "Passwords do not match"
       },
       countdown: {
         getReady: "Get Ready"
@@ -259,6 +271,20 @@ const resources = {
       appearance: {
         lightMode: "Light Mode",
         darkMode: "Dark Mode"
+      },
+      team: {
+        teamInformation: "Team Information",
+        manageMembers: "Manage Members",
+        teamRoles: "Team Roles",
+        leaveTeam: "Leave Team"
+      },
+      changePassword: {
+        currentPassword: "Current Password",
+        currentPasswordPlaceholder: "Enter current password",
+        newPassword: "New Password",
+        newPasswordPlaceholder: "Enter new password",
+        confirmPassword: "Confirm Password",
+        confirmPasswordPlaceholder: "Confirm new password"
       }
     }
   },
@@ -276,7 +302,15 @@ const resources = {
         details: "詳細",
         attempt: "試み",
         instructions: "手順",
-        language: "言語"
+        language: "言語",
+        contactSupport: "サポートに問い合わせる",
+        privacyPolicy: "プライバシーポリシー",
+        termsOfService: "利用規約",
+        changePassword: "パスワードを変更する",
+        profileInformation: "プロフィール情報",
+        manageMembers: "メンバーの管理",
+        teamInformation: "チーム情報",
+        teamRoles: "チームの役割"
       },
       buttons: {
         register: "登録",
@@ -291,7 +325,8 @@ const resources = {
         continue: "続ける",
         backToActivities: "アクティビティに戻る",
         waitForSignal: "合図を待ってください",
-        tapNow: "今すぐタップ！"
+        tapNow: "今すぐタップ！",
+        changePassword: "パスワードを変更する"
       },
       landing: {
         slogan: "試行。測定。改善。"
@@ -488,13 +523,15 @@ const resources = {
       },
       errorMessages: {
         invalidCredential: "メールアドレスまたはパスワードが正しくありません",
+        fillInAllFields: "すべての項目にご記入ください",
         userNotFound: "このメールアドレスに登録されたアカウントが見つかりません",
         wrongPassword: "パスワードが間違っています",
         invalidEmail: "有効なメールアドレスを入力してください",
         tooManyRequests: "試行回数を超えました。後ほどもう一度お試しください",
         defaultError: "何か問題が発生しました",
         weakPassword: "パスワードは6文字以上にしてください",
-        emailAlreadyInUse: "このメールアドレスはすでに登録されています"
+        emailAlreadyInUse: "このメールアドレスはすでに登録されています",
+        failedPasswordUpdate: "パスワードの更新に失敗しました"
       },
       countdown: {
         getReady: "準備をしよう"
@@ -517,6 +554,20 @@ const resources = {
       appearance: {
         lightMode: "ライトモード",
         darkMode: "ダークモード"
+      },
+      team: {
+        teamInformation: "チーム情報",
+        manageMembers: "メンバーの管理",
+        teamRoles: "チームの役割",
+        leaveTeam: "チームを離れる"
+      },
+      changePassword: {
+        currentPassword: "現在のパスワード",
+        currentPasswordPlaceholder: "現在のパスワードを入力してください",
+        newPassword: "新しいパスワード",
+        newPasswordPlaceholder: "新しいパスワードを入力してください",
+        confirmPassword: "パスワードを認証する",
+        confirmPasswordPlaceholder: "新しいパスワードを確認します"
       }
     }
   },

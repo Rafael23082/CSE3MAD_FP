@@ -25,6 +25,11 @@ export default function SignupScreen(){
 
     const handleSignup = async() => {
         try{
+            if (!firstName || !email || !password){
+                setError(t("errorMessages.fillInAllFields"));
+                return;
+            };
+
             const userCredential = createUserWithEmailAndPassword(auth, email, password);
             const user = (await userCredential).user;
 

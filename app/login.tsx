@@ -23,6 +23,11 @@ export default function LoginScreen(){
     const {t} = useTranslation();
     
     const handleSignin = () => {
+        if (!email || !password){
+            setError(t("errorMessages.fillInAllFields"));
+            return;
+        };
+
         signInWithEmailAndPassword(auth, email, password)
             .then(() => {
                 router.push("/(tabs)");
