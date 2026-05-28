@@ -35,7 +35,7 @@ const createStyles = (colors: ThemeColors) => {
         },
         buttonText: {
             color: "#FFFFFF",
-            fontFamily: "InterSemiBold",
+            fontFamily: "InterRegular",
             width: "100%",
             textAlign: "center",
             lineHeight: 18,

@@ -1,9 +1,10 @@
+import { InfoItem } from "@/components/infoItem";
 import { SettingsOption } from "@/components/settingsOption";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 export default function AboutScreen() {
   const { theme } = useTheme();
@@ -14,18 +15,23 @@ export default function AboutScreen() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.infoSection}>
-        <View>
-          <Text style={styles.label}>{t("about.appName")}</Text>
-          <Text style={styles.value}>STEMMLAB</Text>
-        </View>
-        <View>
-          <Text style={styles.label}>{t("about.version")}</Text>
-          <Text style={styles.value}>1.0.0</Text>
-        </View>
-        <View>
-          <Text style={styles.label}>{t("about.description")}</Text>
-          <Text style={styles.value}>{t("about.descriptionValue")}</Text>
-        </View>
+        <InfoItem 
+          label={t("about.appName")}
+          value="STEMMLAB"
+          marginTop={false}
+        />
+
+        <InfoItem 
+          label={t("about.version")}
+          value="1.0.0"
+          marginTop={true}
+        />
+
+        <InfoItem 
+          label={t("about.description")}
+          value={t("about.descriptionValue")}
+          marginTop={true}
+        />
       </View>
 
       <SettingsOption text={t("about.privacyPolicy")} action={()=>{router.push("/(tabs)/settings/about/privacyPolicy")}} paddingTop={false} />
@@ -51,21 +57,6 @@ const createStyles = (colors: ThemeColors) => {
     },
     infoSection: {
       marginBottom: 24,
-      display: "flex",
-      flexDirection: "column",
-      rowGap: 16
-    },
-    label: {
-      fontFamily: "InterRegular",
-      fontSize: 14,
-      opacity: 0.7,
-      color: colors.secondary,
-      marginBottom: 8,
-    },
-    value: {
-      fontFamily: "InterRegular",
-      fontSize: 16,
-      color: colors.secondary,
     },
   });
 };

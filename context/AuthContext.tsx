@@ -1,5 +1,5 @@
 import { onAuthStateChanged, User } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
 import { createContext, ReactNode, useEffect, useState } from "react";
 import { auth, db } from "../firebase";
 
@@ -22,23 +22,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+        const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
             setUser(user);
-            if (user){
+
+            if (user) {
                 const userDocRef = doc(db, "users", user.uid);
-                const userDoc = await getDoc(userDocRef);
-                if (userDoc.exists()){
-                    setUserProfile(userDoc.data() as UserProfile);
-                }
-                console.log("User is logged in");
-            }else{
-                console.log("User is logged out");
+
+                const unsubscribeSnapshot = onSnapshot(userDocRef, (doc) => {
+                    if (doc.exists()) {
+                        setUserProfile(doc.data() as UserProfile);
+                    }
+                });
+
+                setLoading(false);
+
+                return unsubscribeSnapshot;
+            } else {
                 setUserProfile(null);
+                setLoading(false);
             }
-            setLoading(false);
         });
 
-        return unsubscribe;
+        return unsubscribeAuth;
     }, []);
 
     return (

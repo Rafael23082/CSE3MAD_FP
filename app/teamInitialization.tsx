@@ -295,7 +295,7 @@ const createStyles = (colors: ThemeColors) => {
             fontFamily: "InterRegular",
             marginTop: 16,
             color: "red",
-            fontSize: 16
+            fontSize: 14
         }
     });
 };

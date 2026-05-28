@@ -33,9 +33,11 @@ export default function SignupScreen(){
             const userCredential = createUserWithEmailAndPassword(auth, email, password);
             const user = (await userCredential).user;
 
+            const formattedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
+
             await setDoc(doc(db, "users", user.uid), {  
                 uid: user.uid,
-                firstName: firstName,
+                firstName: formattedFirstName,
                 email: email,
                 createdAt: new Date()
             })
@@ -159,7 +161,7 @@ const createStyles = (colors: ThemeColors) => {
             fontFamily: "InterRegular",
             marginTop: 16,
             color: "red",
-            fontSize: 16
+            fontSize: 14
         }
     })
     return styles;

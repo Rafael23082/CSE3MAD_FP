@@ -7,7 +7,7 @@ import { useRouter } from "expo-router";
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from "firebase/auth";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 export default function ChangePasswordScreen() {
   const {theme} = useTheme();
@@ -53,56 +53,57 @@ export default function ChangePasswordScreen() {
     await reauthenticateWithCredential(user, credential);
     await updatePassword(user, newPassword);
 
-    setCurrentPassword("");
-    setNewPassword("");
-    setconfirmPassword("");
+    Alert.alert("Success", "Password changed successfully!");
+    router.push("/(tabs)/settings/account");
   } catch (error: any) {
     setError(t("errorMessages.failedPasswordUpdate"));
   }}
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.growingContainer}>
-        <View style={{marginTop: -40}}>
+    <KeyboardAvoidingView style={styles.flexContainer} behavior="height" keyboardVerticalOffset={80} >
+      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+        <View style={styles.subContainer}>
+          <View style={{marginTop: -40}}>
+            <InputGroup
+              first={true}
+              label={t("changePassword.currentPassword")}
+              text={currentPassword}
+              setText={setCurrentPassword}
+              placeholder={t("changePassword.currentPasswordPlaceholder")}
+              isPassword={true}
+              isLabeled={true}
+            />
+          </View>
+      
           <InputGroup
-            first={true}
-            label={t("changePassword.currentPassword")}
-            text={currentPassword}
-            setText={setCurrentPassword}
-            placeholder={t("changePassword.currentPasswordPlaceholder")}
+            first={false}
+            label={t("changePassword.newPassword")}
+            text={newPassword}
+            setText={setNewPassword}
+            placeholder={t("changePassword.newPasswordPlaceholder")}
             isPassword={true}
             isLabeled={true}
           />
+      
+          <InputGroup
+            first={false}
+            label={t("changePassword.confirmPassword")}
+            text={confirmPassword}
+            setText={setconfirmPassword}
+            placeholder={t("changePassword.confirmPasswordPlaceholder")}
+            isPassword={true}
+            isLabeled={true}
+          />
+          {error && (
+              <Text style={styles.errorMessage}>{error}</Text>
+          )}
         </View>
-    
-        <InputGroup
-          first={false}
-          label={t("changePassword.newPassword")}
-          text={newPassword}
-          setText={setNewPassword}
-          placeholder={t("changePassword.newPasswordPlaceholder")}
-          isPassword={true}
-          isLabeled={true}
+        <Button 
+          text={t("buttons.changePassword")}
+          action={() => {handleChangePassword()}}
         />
-    
-        <InputGroup
-          first={false}
-          label={t("changePassword.confirmPassword")}
-          text={confirmPassword}
-          setText={setconfirmPassword}
-          placeholder={t("changePassword.confirmPasswordPlaceholder")}
-          isPassword={true}
-          isLabeled={true}
-        />
-        {error && (
-            <Text style={styles.errorMessage}>{error}</Text>
-        )}
-      </View>
-      <Button 
-        text={t("buttons.changePassword")}
-        action={() => {handleChangePassword()}}
-      />
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -113,14 +114,18 @@ const createStyles = (colors: ThemeColors) => {
       flexGrow: 1,
       backgroundColor: colors.backgroundColor,
     },
-    growingContainer: {
+    subContainer: {
+      paddingBottom: 24,
       flexGrow: 1
     },
     errorMessage: {
         fontFamily: "InterRegular",
         marginTop: 16,
         color: "red",
-        fontSize: 16
+        fontSize: 14
+    },
+    flexContainer: {
+      flex: 1
     }
   });
   return styles;
