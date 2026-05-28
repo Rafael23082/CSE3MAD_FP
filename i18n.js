@@ -248,7 +248,8 @@ const resources = {
         weakPassword: "Password should be at least 6 characters",
         emailAlreadyInUse: "This email is already registered",
         failedPasswordUpdate: "Password update failed",
-        passwordsDoNotMatch: "Passwords do not match"
+        passwordsDoNotMatch: "Passwords do not match",
+        emptyFirstName: "First name cannot be empty"
       },
       countdown: {
         getReady: "Get Ready"
@@ -531,7 +532,8 @@ const resources = {
         defaultError: "何か問題が発生しました",
         weakPassword: "パスワードは6文字以上にしてください",
         emailAlreadyInUse: "このメールアドレスはすでに登録されています",
-        failedPasswordUpdate: "パスワードの更新に失敗しました"
+        failedPasswordUpdate: "パスワードの更新に失敗しました",
+        emptyFirstName: "名字は空欄にできません"
       },
       countdown: {
         getReady: "準備をしよう"

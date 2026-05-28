@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 type EditableInfoItemProps = {
   label: string;
@@ -25,6 +25,12 @@ export default function EditableInfoItem({ label, value, onSave, placeholder}: E
 
     setEditing(!editing);
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      return () => setEditing(false);
+    }, [])
+  )
 
   return (
     <View style={styles.container}>

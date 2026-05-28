@@ -5,12 +5,12 @@ import { AuthContext } from "@/context/AuthContext";
 import { auth, db } from "@/firebase";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { signOut } from "firebase/auth";
 import { doc, updateDoc } from "firebase/firestore";
-import { useContext } from "react";
+import { useCallback, useContext, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function AccountSettingsScreen() {
   const { theme } = useTheme();
@@ -20,20 +20,27 @@ export default function AccountSettingsScreen() {
   const authContext = useContext(AuthContext);
   if (!authContext) return;
   const { userProfile, user } = authContext;
+  const [error, setError] = useState("");
+
+  useFocusEffect(
+    useCallback(() => {
+      return () => setError("");
+    }, [])
+  )
 
   async function handleLogout() {
     try {
       await signOut(auth);
       router.replace("/home");
-    } catch {
-      Alert.alert("Error", "Failed to logout");
+    } catch(err) {
+      console.log(err);
     }
   }
 
   const handleUpdateFirstName = async (newValue: string) => {
     try {
       if (!newValue) {
-        Alert.alert("Error", "First name cannot be empty.");
+        setError(t("errorMessages.emptyFirstName"));
         return;
       }
       const user = auth.currentUser;
@@ -47,7 +54,9 @@ export default function AccountSettingsScreen() {
       await updateDoc(doc(db, "users", user.uid), {
         firstName: formattedFirstName,
       });
+      setError("");
     } catch (error) {
+      setError(t("errorMessages.defaultError"))
       console.log(error);
     }
   };
@@ -67,6 +76,10 @@ export default function AccountSettingsScreen() {
           onSave={handleUpdateFirstName}
           placeholder={t("forms.firstNamePlaceholder")}
         />
+
+        {error && (
+            <Text style={styles.errorMessage}>{error}</Text>
+        )}
 
         <InfoItem 
           label={t("forms.email")}
@@ -111,5 +124,11 @@ const createStyles = (colors: ThemeColors) => {
     infoSection: {
       marginBottom: 24,
     },
+    errorMessage: {
+        fontFamily: "InterRegular",
+        marginTop: 8,
+        color: "red",
+        fontSize: 14
+    }
   });
 };
