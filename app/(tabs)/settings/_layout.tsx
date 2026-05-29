@@ -66,13 +66,6 @@ export default function SettingsLayout() {
       />
 
       <Stack.Screen
-        name="account/profileInformation"
-        options={{
-          title: t("tabs.profileInformation"),
-        }}
-      />
-
-      <Stack.Screen
         name="about/contactSupport"
         options={{
           title: t("tabs.contactSupport"),
@@ -94,9 +87,9 @@ export default function SettingsLayout() {
       />
 
       <Stack.Screen
-        name="team/manageMembers"
+        name="team/members"
         options={{
-          title: t("tabs.manageMembers"),
+          title: t("tabs.members"),
         }}
       />
 

@@ -11,7 +11,8 @@ type AuthContextType = {
 
 type UserProfile = {
     firstName: string,
-    createdAt: Date
+    createdAt: Date,
+    teamId: string
 };
 
 export const AuthContext = createContext<AuthContextType | null>(null);

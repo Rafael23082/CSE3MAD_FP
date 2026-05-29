@@ -4,16 +4,17 @@ import { AuthContext } from "@/context/AuthContext";
 import { db } from "@/firebase";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
-import { arrayUnion, collection, doc, getDoc, setDoc, updateDoc } from "@firebase/firestore";
+import { collection, doc, getDoc, setDoc, updateDoc } from "@firebase/firestore";
 import { Picker } from "@react-native-picker/picker";
-import { useRouter } from "expo-router";
-import { useContext, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function TeamInitializationPage() {
-    const {theme} = useTheme();
+    const {theme, isDark} = useTheme();
 
     const styles = createStyles(theme);
     const router = useRouter();
@@ -23,6 +24,14 @@ export default function TeamInitializationPage() {
     const { user } = auth;
 
     const [mode, setMode] = useState<"create" | "join">("create");
+    const queryClient = useQueryClient();
+
+    const { mode: initialMode } = useLocalSearchParams();
+    useEffect(() => {
+    if (initialMode === "join" || initialMode === "create") {
+        setMode(initialMode);
+    }
+    }, [initialMode]);
 
     const [teamName, setTeamName] = useState("");
     const [gradeLevel, setGradeLevel] = useState("");
@@ -61,14 +70,17 @@ export default function TeamInitializationPage() {
             teamId: teamRef.id,
             teamName,
             gradeLevel,
-            members: [
-                {
-                    uid: user?.uid,
-                    role: "leader"
-                }
-            ],
             inviteCode
+        });
+
+        if (!user) return null;
+        const userRef = doc(db, "users", user?.uid);
+        await setDoc(userRef, {
+            teamId: teamRef.id,
+        }, {
+            merge: true
         })
+        queryClient.invalidateQueries({ queryKey: ["team", user.uid] });
         router.push("/(tabs)");
     }
     
@@ -97,16 +109,11 @@ export default function TeamInitializationPage() {
 
             if (!user) return;
 
-            await updateDoc(teamRef, {
-                members: arrayUnion({
-                    uid: user?.uid,
-                    role: "member"
-                })
-            })
             await updateDoc(doc(db, "users", user?.uid), {
-                teamId: teamData.Id
+                teamId: teamRef.id
             })
 
+            queryClient.invalidateQueries({ queryKey: ["team", user.uid] });
             router.push("/(tabs)");
         }catch(err){
             setError("Something went wrong");
@@ -147,28 +154,34 @@ export default function TeamInitializationPage() {
 
                                     <View style={styles.pickerContainer}>
                                         <Text style={styles.pickerLabel}>{t("teamInitialization.gradeLevel")}</Text>
-                                        <Picker
-                                            selectedValue={gradeLevel}
-                                            onValueChange={(itemValue) => setGradeLevel(itemValue)}
-                                            dropdownIconColor={theme.secondary}
-                                            style={styles.picker}
-                                        >
-                                            <Picker.Item
-                                                label={t("teamInitialization.gradeLevelPlaceholder")}
-                                                value={""}
-                                                enabled={false}
-                                            />
-                                            {[...Array(12)].map((_, index) => {
-                                                const grade = index + 1;
-                                                return (
-                                                    <Picker.Item 
-                                                        key={grade}
-                                                        label={`Grade ${grade}`}
-                                                        value={grade}
-                                                    />
-                                                )
-                                            })}
-                                        </Picker>
+                                        <View style={{
+                                            borderWidth: isDark ? 0: 1,
+                                            borderRadius: 5,
+                                            overflow: "hidden"
+                                        }}>
+                                            <Picker
+                                                selectedValue={gradeLevel}
+                                                onValueChange={(itemValue) => setGradeLevel(itemValue)}
+                                                dropdownIconColor={theme.secondary}
+                                                style={styles.picker}
+                                            >
+                                                <Picker.Item
+                                                    label={t("teamInitialization.gradeLevelPlaceholder")}
+                                                    value={""}
+                                                    enabled={false}
+                                                />
+                                                {[...Array(12)].map((_, index) => {
+                                                    const grade = index + 1;
+                                                    return (
+                                                        <Picker.Item 
+                                                            key={grade}
+                                                            label={`Grade ${grade}`}
+                                                            value={grade}
+                                                        />
+                                                    )
+                                                })}
+                                            </Picker>
+                                        </View>
                                         {error && (
                                             <Text style={styles.errorMessage}>{error}</Text>
                                         )}
@@ -260,7 +273,8 @@ const createStyles = (colors: ThemeColors) => {
             color: "#fff"
         },
         growingContainer: {
-            flexGrow: 1
+            flexGrow: 1,
+            paddingBottom: 24
         },
         subContainer: {
             flexGrow: 1,
@@ -276,20 +290,17 @@ const createStyles = (colors: ThemeColors) => {
             fontSize: 16
         },
         pickerContainer: {
-            marginTop: 40
+            marginTop: 30,
         },
         pickerLabel: {
             fontFamily: "InterRegular",
-            color: colors.secondary
+            color: colors.secondary,
+            paddingBottom: 16
         },
         picker: {
-            color: "#000000",
-            backgroundColor: "#FFFFFF",
-            borderRadius: 5,
-            borderColor: "#000000",
-            padding: 12,
+            color: colors.secondary,
+            backgroundColor: colors.backgroundColor,
             fontSize: 16,
-            marginTop: 16
         },
         errorMessage: {
             fontFamily: "InterRegular",

@@ -24,7 +24,7 @@ const resources = {
         termsOfService: "Term of Service",
         changePassword: "Change Password",
         profileInformation: "Profile Information",
-        manageMembers: "Manage Members",
+        members: "Members",
         teamInformation: "Team Information",
         teamRoles: "Team Roles"
       },
@@ -275,7 +275,7 @@ const resources = {
       },
       team: {
         teamInformation: "Team Information",
-        manageMembers: "Manage Members",
+        members: "Members",
         teamRoles: "Team Roles",
         leaveTeam: "Leave Team"
       },
@@ -309,7 +309,7 @@ const resources = {
         termsOfService: "利用規約",
         changePassword: "パスワードを変更する",
         profileInformation: "プロフィール情報",
-        manageMembers: "メンバーの管理",
+        members: "メンバー",
         teamInformation: "チーム情報",
         teamRoles: "チームの役割"
       },
@@ -559,7 +559,7 @@ const resources = {
       },
       team: {
         teamInformation: "チーム情報",
-        manageMembers: "メンバーの管理",
+        members: "メンバー",
         teamRoles: "チームの役割",
         leaveTeam: "チームを離れる"
       },
