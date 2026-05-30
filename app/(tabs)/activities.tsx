@@ -11,7 +11,7 @@ export default function ActivitiesScreen() {
   const styles = createStyles(theme);
   const {t} = useTranslation();
 
-  const activities = getActivities();
+  const activities = getActivities(t);
 
   return (
     <SafeAreaView style={styles.outerContainer} edges={["top"]}>

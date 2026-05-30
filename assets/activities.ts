@@ -32,7 +32,7 @@ const mapPhases = (path: string) => {
   }) as string[];
 };
 
-export const getActivities = (): Record<string, Activity> => ({
+export const getActivities = (t: any): Record<string, Activity> => ({
     "parachute-drop-challenge": {
         key: "parachute-drop-challenge",
         name: i18n.t("activities.parachuteDropChallenge.name"),

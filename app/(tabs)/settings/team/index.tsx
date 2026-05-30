@@ -65,25 +65,25 @@ export default function TeamSettingsScreen() {
         <View>
           <View style={styles.infoSection}>
             <InfoItem 
-              label={"Team ID"}
+              label={t("teamInitialization.teamID")}
               value={team.teamId}
               marginTop={false}
             />
 
             <InfoItem 
-              label={"Team Name"}
+              label={t("teamInitialization.teamName")}
               value={team.teamName}
               marginTop={true}
             />
           
             <InfoItem 
-              label={"Grade Level"}
+              label={t("teamInitialization.gradeLevel")}
               value={team.gradeLevel}
               marginTop={true}
             />
 
             <InfoItem 
-              label={"Invite Code"}
+              label={t("teamInitialization.inviteCode")}
               value={team.inviteCode}
               marginTop={true}
             />
@@ -113,13 +113,13 @@ export default function TeamSettingsScreen() {
         </View>
       ): (
         <View>
-          <SettingsOption text={"Create Team"} action={() => {router.push({
+          <SettingsOption text={t("buttons.createTeam")} action={() => {router.push({
             pathname: "/teamInitialization",
             params: {
               mode: "create"
             }
           })}} paddingTop={false} />        
-          <SettingsOption text={"Join Team"} action={() => {router.push({
+          <SettingsOption text={t("buttons.joinTeam")} action={() => {router.push({
             pathname: "/teamInitialization",
             params: {
               mode: "join"

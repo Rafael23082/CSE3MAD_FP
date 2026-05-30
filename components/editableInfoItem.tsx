@@ -2,6 +2,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 type EditableInfoItemProps = {
@@ -14,6 +15,7 @@ type EditableInfoItemProps = {
 export default function EditableInfoItem({ label, value, onSave, placeholder}: EditableInfoItemProps) {
   const { theme } = useTheme();
   const styles = createStyles(theme);
+  const {t} = useTranslation();
 
   const [editing, setEditing] = useState(false);
   const [inputValue, setInputValue] = useState(value);
@@ -52,7 +54,7 @@ export default function EditableInfoItem({ label, value, onSave, placeholder}: E
 
       <Pressable onPress={handlePress}>
         <Text style={styles.actionText}>
-          {editing ? "Save" : "Edit"}
+          {editing ? t("buttons.save") : t("buttons.edit")}
         </Text>
       </Pressable>
     </View>

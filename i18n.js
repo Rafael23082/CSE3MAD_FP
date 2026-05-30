@@ -47,7 +47,9 @@ const resources = {
         tapNow: "TAP NOW!",
         changePassword: "Change Password",
         stop: "STOP",
-        start: "START"
+        start: "START",
+        edit: "Edit",
+        save: "Save"
       },
       landing: {
         slogan: "Experiment. Measure. Improve."
@@ -534,7 +536,9 @@ const resources = {
         logReading: "測定を記録",
         logDesign: "設計を記録",
         stop: "停止",
-        start: "開始"
+        start: "開始",
+        edit: "編集",
+        save: "保存"
       },
       landing: {
         slogan: "試行。測定。改善。"
@@ -869,7 +873,9 @@ const resources = {
         logReading: "Catat Pembacaan",
         logDesign: "Catat Desain",
         stop: "BERHENTI",
-        start: "MULAI"
+        start: "MULAI",
+        edit: "Ubah",
+        save: "Simpan"
       },
       landing: {
         slogan: "Eksperimen. Ukur. Tingkatkan."
@@ -1361,7 +1367,8 @@ const resources = {
         tapNow: "立即点击！",
         changePassword: "修改密码",
         stop: "停止",
-        start: "开始"
+        edit: "编辑",
+        save: "节省"
       },
       landing: {
         slogan: "实验。测量。改进。"
