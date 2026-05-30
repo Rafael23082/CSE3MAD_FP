@@ -111,7 +111,34 @@ const resources = {
             { name: "Table", description: "Provides a consistent, measured drop height to ensure fair testing." },
             { name: "Scissors", description: "Used to cut and shape the canopy and string to specific design requirements." },
             { name: "Tape", description: "Secures the components together and marks the drop height." }
-          ]
+          ],
+          parameters: "Parameters",
+          analytics: "Physics Analysis",
+          gForce: "G-Force Analysis",
+          contactTime: "Contact Time (s)",
+          contactTimePlaceholder: "Enter contact time (e.g. 0.05)",
+          didBounce: "Did it bounce?",
+          surfaceArea: "Surface Area (cm²)",
+          surfaceAreaPlaceholder: "Parachute surface area",
+          gForceResult: "G-Force",
+          gForceRisk: "Injury Risk",
+          gForceRiskScale: "G-Force Risk Scale",
+          gForceTip: "Use slow-motion video to measure contact time",
+          prototype: "Prototype",
+          baselineLabel: "Baseline (No Parachute)",
+          predictTime: "Predicted Time (s)",
+          predictTimePlaceholder: "Predicted fall time",
+          wasRight: "Was your prediction right?",
+          writeUpPrediction: "Prediction Log",
+          easiestDesign: "Easiest design to make",
+          easiestDesignPlaceholder: "Which design was easiest?",
+          gForceTable: {
+            safe: "1-5 g: No injury (elevators, standing)",
+            moderate: "5-10 g: Possible bruising (hard falls)",
+            serious: "10-30 g: Serious injuries possible (sports collisions)",
+            severe: "30-50 g: High risk of severe injury (car crashes)",
+            critical: "50+ g: Life-threatening injuries likely"
+          }
         },
         
         soundPollutionHunter: {
@@ -124,7 +151,28 @@ const resources = {
           ],
           equipments: [
             { name: "Any Object", description: "Object that is dropped to measure noise from." }
-          ]
+          ],
+          actionLabel: "Action",
+          actionPlaceholder: "e.g. Dropping a book",
+          actionOptions: ["Dropping a book", "Talking", "Walking", "Stamping feet", "Closing a door"],
+          predictionLabel: "Prediction (Louder/Softer)",
+          predictLouder: "Louder",
+          predictSofter: "Softer",
+          predictionCompare: "Was your prediction right?",
+          hearingRiskTable: "Hearing Damage Risk",
+          safeZone: "Safe Zone",
+          warningZone: "Warning Zone",
+          dangerZone: "Danger Zone",
+          riskScale: {
+            safe: "0-60 dB: Safe — no risk",
+            moderate: "60-85 dB: Safe for brief exposure",
+            warning: "85-90 dB: Warning — damage possible >8 hrs",
+            high: "90-100 dB: High risk — damage >15 mins",
+            dangerous: "100-120 dB: Dangerous — minutes count",
+            critical: "120dB+: Immediate damage risk"
+          },
+          needEarMuffs: "Should you wear ear muffs?",
+          needEarMuffsPlaceholder: "Your thoughts on ear protection"
         },
         
         handFanChallenge: {
@@ -140,7 +188,31 @@ const resources = {
             { name: "Paper and cardboard", description: "Used as raw materials to construct both the fan and the vertical target." },
             { name: "Scissors", description: "Enables precise cutting of materials to create specific fan shapes and sizes." },
             { name: "Sticky Tape", description: "Secures the vertical target to the table so it can bend without falling." }
-          ]
+          ],
+          selectMaterial: "Target Material",
+          selectDistance: "Distance (cm)",
+          materialStiffness: "Stiffness Coefficient",
+          targetToggle: "Target Type",
+          paper: "Paper",
+          cardboard: "Cardboard",
+          fanDesign: "Fan Design Name",
+          fanDesignPlaceholder: "e.g. Origami Pleated Fold",
+          deflectionAngle: "Deflection Angle (°)",
+          anglePlaceholder: "Enter bend angle",
+          forceResult: "Estimated Force",
+          forceUnit: "N",
+          stiffnessNote: "Higher stiffness = more force required to bend",
+          predictionAngle: "Predicted Angle (°)",
+          predictionAnglePlaceholder: "Your predicted angle",
+          wasRightLabel: "Were you right?",
+          writeUp: {
+            bestDesign: "Which design moved the paper most?",
+            bestDesignPlaceholder: "Your answer",
+            stiffnessEffect: "How does stiffness affect bend angle?",
+            stiffnessEffectPlaceholder: "Your observation",
+            distanceEffect: "How does distance affect bending?",
+            distanceEffectPlaceholder: "Your observation"
+          }
         },
         
         earthquakeResistantStructure: {
@@ -156,7 +228,28 @@ const resources = {
             { name: "Paper and cardboard", description: "Primary materials used to construct the structural platform and anti-vibration layers." },
             { name: "Scissors", description: "Enables precise cutting of materials to create specific fan shapes and sizes." },
             { name: "Sticky Tape", description: "Secures the vertical target to the table so it can bend without falling." }
-          ]
+          ],
+          designName: "Design Name",
+          designNamePlaceholder: "e.g. Design 1",
+          foldCount: "Fold Count",
+          foldCountPlaceholder: "Number of folds",
+          pillarCount: "Pillar Count",
+          pillarCountPlaceholder: "Number of pillars",
+          predictedMovement: "Predicted Movement (cm)",
+          predictedMovementPlaceholder: "Your prediction",
+          observedSway: "Observed Sway (cm)",
+          observedSwayPlaceholder: "Measured movement",
+          accelerometerData: "Accelerometer Data",
+          startVibration: "Start Vibration",
+          stopVibration: "Stop Vibration",
+          writeUp: {
+            bestDesign: "Which design moved the least?",
+            bestDesignPlaceholder: "Your answer",
+            structuralEffect: "How did folds/pillars affect stability?",
+            structuralEffectPlaceholder: "Your observation",
+            realWorldLink: "How does this relate to real buildings?",
+            realWorldLinkPlaceholder: "Your connection"
+          }
         },
         
         stretchSpeedAndGracefulness: {
@@ -286,6 +379,53 @@ const resources = {
         newPasswordPlaceholder: "Enter new password",
         confirmPassword: "Confirm Password",
         confirmPasswordPlaceholder: "Confirm new password"
+      },
+
+      results: {
+        attempts: "Attempts",
+        ranking: "Ranking",
+        theoryExplanation: "Theory Explanation",
+        rating: "Rate this Activity",
+        ratingPrompt: "How was this activity?",
+        accuracy: "Accuracy",
+        backToActivities: "Back to Activities",
+        parachuteTheory: "How Parachutes Work\n\nWhen you drop a toy without a parachute, gravity pulls it straight down. The only force acting on it is gravity, so it accelerates at 9.8 m/s² until it hits the ground. A parachute adds drag force by increasing surface area. The drag force pushes upward against gravity, slowing the fall. The larger the canopy, the more air resistance, and the slower the descent. The g-force experienced on landing depends on how quickly the object stops. A longer contact time (softer landing) reduces g-force, while a hard, sudden stop increases it dramatically.\n\nKey formulas:\n• Velocity: v = d / t\n• Acceleration: a = v / t\n• Weight: W = m × 9.8\n• Net Force: F = m × a\n• Drag Force: F_drag = W - F_net\n• G-force (no bounce): (v / contactTime) / 9.8\n• G-force (bounce): ((v + v_rebound) / contactTime) / 9.8",
+        soundTheory: "How Sound Pollution Works\n\nSound is measured in decibels (dB), a logarithmic scale. Every 10 dB increase represents a tenfold increase in sound intensity. Normal conversation is about 60 dB, while a rock concert can exceed 120 dB. Prolonged exposure above 85 dB can cause hearing damage. The louder the sound and the longer the exposure, the greater the risk of permanent hearing loss.\n\nKey concepts:\n• Decibel (dB): Unit of sound intensity\n• Logarithmic scale: 20 dB is 10× more intense than 10 dB\n• Safe: 0-60 dB (whisper, quiet room)\n• Warning: 60-85 dB (busy traffic)\n• Dangerous: 85+ dB (machinery, concerts)",
+        fanTheory: "How Hand Fans Work\n\nWhen you fan air toward a paper target, the moving air applies a force. The amount of force depends on the speed of the air, the stiffness of the fan material, and the distance to the target. Stiffer materials generate more force because they push more air per swing.\n\nKey formula:\n• Estimated force: F ≈ k × θ (k = stiffness coefficient, θ = bend angle in radians)\n• Materials: thin paper (k=0.05), card stock (k=0.20), thin cardboard (k=0.50), corrugated cardboard (k=2.50)",
+        earthquakeTheory: "How Earthquake-Resistant Structures Work\n\nWhen an earthquake strikes, buildings experience vibrations in multiple directions. Engineers design structures to absorb and dissipate this energy rather than resist it rigidly. Folds and pillars add structural stability by distributing forces more evenly. More pillars generally create a stronger base, while strategic folding adds cross-bracing that helps absorb lateral movement.\n\nKey concepts:\n• Base isolation: Separating the building from the ground\n• Cross-bracing: Diagonal supports add stability\n• Energy dissipation: Folds and flexible joints absorb vibrations\n• Center of mass: Lowering it improves stability",
+        breathingTheory: "How Breathing Works\n\nBreathing rate changes with physical activity. At rest, a typical person breathes 12-20 times per minute. During exercise, the body needs more oxygen, so breathing rate increases. The accelerometer in your phone can detect the subtle chest movements of breathing to measure your respiration rate.\n\nKey concept:\n• BPM: Breaths per minute — your breathing rate\n• Rest: 12-20 BPM typical\n• Light exercise: 20-40 BPM\n• Vigorous exercise: 40-60 BPM",
+        reactionTheory: "How Reaction Time Works\n\nReaction time is the interval between a stimulus and your response. It involves your senses detecting the stimulus, your brain processing the information, and your nerves signaling your muscles to act. The average human reaction time to a visual stimulus is about 200-250 milliseconds.\n\nKey factors:\n• Dominant hand: Typically 10-20ms faster than non-dominant\n• Age: Reaction time peaks in early 20s\n• Fatigue: Slows reaction time significantly\n• Practice: Can improve reaction time by 10-15%",
+        movementTheory: "How Movement Smoothness Works\n\nMovement smoothness is measured by sudden changes in acceleration. The phone's accelerometer detects vibrations and jolts. Smooth movements produce fewer and smaller acceleration changes. The smoothness score (0-100%) measures how gracefully you moved.\n\nKey concepts:\n• Vibrations: Sudden acceleration changes\n• Smoothness: Percentage of time without excessive vibration\n• Score: Starts at 100%, decreases with each jolt"
+      },
+
+      leaderboard: {
+        title: "Leaderboard",
+        global: "Global Rankings",
+        byActivity: "By Activity",
+        rank: "Rank",
+        team: "Team",
+        score: "Score",
+        members: "Members",
+        noData: "No submissions yet",
+        selectActivity: "Select Activity"
+      },
+
+      teamSettings: {
+        title: "Team Settings",
+        teamName: "Team Name",
+        teamId: "Team ID",
+        inviteCode: "Invite Code",
+        gradeLevel: "Grade Level",
+        members: "Members",
+        maxReached: "Team is full (max 4)",
+        shareQR: "Share QR Code",
+        qrInstructions: "Other students can scan this QR code to join your team",
+        leaveTeam: "Leave Team",
+        leaveConfirm: "Are you sure you want to leave the team?",
+        noTeam: "Not in a team",
+        member: "Member",
+        leader: "Leader",
+        remove: "Remove"
       }
     }
   },
@@ -570,6 +710,428 @@ const resources = {
         newPasswordPlaceholder: "新しいパスワードを入力してください",
         confirmPassword: "パスワードを認証する",
         confirmPasswordPlaceholder: "新しいパスワードを確認します"
+      }
+    }
+  },
+  id: {
+    translation: {
+      tabs: {
+        home: "Beranda",
+        activities: "Aktivitas",
+        leaderboard: "Peringkat",
+        settings: "Pengaturan",
+        account: "Akun",
+        team: "Tim",
+        appearance: "Tampilan",
+        about: "Tentang",
+        details: "Detail",
+        attempt: "Percobaan",
+        instructions: "Petunjuk",
+        language: "Bahasa",
+        contactSupport: "Hubungi Dukungan",
+        privacyPolicy: "Kebijakan Privasi",
+        termsOfService: "Ketentuan Layanan",
+        changePassword: "Ubah Kata Sandi",
+        profileInformation: "Informasi Profil",
+        manageMembers: "Kelola Anggota",
+        teamInformation: "Informasi Tim",
+        teamRoles: "Peran Tim"
+      },
+      buttons: {
+        register: "Daftar",
+        login: "Masuk",
+        createTeam: "Buat Tim",
+        joinTeam: "Gabung Tim",
+        begin: "Mulai",
+        startRecording: "Mulai Rekam",
+        startChallenge: "Mulai Tantangan",
+        recording: "Merekam...",
+        finishActivity: "Selesaikan Aktivitas",
+        continue: "Lanjutkan",
+        backToActivities: "Kembali ke Aktivitas",
+        waitForSignal: "Tunggu Sinyal",
+        tapNow: "TAP SEKARANG!",
+        changePassword: "Ubah Kata Sandi"
+      },
+      landing: {
+        slogan: "Eksperimen. Ukur. Tingkatkan."
+      },
+      forms: {
+        hello: "Halo!",
+        welcome: "Selamat Datang Kembali!",
+        userRegister: "Daftar Pengguna",
+        userLogin: "Masuk Pengguna",
+        firstName: "Nama Depan",
+        firstNamePlaceholder: "Masukkan nama depan",
+        email: "Email",
+        emailPlaceholder: "Masukkan email",
+        password: "Kata Sandi",
+        passwordPlaceholder: "Masukkan kata sandi"
+      },
+      teamInitialization: {
+        createTitle: "Buat Tim Anda",
+        joinTitle: "Gabung Tim",
+        teamName: "Nama Tim",
+        teamNamePlaceholder: "Masukkan nama tim",
+        gradeLevel: "Tingkat Kelas",
+        gradeLevelPlaceholder: "Pilih tingkat kelas",
+        skip: "Lewati dulu",
+        teamID: "ID Tim",
+        teamIDPlaceholder: "Masukkan ID tim",
+        inviteCode: "Kode Undangan",
+        inviteCodePlaceholder: "Masukkan kode undangan"
+      },
+      home: {
+        welcome: "Selamat Datang",
+        subtitle: "Siap untuk eksperimen berikutnya?",
+        howItWorks: "Cara Kerja STEMMLAB",
+        howItWorksElements: [
+          "Pilih Tantangan",
+          "Gunakan bahan nyata dan catat eksperimen Anda",
+          "Ambil data menggunakan sensor ponsel dan unggah hasilnya",
+          "Sempurnakan desain Anda dan naikkan peringkat"
+        ]
+      },
+      activities: {
+        selectActivity: "Pilih Aktivitas",
+        activityDetails: "Detail Aktivitas",
+        overview: "Gambaran",
+        equipmentsNeeded: "Peralatan yang Diperlukan",
+        instructions: "Petunjuk",
+        attempt: "Percobaan",
+        phase: "Fase",
+        activityResults: "Hasil Aktivitas",
+
+        parachuteDropChallenge: {
+          name: "Tantangan Jatuhkan Parasut",
+          description: "Rancang, buat, dan uji parasut untuk mainan kecil guna mengurangi kecepatan jatuh dan gaya benturan. Tim Anda akan melakukan iterasi dengan batasan waktu dan bahan untuk mencapai pendaratan paling lambat dan aman di area target.",
+          instructions: [
+            "Jatuhkan mainan tanpa parasut dan rekam jatuhnya (uji dasar).",
+            "Buat parasut menggunakan bahan yang disediakan.",
+            "Jatuhkan mainan dari ketinggian yang sama dan rekam jatuhnya.",
+            "Tinjau kecepatan dan akurasi pendaratan di aplikasi.",
+            "Rancang ulang dan uji hingga tiga prototipe dalam 20 menit.",
+            "Unggah video, hasil, dan refleksi tim."
+          ],
+          equipments: [
+            { name: "Kantong Plastik Sampah", description: "Digunakan untuk membuat kanopi parasut." },
+            { name: "Tali", description: "Digunakan untuk tali kafan yang menghubungkan kanopi ke beban." },
+            { name: "Mainan Kecil", description: "Berfungsi sebagai 'penumpang' atau muatan untuk uji jatuh." },
+            { name: "Meja", description: "Menyediakan ketinggian jatuh yang konsisten untuk pengujian yang adil." },
+            { name: "Gunting", description: "Digunakan untuk memotong dan membentuk kanopi dan tali sesuai kebutuhan desain." },
+            { name: "Selotip", description: "Mengamankan komponen dan menandai ketinggian jatuh." }
+          ],
+          parameters: "Parameter",
+          analytics: "Analisis Fisika",
+          gForce: "Analisis G-Force",
+          contactTime: "Waktu Kontak (s)",
+          contactTimePlaceholder: "Masukkan waktu kontak (mis. 0.05)",
+          didBounce: "Apakah memantul?",
+          surfaceArea: "Luas Permukaan (cm²)",
+          surfaceAreaPlaceholder: "Luas permukaan parasut",
+          gForceResult: "G-Force",
+          gForceRisk: "Risiko Cedera",
+          gForceRiskScale: "Skala Risiko G-Force",
+          gForceTip: "Gunakan video gerak lambat untuk mengukur waktu kontak",
+          prototype: "Prototipe",
+          baselineLabel: "Dasar (Tanpa Parasut)",
+          predictTime: "Waktu Perkiraan (s)",
+          predictTimePlaceholder: "Perkiraan waktu jatuh",
+          wasRight: "Apakah perkiraan Anda benar?",
+          writeUpPrediction: "Catatan Perkiraan",
+          easiestDesign: "Desain termudah untuk dibuat",
+          easiestDesignPlaceholder: "Desain mana yang paling mudah?",
+          gForceTable: {
+            safe: "1-5 g: Tidak cedera (lift, berdiri)",
+            moderate: "5-10 g: Memar mungkin terjadi (jatuh keras)",
+            serious: "10-30 g: Cedera serius mungkin (tabrakan olahraga)",
+            severe: "30-50 g: Risiko tinggi cedera parah (kecelakaan mobil)",
+            critical: "50+ g: Cedera mengancam jiwa"
+          }
+        },
+
+        soundPollutionHunter: {
+          name: "Pemburu Polusi Suara",
+          description: "Siswa bertindak sebagai penyelidik lingkungan untuk mengukur dan membandingkan tingkat suara yang dihasilkan oleh berbagai aktivitas di kelas. Tujuannya adalah mengidentifikasi bagaimana energi dan permukaan mempengaruhi intensitas suara dan memahami risiko kesehatan terkait paparan kebisingan berkepanjangan.",
+          instructions: [
+            "Ukur kebisingan dari berbagai tindakan (menjatuhkan benda, berbicara, berjalan, menghentakkan kaki).",
+            "Catat tingkat suara dan lokasi.",
+            "Petakan zona bising dan tenang."
+          ],
+          equipments: [
+            { name: "Benda Apapun", description: "Benda yang dijatuhkan untuk mengukur kebisingan." }
+          ],
+          actionLabel: "Tindakan",
+          actionPlaceholder: "Mis. Menjatuhkan buku",
+          actionOptions: ["Menjatuhkan buku", "Berbicara", "Berjalan", "Menghentakkan kaki", "Menutup pintu"],
+          predictionLabel: "Perkiraan (Lebih Keras/Lebih Lembut)",
+          predictLouder: "Lebih Keras",
+          predictSofter: "Lebih Lembut",
+          predictionCompare: "Apakah perkiraan Anda benar?",
+          hearingRiskTable: "Risiko Kerusakan Pendengaran",
+          safeZone: "Zona Aman",
+          warningZone: "Zona Peringatan",
+          dangerZone: "Zona Berbahaya",
+          riskScale: {
+            safe: "0-60 dB: Aman — tidak berisiko",
+            moderate: "60-85 dB: Aman untuk paparan singkat",
+            warning: "85-90 dB: Peringatan — kerusakan mungkin >8 jam",
+            high: "90-100 dB: Risiko tinggi — kerusakan >15 menit",
+            dangerous: "100-120 dB: Berbahaya — hitungan menit",
+            critical: "120dB+: Risiko kerusakan langsung"
+          },
+          needEarMuffs: "Haruskah Anda memakai pelindung telinga?",
+          needEarMuffsPlaceholder: "Pendapat Anda tentang perlindungan telinga"
+        },
+
+        handFanChallenge: {
+          name: "Tantangan Kipas Tangan",
+          description: "Siswa menguji bagaimana pergerakan udara memberikan gaya pada bahan fleksibel. Dengan merancang kipas tangan yang berbeda dan mengujinya terhadap target kertas dan karton, tim menyelidiki hubungan antara desain kipas, jarak, dan kekakuan bahan.",
+          instructions: [
+            "Tegakkan kertas di atas meja.",
+            "Kipaskan udara dari jarak 30 cm.",
+            "Amati dan catat pergerakan.",
+            "Ulangi dengan desain kipas dan jarak yang berbeda (15 cm, 30 cm, 45 cm)."
+          ],
+          equipments: [
+            { name: "Kertas dan Karton", description: "Digunakan sebagai bahan baku untuk membuat kipas dan target vertikal." },
+            { name: "Gunting", description: "Memungkinkan pemotongan presisi untuk membuat bentuk dan ukuran kipas tertentu." },
+            { name: "Selotip", description: "Mengamankan target vertikal ke meja sehingga bisa ditekuk tanpa jatuh." }
+          ],
+          selectMaterial: "Bahan Target",
+          selectDistance: "Jarak (cm)",
+          materialStiffness: "Koefisien Kekakuan",
+          targetToggle: "Jenis Target",
+          paper: "Kertas",
+          cardboard: "Karton",
+          fanDesign: "Nama Desain Kipas",
+          fanDesignPlaceholder: "Mis. Lipatan Origami",
+          deflectionAngle: "Sudut Lenturan (°)",
+          anglePlaceholder: "Masukkan sudut lentur",
+          forceResult: "Perkiraan Gaya",
+          forceUnit: "N",
+          stiffnessNote: "Kekakuan lebih tinggi = lebih banyak gaya diperlukan untuk membengkokkan",
+          predictionAngle: "Sudut Perkiraan (°)",
+          predictionAnglePlaceholder: "Perkiraan sudut Anda",
+          wasRightLabel: "Apakah Anda benar?",
+          writeUp: {
+            bestDesign: "Desain mana yang paling menggerakkan kertas?",
+            bestDesignPlaceholder: "Jawaban Anda",
+            stiffnessEffect: "Bagaimana kekakuan mempengaruhi sudut lentur?",
+            stiffnessEffectPlaceholder: "Pengamatan Anda",
+            distanceEffect: "Bagaimana jarak mempengaruhi lenturan?",
+            distanceEffectPlaceholder: "Pengamatan Anda"
+          }
+        },
+
+        earthquakeResistantStructure: {
+          name: "Struktur Tahan Gempa",
+          description: "Siswa merancang dan membangun prototipe struktur untuk menahan simulasi getaran gempa. Tujuannya adalah menggunakan rekayasa iteratif untuk menciptakan dasar yang menyerap dan mendistribusikan energi, melindungi 'bangunan' (ponsel) dari gerakan berlebihan.",
+          instructions: [
+            "Amankan target vertikal ke meja sehingga bisa ditekuk tanpa jatuh.",
+            "Tempatkan platform karton datar di atasnya.",
+            "Letakkan ponsel di tengah dan aktifkan mode getaran pada Aplikasi STEMM.",
+            "Modifikasi struktur untuk mengurangi gerakan (mis. lebih banyak pilar, lebih banyak lipatan, dll)."
+          ],
+          equipments: [
+            { name: "Kertas dan Karton", description: "Bahan utama untuk membangun platform struktur dan lapisan anti-getaran." },
+            { name: "Gunting", description: "Memungkinkan pemotongan presisi bahan." },
+            { name: "Selotip", description: "Mengamankan target vertikal ke meja." }
+          ],
+          designName: "Nama Desain",
+          designNamePlaceholder: "Mis. Desain 1",
+          foldCount: "Jumlah Lipatan",
+          foldCountPlaceholder: "Jumlah lipatan",
+          pillarCount: "Jumlah Pilar",
+          pillarCountPlaceholder: "Jumlah pilar",
+          predictedMovement: "Perkiraan Gerakan (cm)",
+          predictedMovementPlaceholder: "Perkiraan Anda",
+          observedSway: "Gerakan Teramati (cm)",
+          observedSwayPlaceholder: "Gerakan terukur",
+          accelerometerData: "Data Akselerometer",
+          startVibration: "Mulai Getaran",
+          stopVibration: "Hentikan Getaran",
+          writeUp: {
+            bestDesign: "Desain mana yang paling sedikit bergerak?",
+            bestDesignPlaceholder: "Jawaban Anda",
+            structuralEffect: "Bagaimana lipatan/pilar mempengaruhi stabilitas?",
+            structuralEffectPlaceholder: "Pengamatan Anda",
+            realWorldLink: "Bagaimana ini terkait dengan bangunan nyata?",
+            realWorldLinkPlaceholder: "Hubungan Anda"
+          }
+        },
+
+        stretchSpeedAndGracefulness: {
+          name: "Kecepatan & Keanggunan Gerakan",
+          description: "Siswa menyelidiki biomekanika manusia dengan mengukur kecepatan dan kehalusan gerakan mereka selama peregangan terkontrol. Menggunakan sensor getaran ponsel, tim menganalisis seberapa 'anggun' mereka bergerak dan bagaimana kelelahan atau kecepatan mempengaruhi koordinasi fisik.",
+          instructions: [
+            "Pegang ponsel dengan kuat di satu tangan. Aktifkan sensor getaran aplikasi.",
+            "Lakukan gerakan terbimbing secara perlahan seperti yang ditunjukkan. Rekam getaran.",
+            "Ulangi aktivitas dengan umpan balik getaran diaktifkan.",
+            "Tinjau data kecepatan, kehalusan, dan rentang gerak.",
+            "Unggah hasil dan refleksikan sebagai kelompok."
+          ],
+          equipments: [
+            { name: "Ruangan Terbuka", description: "Menyediakan lingkungan yang aman bagi siswa untuk melakukan latihan rentang gerak penuh." }
+          ],
+          phases: [
+            "Gerakan Searah Jarum Jam",
+            "Gerakan Vertikal",
+            "Gerakan Horizontal"
+          ],
+          recordMovement: "Rekam Gerakan",
+          vibrationsDetected: "Getaran Terdeteksi",
+          smoothnessScore: "Skor Kehalusan",
+          movementMonitor: "Monitor Gerakan",
+          movementMonitorPlaceholder: "Mulai merekam untuk memvisualisasikan kehalusan gerakan",
+          movementVibrations: "Gerakan {{index}} Getaran",
+          movementSmoothness: "Gerakan {{index}} Kehalusan"
+        },
+
+        reactionBoardChallenge: {
+          name: "Tantangan Papan Reaksi",
+          description: "Siswa menguji koordinasi neuromuskular mereka dengan mengukur waktu reaksi dalam kondisi berbeda. Aktivitas ini menggunakan ponsel sebagai papan 'stimulus dan respons' digital untuk menangkap kecepatan jalur sinyal otak-ke-tubuh.",
+          instructions: [
+            "Ketuk layar segera setelah tombol tersembunyi muncul. Catat waktu reaksi.",
+            "Ulangi menggunakan tangan yang tidak dominan. Bandingkan hasil.",
+            "Telusuri bentuk bergerak di layar. Tinjau akurasi dan penundaan."
+          ],
+          equipments: [
+            { name: "Berbagai Gangguan", description: "Musik, percakapan, atau tugas fisik yang digunakan untuk menguji bagaimana beban kognitif mempengaruhi waktu respons." }
+          ],
+          phases: [
+            "Reaksi Ketuk Tangan Dominan",
+            "Reaksi Ketuk Tangan Non-Dominan",
+            "Tantangan Menelusuri"
+          ],
+          recordReactionTime: "Rekam Waktu Reaksi",
+          measureTracingAccuracy: "Ukur Akurasi Penelusuran",
+          tracingZone: "Zona Penelusuran",
+          tracingZonePlaceholder: "Telusuri Di Sini",
+          reactionZone: "Zona Reaksi",
+          reactionZonePlaceholder: "Ketuk di area ini saat target muncul",
+          accuracyScore: "Skor Akurasi",
+          tap: "KETUK!"
+        },
+
+        breathingPaceTrainer: {
+          name: "Pelatih Irama Napas",
+          description: "Siswa mengeksplorasi hubungan antara pernapasan dan relaksasi fisik. Dengan mengikuti pengatur waktu digital, mereka belajar mengontrol laju pernapasan untuk mengamati bagaimana pengaturan sadar mempengaruhi detak jantung atau tingkat stres.",
+          instructions: [
+            "Letakkan ponsel dengan lembut di dada.",
+            "Rekam pernapasan saat istirahat.",
+            "Lakukan olahraga ringan (joging di tempat 1 menit dan 100 lompatan bintang).",
+            "Rekam pernapasan lagi dan bandingkan hasilnya."
+          ],
+          equipments: [
+            { name: "Permukaan Datar", description: "Musik, percakapan, atau tugas fisik yang digunakan untuk menguji bagaimana beban kognitif mempengaruhi waktu respons." }
+          ],
+          phases: [
+            "Istirahat",
+            "Joging Satu Menit",
+            "100 Lompatan Bintang"
+          ],
+          recordBreathing: "Rekam Pernapasan",
+          breathsRecorded: "Napas Terekam",
+          bpm: "BPM",
+          breathingMonitor: "Monitor Pernapasan",
+          breathingMonitorPlaceholder: "Mulai merekam untuk memvisualisasikan gerakan dada",
+          activityBPMCount: "Aktivitas {{index}} BPM"
+        }
+      },
+      errorMessages: {
+        invalidCredential: "Email atau kata sandi tidak valid",
+        fillInAllFields: "Harap isi semua kolom",
+        userNotFound: "Tidak ada akun dengan email ini",
+        wrongPassword: "Kata sandi salah",
+        invalidEmail: "Harap masukkan email yang valid",
+        tooManyRequests: "Terlalu banyak percobaan. Silakan coba lagi nanti",
+        defaultError: "Terjadi kesalahan",
+        weakPassword: "Kata sandi minimal 6 karakter",
+        emailAlreadyInUse: "Email ini sudah terdaftar",
+        failedPasswordUpdate: "Pembaruan kata sandi gagal",
+        passwordsDoNotMatch: "Kata sandi tidak cocok",
+        emptyFirstName: "Nama depan tidak boleh kosong"
+      },
+      countdown: {
+        getReady: "Bersiaplah"
+      },
+      about: {
+        appName: "Nama Aplikasi:",
+        version: "Versi:",
+        description: "Deskripsi:",
+        descriptionValue: "Platform pembelajaran STEM interaktif yang dirancang untuk aktivitas kolaboratif dan kompetisi.",
+        privacyPolicy: "Kebijakan Privasi",
+        termsOfService: "Ketentuan Layanan",
+        contactSupport: "Hubungi Dukungan"
+      },
+      account: {
+        profileInformation: "Informasi Profil",
+        teamInformation: "Informasi Tim",
+        changePassword: "Ubah Kata Sandi",
+        logout: "Keluar"
+      },
+      appearance: {
+        lightMode: "Mode Terang",
+        darkMode: "Mode Gelap"
+      },
+      team: {
+        teamInformation: "Informasi Tim",
+        manageMembers: "Kelola Anggota",
+        teamRoles: "Peran Tim",
+        leaveTeam: "Tinggalkan Tim"
+      },
+      changePassword: {
+        currentPassword: "Kata Sandi Saat Ini",
+        currentPasswordPlaceholder: "Masukkan kata sandi saat ini",
+        newPassword: "Kata Sandi Baru",
+        newPasswordPlaceholder: "Masukkan kata sandi baru",
+        confirmPassword: "Konfirmasi Kata Sandi",
+        confirmPasswordPlaceholder: "Konfirmasi kata sandi baru"
+      },
+      results: {
+        attempts: "Percobaan",
+        ranking: "Peringkat",
+        theoryExplanation: "Penjelasan Teori",
+        rating: "Nilai Aktivitas Ini",
+        ratingPrompt: "Bagaimana aktivitas ini?",
+        accuracy: "Akurasi",
+        backToActivities: "Kembali ke Aktivitas",
+        parachuteTheory: "Cara Kerja Parasut\n\nSaat Anda menjatuhkan mainan tanpa parasut, gravitasi menariknya langsung ke bawah. Satu-satunya gaya yang bekerja adalah gravitasi, sehingga ia berakselerasi pada 9,8 m/s² hingga menyentuh tanah. Parasut menambahkan gaya hambat dengan meningkatkan luas permukaan. Gaya hambat mendorong ke atas melawan gravitasi, memperlambat jatuh.\n\nRumus utama:\n• Kecepatan: v = d / t\n• Akselerasi: a = v / t\n• Berat: W = m × 9,8\n• Gaya Bersih: F = m × a\n• Gaya Hambat: F_hambat = W - F_bersih\n• G-force (tanpa pantul): (v / waktuKontak) / 9,8\n• G-force (dengan pantul): ((v + v_pantul) / waktuKontak) / 9,8",
+        soundTheory: "Cara Kerja Polusi Suara\n\nSuara diukur dalam desibel (dB), skala logaritmik. Setiap kenaikan 10 dB mewakili peningkatan sepuluh kali lipat intensitas suara. Percakapan normal sekitar 60 dB, sementara konser rock bisa melebihi 120 dB. Paparan berkepanjangan di atas 85 dB dapat menyebabkan kerusakan pendengaran.\n\n• Desibel (dB): Satuan intensitas suara\n• Aman: 0-60 dB\n• Peringatan: 60-85 dB\n• Berbahaya: 85+ dB",
+        fanTheory: "Cara Kerja Kipas Tangan\n\nSaat Anda mengipaskan udara ke target kertas, udara yang bergerak memberikan gaya. Jumlah gaya tergantung pada kecepatan udara, kekakuan bahan kipas, dan jarak ke target. Bahan yang lebih kaku menghasilkan lebih banyak gaya karena mendorong lebih banyak udara per ayunan.\n\nRumus utama:\n• Perkiraan gaya: F ≈ k × θ\n• Bahan: kertas tipis (k=0,05), kertas karton (k=0,20), karton tipis (k=0,50), karton bergelombang (k=2,50)",
+        earthquakeTheory: "Cara Kerja Struktur Tahan Gempa\n\nSaat gempa terjadi, bangunan mengalami getaran di berbagai arah. Insinyur merancang struktur untuk menyerap dan menghilangkan energi ini. Lipatan dan pilar menambah stabilitas struktural dengan mendistribusikan gaya lebih merata.\n\n• Isolasi dasar: Memisahkan bangunan dari tanah\n• Penyangga diagonal: Penyangga diagonal menambah stabilitas\n• Disipasi energi: Lipatan dan sambungan fleksibel menyerap getaran",
+        breathingTheory: "Cara Kerja Pernapasan\n\nLaju pernapasan berubah dengan aktivitas fisik. Saat istirahat, seseorang bernapas 12-20 kali per menit. Selama olahraga, tubuh membutuhkan lebih banyak oksigen, sehingga laju pernapasan meningkat.\n\n• BPM: Napas per menit\n• Istirahat: 12-20 BPM\n• Olahraga ringan: 20-40 BPM\n• Olahraga berat: 40-60 BPM",
+        reactionTheory: "Cara Kerja Waktu Reaksi\n\nWaktu reaksi adalah interval antara stimulus dan respons Anda. Ini melibatkan indra Anda mendeteksi stimulus, otak Anda memproses informasi, dan saraf Anda memberi sinyal otot untuk bertindak. Waktu reaksi rata-rata manusia terhadap stimulus visual sekitar 200-250 milidetik.\n\n• Tangan dominan: Biasanya 10-20ms lebih cepat\n• Usia: Waktu reaksi puncak di awal 20-an\n• Kelelahan: Memperlambat waktu reaksi secara signifikan",
+        movementTheory: "Cara Kerja Kehalusan Gerakan\n\nKehalusan gerakan diukur dari perubahan akselerasi mendadak. Akselerometer ponsel mendeteksi getaran dan sentakan. Gerakan halus menghasilkan perubahan akselerasi yang lebih sedikit dan lebih kecil.\n\n• Getaran: Perubahan akselerasi mendadak\n• Kehalusan: Persentase waktu tanpa getaran berlebihan\n• Skor: Mulai dari 100%, berkurang dengan setiap sentakan"
+      },
+      leaderboard: {
+        title: "Peringkat",
+        global: "Peringkat Global",
+        byActivity: "Berdasarkan Aktivitas",
+        rank: "Peringkat",
+        team: "Tim",
+        score: "Skor",
+        members: "Anggota",
+        noData: "Belum ada pengiriman",
+        selectActivity: "Pilih Aktivitas"
+      },
+      teamSettings: {
+        title: "Pengaturan Tim",
+        teamName: "Nama Tim",
+        teamId: "ID Tim",
+        inviteCode: "Kode Undangan",
+        gradeLevel: "Tingkat Kelas",
+        members: "Anggota",
+        maxReached: "Tim sudah penuh (maks 4)",
+        shareQR: "Bagikan Kode QR",
+        qrInstructions: "Siswa lain dapat memindai kode QR ini untuk bergabung dengan tim Anda",
+        leaveTeam: "Tinggalkan Tim",
+        leaveConfirm: "Apakah Anda yakin ingin meninggalkan tim?",
+        noTeam: "Tidak dalam tim",
+        member: "Anggota",
+        leader: "Ketua",
+        remove: "Hapus"
       }
     }
   },

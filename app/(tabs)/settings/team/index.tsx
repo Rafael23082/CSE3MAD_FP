@@ -10,6 +10,7 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { useContext } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import QRCode from "react-native-qrcode-svg";
 
 export default function TeamSettingsScreen() {
   const { theme } = useTheme();
@@ -87,7 +88,19 @@ export default function TeamSettingsScreen() {
               marginTop={true}
             />
           </View>
-          <SettingsOption text={t("team.members")} action={() => {router.push("/(tabs)/settings/team/members")}} paddingTop={!isLoading && team ? false: true} />
+          <View style={styles.qrSection}>
+            <Text style={styles.qrTitle}>{t("teamSettings.shareQR")}</Text>
+            <View style={styles.qrContainer}>
+              <QRCode
+                value={`${team.teamId}:${team.inviteCode}`}
+                size={180}
+                backgroundColor="white"
+                color="black"
+              />
+            </View>
+            <Text style={styles.qrInstruction}>{t("teamSettings.qrInstructions")}</Text>
+          </View>
+          <SettingsOption text={t("team.members")} action={() => {router.push("/(tabs)/settings/team/members")}} paddingTop={false} />
 
           <Pressable
             style={styles.option}
@@ -125,21 +138,37 @@ const createStyles = (colors: ThemeColors) => {
       flexGrow: 1,
       backgroundColor: colors.backgroundColor,
     },
-    welcomeMessage: {
+    qrSection: {
+      alignItems: "center",
+      marginBottom: 24,
+      padding: 20,
+      backgroundColor: colors.card,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: colors.borderColor,
+    },
+    qrTitle: {
       fontFamily: "PoppinsBold",
-      fontSize: 22,
+      fontSize: 16,
       color: colors.primary,
-      marginBottom: 8,
+      marginBottom: 16,
+    },
+    qrContainer: {
+      padding: 16,
+      backgroundColor: "#FFFFFF",
+      borderRadius: 12,
+    },
+    qrInstruction: {
+      fontFamily: "InterRegular",
+      fontSize: 12,
+      color: colors.textMuted,
+      marginTop: 12,
+      textAlign: "center",
     },
     option: {
       paddingVertical: 16,
       borderBottomWidth: 1,
       borderBottomColor: colors.card,
-    },
-    text: {
-      fontFamily: "PoppinsRegular",
-      color: colors.secondary,
-      fontSize: 16,
     },
     leaveText: {
       fontFamily: "PoppinsRegular",

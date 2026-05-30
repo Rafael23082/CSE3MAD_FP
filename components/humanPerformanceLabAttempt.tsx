@@ -269,7 +269,8 @@ export default function HumanPerformanceLabAttemptScreen(){
                                     router.push({
                                         pathname: "/activityResults",
                                         params: {
-                                            results: JSON.stringify(vibrationHistory.current)
+                                            results: JSON.stringify(vibrationHistory.current),
+                                            activityKey: "stretch-speed-and-gracefulness"
                                         }
                                     });
 

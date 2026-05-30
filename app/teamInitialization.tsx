@@ -4,13 +4,14 @@ import { AuthContext } from "@/context/AuthContext";
 import { db } from "@/firebase";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
-import { collection, doc, getDoc, setDoc, updateDoc } from "@firebase/firestore";
+import { collection, doc, getDoc, setDoc, updateDoc, arrayUnion } from "@firebase/firestore";
 import { Picker } from "@react-native-picker/picker";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext, useEffect, useState } from "react";
+import { CameraView, useCameraPermissions } from "expo-camera";
 import { useTranslation } from "react-i18next";
-import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function TeamInitializationPage() {
@@ -40,6 +41,9 @@ export default function TeamInitializationPage() {
     const [inviteCode, setInviteCode] = useState("");
     const [error, setError] = useState("");
 
+    const [isScanning, setIsScanning] = useState(false);
+    const [cameraPermission, requestCameraPermission] = useCameraPermissions();
+
     const {t} = useTranslation();
 
     function generateInviteCode(length = 6) {
@@ -63,18 +67,25 @@ export default function TeamInitializationPage() {
         }else{
             setError("");
         }
+        if (!user) return;
 
         const teamRef = doc(collection(db, "teams"));
-        const inviteCode = generateInviteCode();
+        const inviteCodeGenerated = generateInviteCode();
         await setDoc(teamRef, {
             teamId: teamRef.id,
             teamName,
             gradeLevel,
-            inviteCode
+            members: [
+                {
+                    uid: user.uid,
+                    role: "leader"
+                }
+            ],
+            memberUids: [user.uid],
+            inviteCode: inviteCodeGenerated
         });
 
-        if (!user) return null;
-        const userRef = doc(db, "users", user?.uid);
+        const userRef = doc(db, "users", user.uid);
         await setDoc(userRef, {
             teamId: teamRef.id,
         }, {
@@ -83,17 +94,12 @@ export default function TeamInitializationPage() {
         queryClient.invalidateQueries({ queryKey: ["team", user.uid] });
         router.push("/(tabs)");
     }
-    
-    const handleJoinTeam = async() => {
-        try{
+
+    const doJoinTeam = async(teamId: string, code: string) => {
+        try {
             setError("");
 
-            if (!teamID || !inviteCode){
-                setError("Please fill in the fields");
-                return;
-            }
-
-            const teamRef = doc(db, "teams", teamID);
+            const teamRef = doc(db, "teams", teamId);
             const teamDocument = await getDoc(teamRef);
 
             if (!teamDocument.exists()) {
@@ -102,23 +108,63 @@ export default function TeamInitializationPage() {
             }
             const teamData = teamDocument.data();
 
-            if (teamData.inviteCode != inviteCode){
+            // Enforce 2-4 member limit
+            if (teamData.members?.length >= 4) {
+                setError("Team is full (max 4)");
+                return;
+            }
+
+            if (teamData.inviteCode != code){
                 setError("Invalid invite code");
                 return;
             }
 
             if (!user) return;
-
-            await updateDoc(doc(db, "users", user?.uid), {
+            await updateDoc(teamRef, {
+                members: arrayUnion({
+                    uid: user.uid,
+                    role: "member"
+                }),
+                memberUids: arrayUnion(user.uid)
+            })
+            await updateDoc(doc(db, "users", user.uid), {
                 teamId: teamRef.id
             })
 
             queryClient.invalidateQueries({ queryKey: ["team", user.uid] });
             router.push("/(tabs)");
-        }catch(err){
+        } catch(err) {
             setError("Something went wrong");
         }
     }
+    
+    const handleJoinTeam = async() => {
+        try {
+            setError("");
+
+            if (!teamID || !inviteCode){
+                setError("Please fill in the fields");
+                return;
+            }
+
+            await doJoinTeam(teamID, inviteCode);
+        } catch(err) {
+            setError("Something went wrong");
+        }
+    }
+
+    const handleBarcodeScanned = ({ data }: { data: string }) => {
+        if (!isScanning) return;
+        // QR code format: "teamId:inviteCode"
+        const parts = data.split(':');
+        if (parts.length === 2) {
+            setTeamID(parts[0]);
+            setInviteCode(parts[1]);
+            setIsScanning(false);
+            // Auto-trigger join
+            doJoinTeam(parts[0], parts[1]);
+        }
+    };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -217,6 +263,35 @@ export default function TeamInitializationPage() {
                                     {error && (
                                         <Text style={styles.errorMessage}>{error}</Text>
                                     )}
+
+                                    {/* QR Scanner Section */}
+                                    {isScanning ? (
+                                        <View style={styles.scannerContainer}>
+                                            {cameraPermission?.granted ? (
+                                                <CameraView
+                                                    style={styles.camera}
+                                                    barcodeScannerSettings={{ barcodeTypes: ['qr'] }}
+                                                    onBarcodeScanned={handleBarcodeScanned}
+                                                />
+                                            ) : (
+                                                <Pressable style={styles.permissionBtn} onPress={requestCameraPermission}>
+                                                    <Text style={styles.permissionBtnText}>Grant Camera Permission</Text>
+                                                </Pressable>
+                                            )}
+                                            <Pressable style={styles.cancelBtn} onPress={() => setIsScanning(false)}>
+                                                <Text style={styles.cancelBtnText}>Cancel Scan</Text>
+                                            </Pressable>
+                                        </View>
+                                    ) : (
+                                        <Pressable style={styles.scanBtn} onPress={() => {
+                                            if (!cameraPermission?.granted) {
+                                                requestCameraPermission();
+                                            }
+                                            setIsScanning(true);
+                                        }}>
+                                            <Text style={styles.scanBtnText}>Scan QR Code</Text>
+                                        </Pressable>
+                                    )}
                                 </View>
                                 <Button
                                     text={t("buttons.joinTeam")}
@@ -307,6 +382,54 @@ const createStyles = (colors: ThemeColors) => {
             marginTop: 16,
             color: "red",
             fontSize: 14
-        }
+        },
+        scannerContainer: {
+            marginTop: 16,
+            borderRadius: 10,
+            overflow: "hidden",
+        },
+        camera: {
+            height: 200,
+            borderRadius: 10,
+        },
+        permissionBtn: {
+            height: 200,
+            backgroundColor: colors.surfaceContainer,
+            borderRadius: 10,
+            justifyContent: "center",
+            alignItems: "center",
+        },
+        permissionBtnText: {
+            fontFamily: "PoppinsRegular",
+            color: colors.primary,
+            fontSize: 14,
+        },
+        cancelBtn: {
+            padding: 12,
+            alignItems: "center",
+            backgroundColor: colors.card,
+            marginTop: 8,
+            borderRadius: 8,
+        },
+        cancelBtnText: {
+            fontFamily: "PoppinsRegular",
+            color: colors.danger,
+            fontSize: 14,
+        },
+        scanBtn: {
+            padding: 14,
+            backgroundColor: colors.surfaceContainer,
+            borderRadius: 8,
+            alignItems: "center",
+            marginTop: 12,
+            borderWidth: 1,
+            borderColor: colors.borderColor,
+        },
+        scanBtnText: {
+            fontFamily: "PoppinsRegular",
+            color: colors.primary,
+            fontSize: 14,
+            fontWeight: "bold",
+        },
     });
 };

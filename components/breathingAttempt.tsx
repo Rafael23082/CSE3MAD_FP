@@ -235,7 +235,8 @@ export default function BreathingAttemptScreen(){
                                     router.push({
                                         pathname: "/activityResults",
                                         params: {
-                                            results: JSON.stringify(bpmValues.current)
+                                            results: JSON.stringify(bpmValues.current),
+                                            activityKey: "breathing-pace-trainer"
                                         }
                                     });
                                 }

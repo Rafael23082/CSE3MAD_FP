@@ -1,0 +1,112 @@
+rules_version = '2';
+
+// STEMM Lab - Firestore Security Rules
+// Students can only access their own data and their team's data
+
+// Helper: check if user is authenticated
+function isAuth() {
+  return request.auth != null;
+}
+
+// Helper: get the requesting user's UID
+function uid() {
+  return request.auth.uid;
+}
+
+// Helper: check if the authenticated user is a member of a team
+// memberUids is a flat string array for rule matching
+function isTeamMember(teamId) {
+  return isAuth() && (
+    exists(/databases/$(database)/documents/teams/$(teamId)) &&
+    get(/databases/$(database)/documents/teams/$(teamId)).data.memberUids.hasAny([uid()])
+  );
+}
+
+// Helper: check if the authenticated user is the team creator (leader)
+function isTeamLeader(teamId) {
+  return isAuth() && (
+    exists(/databases/$(database)/documents/teams/$(teamId)) &&
+    get(/databases/$(database)/documents/teams/$(teamId)).data.members[0].uid == uid()
+  );
+}
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ==========================================
+    // Users collection
+    // ==========================================
+    match /users/{userId} {
+      // Anyone authenticated can read their own profile
+      allow read: if isAuth() && request.auth.uid == userId;
+
+      // Allow create during signup
+      allow create: if isAuth() && request.auth.uid == userId
+        && request.resource.data.keys().hasAll(['firstName', 'email', 'createdAt'])
+        && request.resource.data.firstName is string
+        && request.resource.data.email is string
+        && request.resource.data.createdAt is timestamp;
+
+      // Users can update their own profile (not email, not uid)
+      allow update: if isAuth() && request.auth.uid == userId;
+
+      // No one can delete user documents
+      allow delete: if false;
+    }
+
+    // ==========================================
+    // Teams collection
+    // ==========================================
+    match /teams/{teamId} {
+      // Any authenticated user can read any team (needed for team search/join flow)
+      allow read: if isAuth();
+
+      // Create: authenticated user creates team - they become the leader
+      allow create: if isAuth()
+        && request.resource.data.keys().hasAll(['teamId', 'teamName', 'gradeLevel', 'members', 'memberUids', 'inviteCode'])
+        && request.resource.data.members.size() >= 1
+        && request.resource.data.members[0].uid == uid()
+        && request.resource.data.members[0].role == 'leader'
+        && request.resource.data.memberUids.hasAny([uid()])
+        && request.resource.data.teamName is string
+        && request.resource.data.teamName.size() >= 1
+        && request.resource.data.teamName.size() <= 50
+        && request.resource.data.gradeLevel is string
+        && request.resource.data.inviteCode is string
+        && request.resource.data.inviteCode.size() == 6;
+
+      // Update: team members can update (for joining, modifying)
+      allow update: if isAuth() && isTeamMember(teamId);
+
+      // Only the leader can delete
+      allow delete: if isAuth() && isTeamLeader(teamId);
+    }
+
+    // ==========================================
+    // Submissions collection
+    // ==========================================
+    match /submissions/{submissionId} {
+      // Team members can read submissions that belong to their team
+      allow read: if isAuth() && resource.data.teamId is string && isTeamMember(resource.data.teamId);
+
+      // Authenticated users can create submissions for themselves
+      allow create: if isAuth()
+        && request.resource.data.keys().hasAll(['userId', 'activityKey', 'submittedAt'])
+        && request.resource.data.userId == uid()
+        && request.resource.data.submittedAt is timestamp;
+
+      // Only the submitter can update their own submission
+      allow update: if isAuth() && resource.data.userId == uid();
+
+      // No one can delete submissions
+      allow delete: if false;
+    }
+
+    // ==========================================
+    // Default: deny everything else
+    // ==========================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

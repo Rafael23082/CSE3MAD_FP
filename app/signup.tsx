@@ -30,8 +30,8 @@ export default function SignupScreen(){
                 return;
             };
 
-            const userCredential = createUserWithEmailAndPassword(auth, email, password);
-            const user = (await userCredential).user;
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
 
             const formattedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
 

@@ -1,90 +1,36 @@
-import Button from "@/components/button";
-import Card from "@/components/card";
-import { ActivityContext } from "@/context/ActivityContext";
-import { useTheme } from "@/hooks/useTheme";
-import { ThemeColors } from "@/theme/colors";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useContext } from "react";
-import { useTranslation } from "react-i18next";
-import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useEffect } from "react";
+import { View, ActivityIndicator } from "react-native";
 
-export type ActivityResults = {
-        label: string,
-        value: string
-    }
-
-export default function ActivityResultsScreen(){
-    const { theme } = useTheme();
-    const styles = createStyles(theme);
-
-    const activityContext = useContext(ActivityContext);
-    if (!activityContext) return null;
-    const { activity } = activityContext;
-    if (!activity) return null;
-
-    const params = useLocalSearchParams();
-    const results = params.results ? JSON.parse(params.results as string): [];
+export default function ActivityResultsRedirect() {
     const router = useRouter();
-    const {t} = useTranslation();
+    const params = useLocalSearchParams();
+    const activityKey = params.activityKey as string;
 
-    return(
-        <SafeAreaView style={styles.outerContainer}>
-        <KeyboardAvoidingView style={{flex: 1}} behavior="height">
-            <ScrollView contentContainerStyle={styles.container}>
-                <View style={styles.subContainer}>
-                    <Text style={styles.head}>{activity.name}</Text>
-                    <Text style={styles.sectionHeader}>{t("activities.activityResults")}</Text>
-                    <View style={styles.cardContainer}>
-                        {results.map((item: ActivityResults, index: number) => (
-                            <Card metric={item.label} value={String(item.value)} maximumWidth={true} key={index} />
-                        ))}
-                    </View>
-                </View>
-                <View style={styles.buttonContainer}>
-                    <Button text={t("buttons.backToActivities")} action={()=>{router.push("/(tabs)/activities")}} />
-                </View>
-            </ScrollView>
-        </KeyboardAvoidingView>
-        </SafeAreaView>
-    )
-} 
-
-const createStyles = (colors: ThemeColors) => {
-    const styles = StyleSheet.create({
-        outerContainer: {
-            display: "flex",
-            flexDirection: "column",
-            flex: 1,
-            backgroundColor: colors.backgroundColor,
-        },
-        container: {
-            padding: 24,
-            flexGrow: 1
-        },
-        head: {
-          fontFamily: "PoppinsBold",
-          fontSize: 22,
-          color: colors.primary,
-          marginBottom: 24
-        },
-        sectionHeader: {
-            fontFamily: "PoppinsRegular",
-            fontSize: 20,
-            color: colors.secondary,
-            marginBottom: 16,
-        },
-        cardContainer: {
-            display: "flex",
-            flexDirection: "column",
-            rowGap: 16
-        },
-        subContainer: {
-            flexGrow: 1
-        },
-        buttonContainer: {
-            marginTop: 32
+    useEffect(() => {
+        if (activityKey) {
+            const routeMap: Record<string, string> = {
+                'parachute-drop-challenge': '/activityResults/parachuteResults',
+                'sound-pollution-hunter': '/activityResults/soundResults',
+                'hand-fan-challenge': '/activityResults/fanResults',
+                'earthquake-resistant-structure': '/activityResults/earthquakeResults',
+                'breathing-pace-trainer': '/activityResults/breathingResults',
+                'reaction-board-challenge': '/activityResults/reactionResults',
+                'stretch-speed-and-gracefulness': '/activityResults/humanPerformanceResults',
+            };
+            const route = routeMap[activityKey];
+            if (route) {
+                // Using setTimeout to avoid re-render issues during redirect
+                setTimeout(() => router.replace(route as any), 0);
+                return;
+            }
         }
-    });
-    return styles;
+        setTimeout(() => router.replace("/(tabs)/activities" as any), 0);
+    }, [activityKey, router]);
+
+    return (
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#020617" }}>
+            <ActivityIndicator color="#22d3ee" />
+        </View>
+    );
 }

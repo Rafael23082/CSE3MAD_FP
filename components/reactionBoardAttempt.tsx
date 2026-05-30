@@ -1,5 +1,9 @@
-import { ActivityResults } from "@/app/activityResults";
 import { ActivityContext } from "@/context/ActivityContext";
+
+type ActivityResults = {
+    label: string,
+    value: string
+}
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { useRouter } from "expo-router";
@@ -312,7 +316,8 @@ export default function ReactionBoardAttemptScreen(){
                                     router.push({
                                         pathname: "/activityResults",
                                         params: {
-                                            results: JSON.stringify(activityResults.current)
+                                            results: JSON.stringify(activityResults.current),
+                                            activityKey: "reaction-board-challenge"
                                         }
                                     });
                                 }
