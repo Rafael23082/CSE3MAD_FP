@@ -26,7 +26,8 @@ const resources = {
         profileInformation: "Profile Information",
         members: "Members",
         teamInformation: "Team Information",
-        teamRoles: "Team Roles"
+        teamRoles: "Team Roles",
+        journal: "Journal"
       },
       buttons: {
         register: "Register",
@@ -49,7 +50,8 @@ const resources = {
         stop: "STOP",
         start: "START",
         edit: "Edit",
-        save: "Save"
+        save: "Save",
+        openCamera: "Open Camera"
       },
       landing: {
         slogan: "Experiment. Measure. Improve."
@@ -98,7 +100,8 @@ const resources = {
           "Use real-world materials and record your experiment",
           "Capture data using your phone's sensors and upload results",
           "Refine your design and climb the leaderboard"
-        ]
+        ],
+        seeActivityRequirement: "Complete an activity to see it here"
       },
       activities: {
         selectActivity: "Select an Activity",
@@ -109,6 +112,7 @@ const resources = {
         attempt: "Attempt",
         phase: "Phase",
         activityResults: "Activity Results",
+        allActivities: "All Activities",
         
         parachuteDropChallenge: {
           name: "Parachute Drop Challenge",
@@ -515,7 +519,8 @@ const resources = {
         profileInformation: "プロフィール情報",
         members: "メンバー",
         teamInformation: "チーム情報",
-        teamRoles: "チームの役割"
+        teamRoles: "チームの役割",
+        journal: "ジャーナル"
       },
       buttons: {
         register: "登録",
@@ -538,7 +543,8 @@ const resources = {
         stop: "停止",
         start: "開始",
         edit: "編集",
-        save: "保存"
+        save: "保存",
+        openCamera: "カメラを開く"
       },
       landing: {
         slogan: "試行。測定。改善。"
@@ -587,7 +593,8 @@ const resources = {
           "実際の材料を使い、実験の様子を記録しましょう",
           "スマートフォンのセンサーを使ってデータを取得し、結果をアップロードする",
           "デザインを磨き、ランキングを駆け上がろう"
-        ]
+        ],
+        seeActivityRequirement: "アクティビティを完了すると、ここに表示されます。"
       },
       activities: {
         selectActivity: "アクティビティを選択してください",
@@ -598,6 +605,7 @@ const resources = {
         attempt: "試み",
         phase: "段階",
         activityResults: "活動結果",
+        allActivities: "すべてのアクティビティ",
         
         parachuteDropChallenge: {
           name: "パラシュート投下チャレンジ",
@@ -852,7 +860,8 @@ const resources = {
         manageMembers: "Kelola Anggota",
         members: "Anggota",
         teamInformation: "Informasi Tim",
-        teamRoles: "Peran Tim"
+        teamRoles: "Peran Tim",
+        journal: "Jurnal"
       },
       buttons: {
         register: "Daftar",
@@ -875,7 +884,8 @@ const resources = {
         stop: "BERHENTI",
         start: "MULAI",
         edit: "Ubah",
-        save: "Simpan"
+        save: "Simpan",
+        openCamera: "Buka Kamera"
       },
       landing: {
         slogan: "Eksperimen. Ukur. Tingkatkan."
@@ -932,7 +942,8 @@ const resources = {
           "Gunakan bahan nyata dan catat eksperimen Anda",
           "Ambil data menggunakan sensor ponsel dan unggah hasilnya",
           "Sempurnakan desain Anda dan naikkan peringkat"
-        ]
+        ],
+        seeActivityRequirement: "Selesaikan sebuah aktivitas untuk melihatnya di sini."
       },
       activities: {
         selectActivity: "Pilih Aktivitas",
@@ -943,6 +954,7 @@ const resources = {
         attempt: "Percobaan",
         phase: "Fase",
         activityResults: "Hasil Aktivitas",
+        allActivities: "Semua Aktivitas",
 
         parachuteDropChallenge: {
           name: "Tantangan Jatuhkan Parasut",
@@ -1257,7 +1269,7 @@ const resources = {
       },
       team: {
         teamInformation: "Informasi Tim",
-        manageMembers: "Kelola Anggota",
+        members: "Anggota",
         teamRoles: "Peran Tim",
         leaveTeam: "Tinggalkan Tim"
       },
@@ -1346,7 +1358,8 @@ const resources = {
         profileInformation: "个人信息",
         members: "成员",
         teamInformation: "团队信息",
-        teamRoles: "团队角色"
+        teamRoles: "团队角色",
+        journal: "杂志"
       },
       buttons: {
         register: "注册",
@@ -1368,7 +1381,8 @@ const resources = {
         changePassword: "修改密码",
         stop: "停止",
         edit: "编辑",
-        save: "节省"
+        save: "节省",
+        openCamera: "打开摄像头"
       },
       landing: {
         slogan: "实验。测量。改进。"
@@ -1417,7 +1431,8 @@ const resources = {
           "使用真实材料记录您的实验",
           "使用手机传感器捕获数据并上传结果",
           "优化设计并登上排行榜"
-        ]
+        ],
+        seeActivityRequirement: "完成活动即可在此处查看。"
       },
       activities: {
         selectActivity: "选择活动",
@@ -1428,6 +1443,7 @@ const resources = {
         attempt: "尝试",
         phase: "阶段",
         activityResults: "活动结果",
+        allActivities: "所有活动",
 
         parachuteDropChallenge: {
           name: "降落伞投放挑战",

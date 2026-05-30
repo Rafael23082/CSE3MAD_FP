@@ -1,14 +1,15 @@
 import { AuthContext } from "@/context/AuthContext";
 import { db } from "@/firebase";
 import { useTheme } from "@/hooks/useTheme";
+import i18n from "@/i18n";
 import { ThemeColors } from "@/theme/colors";
-import { collection, getDoc, getDocs, doc } from "firebase/firestore";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 type RankEntry = {
   rank: number;
@@ -19,14 +20,14 @@ type RankEntry = {
 };
 
 const ACTIVITIES = [
-  { key: '', label: 'All Activities' },
-  { key: 'parachute-drop-challenge', label: 'Parachute Drop' },
-  { key: 'sound-pollution-hunter', label: 'Sound Hunter' },
-  { key: 'hand-fan-challenge', label: 'Hand Fan' },
-  { key: 'earthquake-resistant-structure', label: 'Earthquake' },
-  { key: 'breathing-pace-trainer', label: 'Breathing' },
-  { key: 'reaction-board-challenge', label: 'Reaction Board' },
-  { key: 'stretch-speed-and-gracefulness', label: 'Movement' },
+  { key: '', label: i18n.t("activities.allActivities") },
+  { key: 'parachute-drop-challenge', label: i18n.t("activities.parachuteDropChallenge.name") },
+  { key: 'sound-pollution-hunter', label: i18n.t("activities.soundPollutionHunter.name") },
+  { key: 'hand-fan-challenge', label: i18n.t("activities.handFanChallenge.name") },
+  { key: 'earthquake-resistant-structure', label: i18n.t("activities.earthquakeResistantStructure.name") },
+  { key: 'breathing-pace-trainer', label: i18n.t("activities.breathingPaceTrainer.name") },
+  { key: 'reaction-board-challenge', label: i18n.t("activities.reactionBoardChallenge.name") },
+  { key: 'stretch-speed-and-gracefulness', label: i18n.t("activities.stretchSpeedAndGracefulness.name") },
 ];
 
 const MEDAL = ['🥇', '🥈', '🥉'];
@@ -201,7 +202,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   toggleText: { fontFamily: "PoppinsRegular", fontSize: 14, color: colors.textMuted },
   toggleActiveText: { color: "#fff" },
   activityPicker: { paddingHorizontal: 24, marginBottom: 12, maxHeight: 40 },
-  actChip: { paddingHorizontal: 14, paddingVertical: 6, backgroundColor: colors.card, borderRadius: 16, marginRight: 8, borderWidth: 1, borderColor: colors.borderColor },
+  actChip: { paddingHorizontal: 14, paddingVertical: 6, backgroundColor: colors.card, borderRadius: 16, marginRight: 8, borderWidth: 1, borderColor: colors.borderColor, justifyContent: "center", alignItems: "center" },
   actChipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
   actChipText: { fontSize: 12, color: colors.textMuted },
   actChipTextActive: { color: "#fff" },

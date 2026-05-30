@@ -3,7 +3,7 @@ export const lightTheme = {
     secondary: "#000000",
     tertiary: "#10B981",
     danger: "#EF4444",
-    textPrimary: "#000000",
+    textPrimary: "#f1f5f9",
     textMuted: "#64748B",
     buttonText: "#FFFFFF",
     backgroundColor: "#FFFFFF",

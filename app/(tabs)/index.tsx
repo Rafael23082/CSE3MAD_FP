@@ -3,13 +3,13 @@ import { AuthContext } from "@/context/AuthContext";
 import { db } from "@/firebase";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function HomeScreen() {
   const { theme } = useTheme();
@@ -80,7 +80,7 @@ export default function HomeScreen() {
                 <View style={styles.stat}>
                   <MaterialCommunityIcons name="account-group" size={16} color={theme.secondary} />
                   <Text style={styles.statValue}>{team.members?.length || 0}</Text>
-                  <Text style={styles.statLabel}>Members</Text>
+                  <Text style={styles.statLabel}>{t("team.members")}</Text>
                 </View>
               </View>
             </View>
@@ -96,7 +96,7 @@ export default function HomeScreen() {
             <View style={styles.emptyCard}>
               <MaterialCommunityIcons name="flask-outline" size={32} color={theme.textMuted} />
               <Text style={styles.emptyText}>{t("home.noRecentActivity")}</Text>
-              <Text style={styles.emptySubtext}>Complete an activity to see it here</Text>
+              <Text style={styles.emptySubtext}>{t("home.seeActivityRequirement")}</Text>
             </View>
           ) : (
             [...submissions].reverse().slice(0, 3).map((s) => (
