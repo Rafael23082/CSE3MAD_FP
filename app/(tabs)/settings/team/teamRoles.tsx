@@ -12,7 +12,7 @@ export default function TeamRolesScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-        <Text>Team Roles</Text>
+        <Text>{t("team.teamRoles")}</Text>
     </ScrollView>
   );
 }

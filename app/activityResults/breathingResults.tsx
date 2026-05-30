@@ -51,7 +51,7 @@ export default function BreathingResultsScreen() {
         {logs.length === 0 ? (
           <View style={styles.emptyState}>
             <MaterialCommunityIcons name="flask-outline" size={40} color={theme.textMuted} />
-            <Text style={styles.emptyText}>No recordings yet</Text>
+            <Text style={styles.emptyText}>{t("results.noData")}</Text>
           </View>
         ) : (
           <View style={styles.card}>
@@ -59,7 +59,7 @@ export default function BreathingResultsScreen() {
               const d = log.data || {};
               return (
                 <View key={log.timestamp} style={styles.logItem}>
-                  <Text style={styles.trialName}>Recording #{i + 1}</Text>
+                  <Text style={styles.trialName}>{t("results.entryNumber", {number: i + 1})}</Text>
                   {d.bpm !== undefined && <Text style={styles.bpmValue}>{d.bpm} BPM</Text>}
                   {d.breaths !== undefined && <Text style={styles.detail}>Breaths: {d.breaths}</Text>}
                   {d.phase && <Text style={styles.detail}>Phase: {d.phase}</Text>}
@@ -77,7 +77,7 @@ export default function BreathingResultsScreen() {
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>{t("results.ratingPrompt")}</Text>
           <StarRating rating={rating} onChange={saveRating} />
-          <Text style={styles.ratingHint}>Tap a star to rate this activity</Text>
+          <Text style={styles.ratingHint}>{t("results.ratingHint")}</Text>
         </View>
 
         <View style={{ marginTop: 16, marginBottom: 40 }}>

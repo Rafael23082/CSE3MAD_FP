@@ -7,8 +7,10 @@ import { ThemeColors } from '@/theme/colors';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '@/firebase';
+import { useTranslation } from 'react-i18next';
 
 export default function JournalScreen() {
+    const { t } = useTranslation();
     const { theme } = useTheme();
     const styles = createStyles(theme);
     const activityContext = useContext(ActivityContext);
@@ -29,11 +31,11 @@ export default function JournalScreen() {
 
     const getMetricLabel = () => {
         switch(activity.key) {
-            case 'parachute-drop-challenge': return 'Velocity (m/s)';
-            case 'sound-pollution-hunter': return 'Decibel (dB)';
-            case 'hand-fan-challenge': return 'Force (N)';
-            case 'earthquake-resistant-structure': return 'Sway (cm)';
-            default: return 'Measurement';
+            case 'parachute-drop-challenge': return t('journal.velocityMetric');
+            case 'sound-pollution-hunter': return t('journal.decibelMetric');
+            case 'hand-fan-challenge': return t('journal.forceMetric');
+            case 'earthquake-resistant-structure': return t('journal.swayMetric');
+            default: return t('journal.defaultMetric');
         }
     };
 
@@ -48,9 +50,9 @@ export default function JournalScreen() {
     };
 
     const handleDeleteTrial = (timestamp: number) => {
-        Alert.alert("Delete Trial", "Remove this trial?", [
-            { text: "Cancel", style: "cancel" },
-            { text: "Delete", style: "destructive", onPress: () => {
+        Alert.alert(t("journal.deleteTitle"), t("journal.deleteMsg"), [
+            { text: t("common.cancel"), style: "cancel" },
+            { text: t("common.delete"), style: "destructive", onPress: () => {
                 // Clear all and re-add except this one
                 const remaining = experimentLogs.filter(l => l.timestamp !== timestamp);
                 clearExperimentLogs(activity.key);
@@ -62,22 +64,22 @@ export default function JournalScreen() {
     };
 
     const handleClearAll = () => {
-        Alert.alert("Clear All", "Delete all trials for this activity?", [
-            { text: "Cancel", style: "cancel" },
-            { text: "Clear", style: "destructive", onPress: () => clearExperimentLogs(activity.key) }
+        Alert.alert(t("journal.clearAllTitle"), t("journal.clearAllMsg"), [
+            { text: t("common.cancel"), style: "cancel" },
+            { text: t("common.clear"), style: "destructive", onPress: () => clearExperimentLogs(activity.key) }
         ]);
     };
 
     const handleSubmit = async () => {
         if (!reflection.trim()) {
-            Alert.alert("Missing Reflection", "Please write your reflection before submitting.");
+            Alert.alert(t("journal.missingReflection"), t("journal.missingReflectionMsg"));
             return;
         }
 
         // Check if activity requires team confirmation
         const needsConfirm = ['parachute-drop-challenge', 'earthquake-resistant-structure'].includes(activity.key);
         if (needsConfirm && !teamConfirmed) {
-            Alert.alert("Team Confirmation Required", "All team members must confirm before submission. Please check the confirmation box.");
+            Alert.alert(t("journal.confirmRequired"), t("journal.confirmRequiredMsg"));
             return;
         }
 
@@ -91,12 +93,12 @@ export default function JournalScreen() {
                 logs: currentLogs,
                 submittedAt: new Date()
             });
-            Alert.alert("Success", "Mission Submitted!");
+            Alert.alert(t("journal.submitSuccess"));
             setReflection("");
             setTeamConfirmed(false);
         } catch (error) {
             console.error("Submission error:", error);
-            Alert.alert("Error", "Failed to submit. Check your connection.");
+            Alert.alert(t("journal.submitError"));
         } finally {
             setIsSubmitting(false);
         }
@@ -141,17 +143,17 @@ export default function JournalScreen() {
 
     return (
         <ScrollView style={styles.container} contentContainerStyle={{ padding: 20, paddingBottom: 80 }}>
-            <Text style={styles.title}>Journal</Text>
+            <Text style={styles.title}>{t("journal.title")}</Text>
             <Text style={styles.subtitle}>{activity.name}</Text>
 
             {/* Experiment Logs Feed with Review */}
             <View style={styles.card}>
                 <View style={styles.cardHeader}>
                     <MaterialCommunityIcons name="chart-line" size={18} color={theme.primary} />
-                    <Text style={styles.cardTitle}>EXPERIMENT RECORDS</Text>
+                    <Text style={styles.cardTitle}>{t("journal.experimentRecords")}</Text>
                     {currentLogs.length > 0 && (
                         <TouchableOpacity onPress={handleClearAll} style={{ marginLeft: 'auto' }}>
-                            <Text style={{ color: theme.danger, fontSize: 11 }}>Clear All</Text>
+                            <Text style={{ color: theme.danger, fontSize: 11 }}>{t("journal.clearAll")}</Text>
                         </TouchableOpacity>
                     )}
                 </View>
@@ -159,16 +161,16 @@ export default function JournalScreen() {
                 {currentLogs.length === 0 ? (
                     <View style={styles.emptyState}>
                         <MaterialCommunityIcons name="flask-outline" size={40} color={theme.textMuted} />
-                        <Text style={styles.emptyText}>No experiment data yet</Text>
-                        <Text style={styles.emptySubtext}>Go to the Experiment tab and log your first trial!</Text>
+                        <Text style={styles.emptyText}>{t("journal.noData")}</Text>
+                        <Text style={styles.emptySubtext}>{t("journal.noDataSubtext")}</Text>
                     </View>
                 ) : (
                     <>
-                        <Text style={styles.logCount}>{currentLogs.length} trial{currentLogs.length !== 1 ? 's' : ''} recorded</Text>
+                        <Text style={styles.logCount}>{t(currentLogs.length === 1 ? 'journal.trialCount' : 'journal.trialCount_plural', {count: currentLogs.length})} recorded</Text>
                         {[...currentLogs].reverse().map((log, i) => (
                             <View key={log.timestamp} style={styles.logItem}>
                                 <View style={styles.logHeader}>
-                                    <Text style={styles.logNumber}>Trial #{currentLogs.length - i}</Text>
+                                    <Text style={styles.logNumber}>{t("journal.trialNumber", {number: currentLogs.length - i})}</Text>
                                     <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
                                         <Text style={styles.logTime}>{formatTime(log.timestamp)}</Text>
                                         <TouchableOpacity onPress={() => handleDeleteTrial(log.timestamp)}>
@@ -197,10 +199,10 @@ export default function JournalScreen() {
                 <View style={styles.card}>
                     <View style={styles.cardHeader}>
                         <MaterialCommunityIcons name="account-group" size={18} color={theme.secondary} />
-                        <Text style={styles.cardTitle}>TEAM CONFIRMATION</Text>
+                        <Text style={styles.cardTitle}>{t("journal.teamConfirmation")}</Text>
                     </View>
                     <Text style={{ color: theme.textMuted, fontSize: 12, marginBottom: 10 }}>
-                        All team members must confirm before submission
+                        {t("journal.confirmSubtext")}
                     </Text>
                     <TouchableOpacity
                         style={[styles.confirmBtn, { backgroundColor: teamConfirmed ? theme.tertiary + '20' : theme.surfaceContainer }]}
@@ -212,11 +214,11 @@ export default function JournalScreen() {
                             color={teamConfirmed ? theme.tertiary : theme.textMuted}
                         />
                         <Text style={[styles.confirmText, { color: teamConfirmed ? theme.tertiary : theme.textMuted }]}>
-                            {teamConfirmed ? 'Confirmed' : 'I confirm our team\'s submission'}
+                            {teamConfirmed ? t("journal.confirmed") : t("journal.confirmText")}
                         </Text>
                     </TouchableOpacity>
                     <Text style={{ color: theme.textMuted, fontSize: 10, marginTop: 8, fontStyle: 'italic' }}>
-                        Each team member should confirm independently. This is self-reported.
+                        {t("journal.confirmNote")}
                     </Text>
                 </View>
             )}
@@ -225,11 +227,11 @@ export default function JournalScreen() {
             <View style={styles.card}>
                 <View style={styles.cardHeader}>
                     <MaterialCommunityIcons name="note-edit-outline" size={18} color={theme.secondary} />
-                    <Text style={styles.cardTitle}>TEAM REFLECTION</Text>
+                    <Text style={styles.cardTitle}>{t("journal.teamReflection")}</Text>
                 </View>
                 <TextInput
                     style={styles.textInput}
-                    placeholder="What did you observe? What was surprising?"
+                    placeholder={t("journal.reflectionPlaceholder")}
                     placeholderTextColor={theme.textMuted}
                     multiline
                     numberOfLines={4}
@@ -244,7 +246,7 @@ export default function JournalScreen() {
                 disabled={isSubmitting}
             >
                 <MaterialCommunityIcons name="send" size={18} color={theme.textPrimary} style={{marginRight: 8}} />
-                <Text style={styles.buttonText}>{isSubmitting ? 'SUBMITTING...' : 'SUBMIT MISSION'}</Text>
+                <Text style={styles.buttonText}>{isSubmitting ? t("journal.submitting") : t("journal.submitMission")}</Text>
             </TouchableOpacity>
         </ScrollView>
     );

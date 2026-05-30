@@ -62,7 +62,7 @@ export default function ParachuteResultsScreen() {
         {logs.length === 0 ? (
           <View style={styles.emptyState}>
             <MaterialCommunityIcons name="flask-outline" size={40} color={theme.textMuted} />
-            <Text style={styles.emptyText}>No trials recorded</Text>
+            <Text style={styles.emptyText}>{t("results.noData")}</Text>
           </View>
         ) : (
           <View style={styles.card}>
@@ -70,17 +70,17 @@ export default function ParachuteResultsScreen() {
               const d = log.data || {};
               return (
                 <View key={log.timestamp} style={styles.logItem}>
-                  <Text style={styles.trialName}>Trial #{i + 1}</Text>
+                  <Text style={styles.trialName}>{t("results.entryNumber", {number: i + 1})}</Text>
                   <View style={styles.metricsGrid}>
                     {d.vFinal !== undefined && (
                       <View style={styles.metric}>
-                        <Text style={styles.metricLabel}>Velocity</Text>
+                        <Text style={styles.metricLabel}>{t("results.velocity")}</Text>
                         <Text style={styles.metricValue}>{d.vFinal.toFixed(2)} m/s</Text>
                       </View>
                     )}
                     {d.gForce !== undefined && d.gForce > 0 && (
                       <View style={styles.metric}>
-                        <Text style={styles.metricLabel}>G-Force</Text>
+                        <Text style={styles.metricLabel}>{t("results.gForce")}</Text>
                         <Text style={[styles.metricValue, { color: d.gForce > 10 ? theme.danger : theme.tertiary }]}>
                           {d.gForce.toFixed(1)} g
                         </Text>
@@ -88,13 +88,13 @@ export default function ParachuteResultsScreen() {
                     )}
                     {d.time !== undefined && (
                       <View style={styles.metric}>
-                        <Text style={styles.metricLabel}>Time</Text>
+                        <Text style={styles.metricLabel}>{t("results.time")}</Text>
                         <Text style={styles.metricValue}>{d.time.toFixed(2)}s</Text>
                       </View>
                     )}
                     {d.surfaceArea && (
                       <View style={styles.metric}>
-                        <Text style={styles.metricLabel}>Surface Area</Text>
+                        <Text style={styles.metricLabel}>{t("results.surfaceArea")}</Text>
                         <Text style={styles.metricValue}>{d.surfaceArea} cm²</Text>
                       </View>
                     )}
@@ -115,7 +115,7 @@ export default function ParachuteResultsScreen() {
               const diff = actual ? Math.abs(pred - actual) : 0;
               return (
                 <View key={log.timestamp} style={styles.accuracyRow}>
-                  <Text style={styles.accuracyLabel}>Trial #{i + 1}</Text>
+                  <Text style={styles.accuracyLabel}>{t("results.entryNumber", {number: i + 1})}</Text>
                   <Text style={styles.accuracyValue}>
                     Pred: {pred}s | Actual: {actual?.toFixed(2) || '?'}s | Diff: {diff.toFixed(2)}s
                   </Text>
@@ -134,14 +134,14 @@ export default function ParachuteResultsScreen() {
         {/* Ranking Placeholder */}
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>{t("results.ranking")}</Text>
-          <Text style={styles.bodyText}>Compare your results with your team and the leaderboard!</Text>
+          <Text style={styles.bodyText}>{t("results.compare")}</Text>
         </View>
 
         {/* Star Rating */}
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>{t("results.ratingPrompt")}</Text>
           <StarRating rating={rating} onChange={saveRating} />
-          <Text style={styles.ratingHint}>Tap a star to rate this activity</Text>
+          <Text style={styles.ratingHint}>{t("results.ratingHint")}</Text>
         </View>
 
         {/* Back Button */}

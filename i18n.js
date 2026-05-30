@@ -30,6 +30,9 @@ const resources = {
       },
       buttons: {
         register: "Register",
+        logTrial: "Log Trial",
+        logReading: "Log Reading",
+        logDesign: "Log Design",
         login: "Login",
         createTeam: "Create Team",
         joinTeam: "Join Team",
@@ -42,7 +45,9 @@ const resources = {
         backToActivities: "Back to Activities",
         waitForSignal: "Wait for the Signal",
         tapNow: "TAP NOW!",
-        changePassword: "Change Password"
+        changePassword: "Change Password",
+        stop: "STOP",
+        start: "START"
       },
       landing: {
         slogan: "Experiment. Measure. Improve."
@@ -70,10 +75,20 @@ const resources = {
         teamID: "Team ID",
         teamIDPlaceholder: "Enter team ID",
         inviteCode: "Invite Code",
-        inviteCodePlaceholder: "Enter invite code"
+        inviteCodePlaceholder: "Enter invite code",
+        grantCamera: "Grant Camera Permission",
+        cancelScan: "Cancel Scan",
+        scanQR: "Scan QR Code"
       },
       home: {
         welcome: "Welcome",
+        rank: "Rank",
+        completed: "Completed",
+        noTeam: "Not in a team",
+        joinOrCreate: "Join a team or create your own to get started",
+        recentActivity: "Recent Activity",
+        noRecentActivity: "No recent activity",
+        startActivity: "Start activity",
         subtitle: "Ready for your next experiment?",
         howItWorks: "How STEMMLAB Works",
         howItWorksElements: [
@@ -125,6 +140,8 @@ const resources = {
           gForceRiskScale: "G-Force Risk Scale",
           gForceTip: "Use slow-motion video to measure contact time",
           prototype: "Prototype",
+          dropHeightPlaceholder: "Drop Height (m)",
+          toyMassPlaceholder: "Toy Mass (kg)",
           baselineLabel: "Baseline (No Parachute)",
           predictTime: "Predicted Time (s)",
           predictTimePlaceholder: "Predicted fall time",
@@ -155,6 +172,7 @@ const resources = {
           actionLabel: "Action",
           actionPlaceholder: "e.g. Dropping a book",
           actionOptions: ["Dropping a book", "Talking", "Walking", "Stamping feet", "Closing a door"],
+          locationPlaceholder: "e.g. Cafeteria, Library, Gym",
           predictionLabel: "Prediction (Louder/Softer)",
           predictLouder: "Louder",
           predictSofter: "Softer",
@@ -330,6 +348,41 @@ const resources = {
           activityBPMCount: "Activity {{index}} BPM"
         }
       },
+      journal: {
+        title: "Journal",
+        experimentRecords: "EXPERIMENT RECORDS",
+        clearAll: "Clear All",
+        noData: "No experiment data yet",
+        noDataSubtext: "Go to the Experiment tab and log your first trial!",
+        trialCount: "{{count}} trial",
+        trialCount_plural: "{{count}} trials",
+        trialNumber: "Trial #{{number}}",
+        teamConfirmation: "TEAM CONFIRMATION",
+        confirmSubtext: "All team members must confirm before submission",
+        confirmed: "Confirmed",
+        confirmText: "I confirm our team's submission",
+        confirmNote: "Each team member should confirm independently. This is self-reported.",
+        teamReflection: "TEAM REFLECTION",
+        reflectionPlaceholder: "What did you observe? What was surprising?",
+        submitting: "SUBMITTING...",
+        submitMission: "SUBMIT MISSION",
+        missingReflection: "Missing Reflection",
+        missingReflectionMsg: "Please write your reflection before submitting.",
+        confirmRequired: "Team Confirmation Required",
+        confirmRequiredMsg: "All team members must confirm before submission. Please check the confirmation box.",
+        submitSuccess: "Mission Submitted!",
+        submitError: "Failed to submit. Check your connection.",
+        deleteTitle: "Delete Trial",
+        deleteMsg: "Remove this trial?",
+        clearAllTitle: "Clear All",
+        clearAllMsg: "Delete all trials for this activity?",
+        velocityMetric: "Velocity (m/s)",
+        decibelMetric: "Decibel (dB)",
+        forceMetric: "Force (N)",
+        swayMetric: "Sway (cm)",
+        defaultMetric: "Measurement",
+        recordedTrials: "Recorded Trials"
+      },
       errorMessages: {
         invalidCredential: "Invalid email or password",
         fillInAllFields: "Please fill in all fields",
@@ -388,6 +441,15 @@ const resources = {
         rating: "Rate this Activity",
         ratingPrompt: "How was this activity?",
         accuracy: "Accuracy",
+        noData: "No trials recorded",
+        entryNumber: "#{{number}}",
+        ratingHint: "Tap a star to rate this activity",
+        compare: "Compare your results with your team and the leaderboard!",
+        compareNoise: "Compare your team's noise map with others on the leaderboard!",
+        velocity: "Velocity",
+        gForce: "G-Force",
+        time: "Time",
+        surfaceArea: "Surface Area",
         backToActivities: "Back to Activities",
         parachuteTheory: "How Parachutes Work\n\nWhen you drop a toy without a parachute, gravity pulls it straight down. The only force acting on it is gravity, so it accelerates at 9.8 m/s² until it hits the ground. A parachute adds drag force by increasing surface area. The drag force pushes upward against gravity, slowing the fall. The larger the canopy, the more air resistance, and the slower the descent. The g-force experienced on landing depends on how quickly the object stops. A longer contact time (softer landing) reduces g-force, while a hard, sudden stop increases it dramatically.\n\nKey formulas:\n• Velocity: v = d / t\n• Acceleration: a = v / t\n• Weight: W = m × 9.8\n• Net Force: F = m × a\n• Drag Force: F_drag = W - F_net\n• G-force (no bounce): (v / contactTime) / 9.8\n• G-force (bounce): ((v + v_rebound) / contactTime) / 9.8",
         soundTheory: "How Sound Pollution Works\n\nSound is measured in decibels (dB), a logarithmic scale. Every 10 dB increase represents a tenfold increase in sound intensity. Normal conversation is about 60 dB, while a rock concert can exceed 120 dB. Prolonged exposure above 85 dB can cause hearing damage. The louder the sound and the longer the exposure, the greater the risk of permanent hearing loss.\n\nKey concepts:\n• Decibel (dB): Unit of sound intensity\n• Logarithmic scale: 20 dB is 10× more intense than 10 dB\n• Safe: 0-60 dB (whisper, quiet room)\n• Warning: 60-85 dB (busy traffic)\n• Dangerous: 85+ dB (machinery, concerts)",
@@ -467,7 +529,12 @@ const resources = {
         backToActivities: "アクティビティに戻る",
         waitForSignal: "合図を待ってください",
         tapNow: "今すぐタップ！",
-        changePassword: "パスワードを変更する"
+        changePassword: "パスワードを変更する",
+        logTrial: "試験を記録",
+        logReading: "測定を記録",
+        logDesign: "設計を記録",
+        stop: "停止",
+        start: "開始"
       },
       landing: {
         slogan: "試行。測定。改善。"
@@ -495,10 +562,20 @@ const resources = {
         teamID: "チームID",
         teamIDPlaceholder: "チームIDを入力してください",
         inviteCode: "招待コード",
-        inviteCodePlaceholder: "招待コードを入力してください"
+        inviteCodePlaceholder: "招待コードを入力してください",
+        grantCamera: "カメラの許可を与える",
+        cancelScan: "スキャンをキャンセル",
+        scanQR: "QRコードをスキャン"
       },
       home: {
         welcome: "ようこそ",
+        rank: "順位",
+        completed: "完了",
+        noTeam: "チームに参加していません",
+        joinOrCreate: "チームに参加するか作成して始めましょう",
+        recentActivity: "最近のアクティビティ",
+        noRecentActivity: "最近のアクティビティはありません",
+        startActivity: "アクティビティを開始",
         subtitle: "次の実験の準備はできましたか？",
         howItWorks: "STEMMLABの仕組み",
         howItWorksElements: [
@@ -662,6 +739,41 @@ const resources = {
           activityBPMCount: "アクティビティ {{index}} BPM"
         }
       },
+      journal: {
+        title: "ジャーナル",
+        experimentRecords: "実験記録",
+        clearAll: "すべてクリア",
+        noData: "実験データがまだありません",
+        noDataSubtext: "実験タブに移動して最初の試験を記録してください！",
+        trialCount: "{{count}} 回の試験",
+        trialCount_plural: "{{count}} 回の試験",
+        trialNumber: "試験 #{{number}}",
+        teamConfirmation: "チーム確認",
+        confirmSubtext: "提出前にすべてのチームメンバーが確認する必要があります",
+        confirmed: "確認済み",
+        confirmText: "チームの提出を確認します",
+        confirmNote: "各メンバーが独立して確認する必要があります。これは自己申告です。",
+        teamReflection: "チーム反省",
+        reflectionPlaceholder: "何を観察しましたか？何が驚きでしたか？",
+        submitting: "送信中...",
+        submitMission: "ミッションを送信",
+        missingReflection: "反省文がありません",
+        missingReflectionMsg: "送信前に反省文を書いてください。",
+        confirmRequired: "チーム確認が必要です",
+        confirmRequiredMsg: "すべてのチームメンバーが提出前に確認する必要があります。確認ボックスをチェックしてください。",
+        submitSuccess: "ミッションが送信されました！",
+        submitError: "送信に失敗しました。接続を確認してください。",
+        deleteTitle: "試験を削除",
+        deleteMsg: "この試験を削除しますか？",
+        clearAllTitle: "すべてクリア",
+        clearAllMsg: "このアクティビティのすべての試験を削除しますか？",
+        velocityMetric: "速度（m/s）",
+        decibelMetric: "デシベル（dB）",
+        forceMetric: "力（N）",
+        swayMetric: "揺れ（cm）",
+        defaultMetric: "測定",
+        recordedTrials: "記録された試験"
+      },
       errorMessages: {
         invalidCredential: "メールアドレスまたはパスワードが正しくありません",
         fillInAllFields: "すべての項目にご記入ください",
@@ -734,6 +846,7 @@ const resources = {
         changePassword: "Ubah Kata Sandi",
         profileInformation: "Informasi Profil",
         manageMembers: "Kelola Anggota",
+        members: "Anggota",
         teamInformation: "Informasi Tim",
         teamRoles: "Peran Tim"
       },
@@ -751,7 +864,12 @@ const resources = {
         backToActivities: "Kembali ke Aktivitas",
         waitForSignal: "Tunggu Sinyal",
         tapNow: "TAP SEKARANG!",
-        changePassword: "Ubah Kata Sandi"
+        changePassword: "Ubah Kata Sandi",
+        logTrial: "Catat Percobaan",
+        logReading: "Catat Pembacaan",
+        logDesign: "Catat Desain",
+        stop: "BERHENTI",
+        start: "MULAI"
       },
       landing: {
         slogan: "Eksperimen. Ukur. Tingkatkan."
@@ -768,6 +886,13 @@ const resources = {
         password: "Kata Sandi",
         passwordPlaceholder: "Masukkan kata sandi"
       },
+      common: {
+        loading: "Memuat...",
+        notImplemented: "Belum Diimplementasikan",
+        cancel: "Batal",
+        delete: "Hapus",
+        clear: "Bersihkan"
+      },
       teamInitialization: {
         createTitle: "Buat Tim Anda",
         joinTitle: "Gabung Tim",
@@ -779,10 +904,21 @@ const resources = {
         teamID: "ID Tim",
         teamIDPlaceholder: "Masukkan ID tim",
         inviteCode: "Kode Undangan",
-        inviteCodePlaceholder: "Masukkan kode undangan"
+        inviteCodePlaceholder: "Masukkan kode undangan",
+        grantCamera: "Izinkan Akses Kamera",
+        cancelScan: "Batalkan Pindai",
+        scanQR: "Pindai Kode QR"
       },
       home: {
         welcome: "Selamat Datang",
+        rank: "Peringkat",
+        completed: "Selesai",
+        noTeam: "Tidak dalam tim",
+        joinOrCreate: "Gabung atau buat tim untuk memulai",
+        recentActivity: "Aktivitas Terbaru",
+        noRecentActivity: "Tidak ada aktivitas terbaru",
+        startActivity: "Mulai aktivitas",
+        subtitle: "Siap untuk eksperimen berikutnya?",
         subtitle: "Siap untuk eksperimen berikutnya?",
         howItWorks: "Cara Kerja STEMMLAB",
         howItWorksElements: [
@@ -834,6 +970,8 @@ const resources = {
           gForceRiskScale: "Skala Risiko G-Force",
           gForceTip: "Gunakan video gerak lambat untuk mengukur waktu kontak",
           prototype: "Prototipe",
+          dropHeightPlaceholder: "Tinggi Jatuh (m)",
+          toyMassPlaceholder: "Massa Mainan (kg)",
           baselineLabel: "Dasar (Tanpa Parasut)",
           predictTime: "Waktu Perkiraan (s)",
           predictTimePlaceholder: "Perkiraan waktu jatuh",
@@ -864,6 +1002,7 @@ const resources = {
           actionLabel: "Tindakan",
           actionPlaceholder: "Mis. Menjatuhkan buku",
           actionOptions: ["Menjatuhkan buku", "Berbicara", "Berjalan", "Menghentakkan kaki", "Menutup pintu"],
+          locationPlaceholder: "Mis. Kantin, Perpustakaan, Gym",
           predictionLabel: "Perkiraan (Lebih Keras/Lebih Lembut)",
           predictLouder: "Lebih Keras",
           predictSofter: "Lebih Lembut",
@@ -1039,6 +1178,41 @@ const resources = {
           activityBPMCount: "Aktivitas {{index}} BPM"
         }
       },
+      journal: {
+        title: "Jurnal",
+        experimentRecords: "CATATAN EKSPERIMEN",
+        clearAll: "Hapus Semua",
+        noData: "Belum ada data eksperimen",
+        noDataSubtext: "Pergi ke tab Eksperimen dan catat percobaan pertama Anda!",
+        trialCount: "{{count}} percobaan",
+        trialCount_plural: "{{count}} percobaan",
+        trialNumber: "Percobaan #{{number}}",
+        teamConfirmation: "KONFIRMASI TIM",
+        confirmSubtext: "Semua anggota tim harus mengonfirmasi sebelum pengiriman",
+        confirmed: "Dikonfirmasi",
+        confirmText: "Saya mengonfirmasi pengiriman tim kami",
+        confirmNote: "Setiap anggota harus mengonfirmasi secara mandiri. Ini adalah laporan mandiri.",
+        teamReflection: "REFLEKSI TIM",
+        reflectionPlaceholder: "Apa yang Anda amati? Apa yang mengejutkan?",
+        submitting: "MENGIRIM...",
+        submitMission: "KIRIM MISI",
+        missingReflection: "Refleksi Hilang",
+        missingReflectionMsg: "Harap tulis refleksi Anda sebelum mengirim.",
+        confirmRequired: "Konfirmasi Tim Diperlukan",
+        confirmRequiredMsg: "Semua anggota tim harus mengonfirmasi sebelum pengiriman. Harap centang kotak konfirmasi.",
+        submitSuccess: "Misi Terkirim!",
+        submitError: "Gagal mengirim. Periksa koneksi Anda.",
+        deleteTitle: "Hapus Percobaan",
+        deleteMsg: "Hapus percobaan ini?",
+        clearAllTitle: "Hapus Semua",
+        clearAllMsg: "Hapus semua percobaan untuk aktivitas ini?",
+        velocityMetric: "Kecepatan (m/s)",
+        decibelMetric: "Desibel (dB)",
+        forceMetric: "Gaya (N)",
+        swayMetric: "Ayunan (cm)",
+        defaultMetric: "Pengukuran",
+        recordedTrials: "Percobaan Tercatat"
+      },
       errorMessages: {
         invalidCredential: "Email atau kata sandi tidak valid",
         fillInAllFields: "Harap isi semua kolom",
@@ -1096,6 +1270,15 @@ const resources = {
         rating: "Nilai Aktivitas Ini",
         ratingPrompt: "Bagaimana aktivitas ini?",
         accuracy: "Akurasi",
+        noData: "Belum ada catatan",
+        entryNumber: "#{{number}}",
+        ratingHint: "Ketuk bintang untuk menilai aktivitas ini",
+        compare: "Bandingkan hasil Anda dengan tim dan papan peringkat!",
+        compareNoise: "Bandingkan peta kebisingan tim Anda dengan yang lain di papan peringkat!",
+        velocity: "Kecepatan",
+        gForce: "G-Force",
+        time: "Waktu",
+        surfaceArea: "Luas Permukaan",
         backToActivities: "Kembali ke Aktivitas",
         parachuteTheory: "Cara Kerja Parasut\n\nSaat Anda menjatuhkan mainan tanpa parasut, gravitasi menariknya langsung ke bawah. Satu-satunya gaya yang bekerja adalah gravitasi, sehingga ia berakselerasi pada 9,8 m/s² hingga menyentuh tanah. Parasut menambahkan gaya hambat dengan meningkatkan luas permukaan. Gaya hambat mendorong ke atas melawan gravitasi, memperlambat jatuh.\n\nRumus utama:\n• Kecepatan: v = d / t\n• Akselerasi: a = v / t\n• Berat: W = m × 9,8\n• Gaya Bersih: F = m × a\n• Gaya Hambat: F_hambat = W - F_bersih\n• G-force (tanpa pantul): (v / waktuKontak) / 9,8\n• G-force (dengan pantul): ((v + v_pantul) / waktuKontak) / 9,8",
         soundTheory: "Cara Kerja Polusi Suara\n\nSuara diukur dalam desibel (dB), skala logaritmik. Setiap kenaikan 10 dB mewakili peningkatan sepuluh kali lipat intensitas suara. Percakapan normal sekitar 60 dB, sementara konser rock bisa melebihi 120 dB. Paparan berkepanjangan di atas 85 dB dapat menyebabkan kerusakan pendengaran.\n\n• Desibel (dB): Satuan intensitas suara\n• Aman: 0-60 dB\n• Peringatan: 60-85 dB\n• Berbahaya: 85+ dB",
@@ -1132,6 +1315,490 @@ const resources = {
         member: "Anggota",
         leader: "Ketua",
         remove: "Hapus"
+      }
+    }
+  },
+  zh: {
+    translation: {
+      tabs: {
+        home: "首页",
+        activities: "活动",
+        leaderboard: "排行榜",
+        settings: "设置",
+        account: "账户",
+        team: "团队",
+        appearance: "外观",
+        about: "关于",
+        details: "详情",
+        attempt: "尝试",
+        instructions: "说明",
+        language: "语言",
+        contactSupport: "联系支持",
+        privacyPolicy: "隐私政策",
+        termsOfService: "服务条款",
+        changePassword: "修改密码",
+        profileInformation: "个人信息",
+        members: "成员",
+        teamInformation: "团队信息",
+        teamRoles: "团队角色"
+      },
+      buttons: {
+        register: "注册",
+        logTrial: "记录试验",
+        logReading: "记录读数",
+        logDesign: "记录设计",
+        login: "登录",
+        createTeam: "创建团队",
+        joinTeam: "加入团队",
+        begin: "开始",
+        startRecording: "开始录制",
+        startChallenge: "开始挑战",
+        recording: "录制中...",
+        finishActivity: "完成活动",
+        continue: "继续",
+        backToActivities: "返回活动",
+        waitForSignal: "等待信号",
+        tapNow: "立即点击！",
+        changePassword: "修改密码",
+        stop: "停止",
+        start: "开始"
+      },
+      landing: {
+        slogan: "实验。测量。改进。"
+      },
+      forms: {
+        hello: "你好！",
+        welcome: "欢迎回来！",
+        userRegister: "用户注册",
+        userLogin: "用户登录",
+        firstName: "名字",
+        firstNamePlaceholder: "请输入您的名字",
+        email: "邮箱",
+        emailPlaceholder: "请输入您的邮箱",
+        password: "密码",
+        passwordPlaceholder: "请输入您的密码"
+      },
+      teamInitialization: {
+        createTitle: "创建您的团队",
+        joinTitle: "加入团队",
+        teamName: "团队名称",
+        teamNamePlaceholder: "请输入团队名称",
+        gradeLevel: "年级",
+        gradeLevelPlaceholder: "选择年级",
+        skip: "跳过",
+        teamID: "团队ID",
+        teamIDPlaceholder: "请输入团队ID",
+        inviteCode: "邀请码",
+        inviteCodePlaceholder: "请输入邀请码",
+        grantCamera: "授予相机权限",
+        cancelScan: "取消扫描",
+        scanQR: "扫描二维码"
+      },
+      home: {
+        welcome: "欢迎",
+        rank: "排名",
+        completed: "已完成",
+        noTeam: "未加入团队",
+        joinOrCreate: "加入或创建团队来开始",
+        recentActivity: "最近活动",
+        noRecentActivity: "暂无最近活动",
+        startActivity: "开始活动",
+        subtitle: "准备好下一次实验了吗？",
+        howItWorks: "STEMMLAB 工作原理",
+        howItWorksElements: [
+          "选择挑战",
+          "使用真实材料记录您的实验",
+          "使用手机传感器捕获数据并上传结果",
+          "优化设计并登上排行榜"
+        ]
+      },
+      activities: {
+        selectActivity: "选择活动",
+        activityDetails: "活动详情",
+        overview: "概述",
+        equipmentsNeeded: "所需设备",
+        instructions: "说明",
+        attempt: "尝试",
+        phase: "阶段",
+        activityResults: "活动结果",
+
+        parachuteDropChallenge: {
+          name: "降落伞投放挑战",
+          description: "设计、制作和测试小型玩具的降落伞，以降低其落地速度和冲击力。您的团队将在时间和材料的限制下迭代，在目标区域内实现最慢、最安全的着陆。",
+          instructions: [
+            "不带降落伞投掷玩具并记录坠落（基线测试）。",
+            "使用提供的材料制作降落伞。",
+            "从相同高度投掷玩具并记录坠落。",
+            "在应用中查看速度和着陆精度结果。",
+            "在20分钟内重新设计和测试最多三个原型。",
+            "上传视频、结果和团队反思。"
+          ],
+          equipments: [
+            { name: "塑料袋", description: "用于制作降落伞的伞面。" },
+            { name: "绳子", description: "用于连接伞面与负载的吊带。" },
+            { name: "小玩具", description: "用作投掷测试的乘客或货物。" },
+            { name: "桌子", description: "提供一致、可测量的投掷高度以确保公平测试。" },
+            { name: "剪刀", description: "用于根据设计要求切割和塑形伞面和绳子。" },
+            { name: "胶带", description: "固定各部件并标记投掷高度。" }
+          ],
+          parameters: "参数",
+          analytics: "物理分析",
+          gForce: "G力分析",
+          contactTime: "接触时间（秒）",
+          contactTimePlaceholder: "输入接触时间（例如 0.05）",
+          didBounce: "是否弹起？",
+          surfaceArea: "表面积（cm²）",
+          surfaceAreaPlaceholder: "降落伞表面积",
+          gForceResult: "G力",
+          gForceRisk: "受伤风险",
+          gForceRiskScale: "G力风险等级",
+          gForceTip: "使用慢动作视频测量接触时间",
+          prototype: "原型",
+          dropHeightPlaceholder: "投掷高度（米）",
+          toyMassPlaceholder: "玩具质量（千克）",
+          baselineLabel: "基线（无降落伞）",
+          predictTime: "预测时间（秒）",
+          predictTimePlaceholder: "预测坠落时间",
+          wasRight: "您的预测正确吗？",
+          writeUpPrediction: "预测记录",
+          easiestDesign: "最容易制作的设计",
+          easiestDesignPlaceholder: "哪个设计最容易？",
+          gForceTable: {
+            safe: "1-5 g：无伤害（电梯、站立）",
+            moderate: "5-10 g：可能擦伤（硬摔）",
+            serious: "10-30 g：可能严重受伤（运动碰撞）",
+            severe: "30-50 g：严重受伤高风险（车祸）",
+            critical: "50+ g：可能危及生命"
+          }
+        },
+
+        soundPollutionHunter: {
+          name: "噪音污染探测",
+          description: "学生作为环境调查员，测量和比较不同课堂活动产生的声音水平。目标是识别能量和表面如何影响声音强度，并了解长时间暴露于噪音的健康风险。",
+          instructions: [
+            "测量不同动作的噪音（扔物体、说话、走路、跺脚）。",
+            "记录声音水平和位置。",
+            "绘制噪音区和安静区地图。"
+          ],
+          equipments: [
+            { name: "任意物品", description: "用于测量噪音的投掷物。" }
+          ],
+          actionLabel: "动作",
+          actionPlaceholder: "例如：扔书",
+          actionOptions: ["扔书", "说话", "走路", "跺脚", "关门"],
+          locationPlaceholder: "例如：食堂、图书馆、体育馆",
+          predictionLabel: "预测（更响/更轻）",
+          predictLouder: "更响",
+          predictSofter: "更轻",
+          predictionCompare: "您的预测正确吗？",
+          hearingRiskTable: "听力损伤风险",
+          safeZone: "安全区",
+          warningZone: "警告区",
+          dangerZone: "危险区",
+          riskScale: {
+            safe: "0-60 dB：安全 — 无风险",
+            moderate: "60-85 dB：短时间暴露安全",
+            warning: "85-90 dB：警告 — 超过8小时可能损伤",
+            high: "90-100 dB：高风险 — 超过15分钟损伤",
+            dangerous: "100-120 dB：危险 — 按分钟计",
+            critical: "120dB+：立即损伤风险"
+          },
+          needEarMuffs: "应该戴耳罩吗？",
+          needEarMuffsPlaceholder: "您对听力保护的看法"
+        },
+
+        handFanChallenge: {
+          name: "手扇挑战",
+          description: "学生测试空气流动如何对柔性材料施加力。通过设计不同的手扇并针对纸和纸板目标进行测试，团队研究扇子设计、距离和材料刚度之间的关系。",
+          instructions: [
+            "将纸直立放在桌子上。",
+            "从30厘米外扇风。",
+            "观察并记录运动。",
+            "使用不同的扇子设计和距离（15厘米、30厘米、45厘米）重复。"
+          ],
+          equipments: [
+            { name: "纸和纸板", description: "用于制作扇子和垂直目标的原材料。" },
+            { name: "剪刀", description: "用于精确切割材料以制作特定扇子形状和尺寸。" },
+            { name: "胶带", description: "将垂直目标固定到桌子上，使其可弯曲而不倒下。" }
+          ],
+          selectMaterial: "目标材料",
+          selectDistance: "距离（厘米）",
+          materialStiffness: "刚度系数",
+          targetToggle: "目标类型",
+          paper: "纸",
+          cardboard: "纸板",
+          fanDesign: "扇子设计名称",
+          fanDesignPlaceholder: "例如：折纸褶皱",
+          deflectionAngle: "偏转角（°）",
+          anglePlaceholder: "输入弯曲角度",
+          forceResult: "估计力",
+          forceUnit: "N",
+          stiffnessNote: "刚度越高 = 弯曲所需力越大",
+          predictionAngle: "预测角度（°）",
+          predictionAnglePlaceholder: "您的预测角度",
+          wasRightLabel: "您正确吗？",
+          writeUp: {
+            bestDesign: "哪个设计最能使纸移动？",
+            bestDesignPlaceholder: "您的答案",
+            stiffnessEffect: "刚度如何影响弯曲角度？",
+            stiffnessEffectPlaceholder: "您的观察",
+            distanceEffect: "距离如何影响弯曲？",
+            distanceEffectPlaceholder: "您的观察"
+          }
+        },
+
+        earthquakeResistantStructure: {
+          name: "抗震结构",
+          description: "学生设计和构建结构原型以承受模拟地震振动。目标是通过迭代工程创建一个吸收和分布能量的底座，保护建筑（手机）免受过度移动。",
+          instructions: [
+            "将垂直目标固定在桌子上，使其可弯曲而不倒下。",
+            "在上面放置一个平坦的纸板平台。",
+            "将手机放在中心，在STEMM应用中激活振动模式。",
+            "修改结构以减少移动（例如增加支柱、增加折叠等）。"
+          ],
+          equipments: [
+            { name: "纸和纸板", description: "用于构建结构平台和防振层的主要材料。" },
+            { name: "剪刀", description: "用于精确切割材料以制作特定形状和尺寸。" },
+            { name: "胶带", description: "将垂直目标固定到桌子上。" }
+          ],
+          designName: "设计名称",
+          designNamePlaceholder: "例如：设计1",
+          foldCount: "折叠数量",
+          foldCountPlaceholder: "折叠数量",
+          pillarCount: "支柱数量",
+          pillarCountPlaceholder: "支柱数量",
+          predictedMovement: "预测移动（厘米）",
+          predictedMovementPlaceholder: "您的预测",
+          observedSway: "观察摆动（厘米）",
+          observedSwayPlaceholder: "测量移动",
+          accelerometerData: "加速度计数据",
+          startVibration: "开始振动",
+          stopVibration: "停止振动",
+          writeUp: {
+            bestDesign: "哪个设计移动最少？",
+            bestDesignPlaceholder: "您的答案",
+            structuralEffect: "折叠/支柱如何影响稳定性？",
+            structuralEffectPlaceholder: "您的观察",
+            realWorldLink: "这与真实建筑有何关系？",
+            realWorldLinkPlaceholder: "您的联系"
+          }
+        },
+
+        stretchSpeedAndGracefulness: {
+          name: "拉伸速度与优雅度",
+          description: "学生通过测量控制拉伸过程中运动的速度和流畅度来研究人体生物力学。使用手机的振动传感器，团队分析他们移动的优雅程度以及疲劳或速度如何影响身体协调。",
+          instructions: [
+            "用一只手牢牢握住手机。激活应用振动传感器。",
+            "按照应用指示缓慢进行引导运动。记录振动。",
+            "在启用振动反馈的情况下重复活动。",
+            "查看速度、流畅度和运动范围数据。",
+            "上传结果并作为小组进行反思。"
+          ],
+          equipments: [
+            { name: "开放空间", description: "为学生进行全范围运动练习提供安全环境。" }
+          ],
+          phases: [
+            "顺时针运动",
+            "垂直运动",
+            "水平运动"
+          ],
+          recordMovement: "记录运动",
+          vibrationsDetected: "检测到振动",
+          smoothnessScore: "流畅度评分",
+          movementMonitor: "运动监视器",
+          movementMonitorPlaceholder: "开始录制以可视化运动流畅度",
+          movementVibrations: "运动 {{index}} 振动",
+          movementSmoothness: "运动 {{index}} 流畅度"
+        },
+
+        reactionBoardChallenge: {
+          name: "反应板挑战",
+          description: "学生通过测量不同条件下的反应时间来测试神经肌肉协调能力。该活动使用手机作为数字刺激与反应板来捕获大脑到身体信号通路的速度。",
+          instructions: [
+            "隐藏按钮出现后立即点击屏幕。记录反应时间。",
+            "用非惯用手重复。比较结果。",
+            "描摹屏幕上移动的形状。查看准确度和延迟。"
+          ],
+          equipments: [
+            { name: "各种干扰", description: "用于测试认知负荷如何影响反应时间的音乐、对话或体力任务。" }
+          ],
+          phases: [
+            "惯用手点击反应",
+            "非惯用手点击反应",
+            "描摹挑战"
+          ],
+          recordReactionTime: "记录反应时间",
+          measureTracingAccuracy: "测量描摹准确度",
+          tracingZone: "描摹区域",
+          tracingZonePlaceholder: "在此描摹",
+          reactionZone: "反应区域",
+          reactionZonePlaceholder: "目标出现时在此区域内点击",
+          accuracyScore: "准确度评分",
+          tap: "点击！"
+        },
+
+        breathingPaceTrainer: {
+          name: "呼吸节奏训练器",
+          description: "学生探索呼吸与身体放松之间的关系。通过跟随数字节奏器，他们学会控制呼吸频率，观察有意识的调节如何影响心率或感知压力水平。",
+          instructions: [
+            "将手机轻轻放在胸前。",
+            "记录静息时呼吸。",
+            "进行轻度运动（原地慢跑1分钟和100次开合跳）。",
+            "再次记录呼吸并比较结果。"
+          ],
+          equipments: [
+            { name: "平坦表面", description: "用于测试认知负荷如何影响反应时间的工具。" }
+          ],
+          phases: [
+            "休息",
+            "慢跑一分钟",
+            "100次开合跳"
+          ],
+          recordBreathing: "记录呼吸",
+          breathsRecorded: "记录呼吸次数",
+          bpm: "次/分钟",
+          breathingMonitor: "呼吸监视器",
+          breathingMonitorPlaceholder: "开始录制以可视化胸部运动",
+          activityBPMCount: "活动 {{index}} 次/分钟"
+        }
+      },
+      journal: {
+        title: "日志",
+        experimentRecords: "实验记录",
+        clearAll: "清除全部",
+        noData: "暂无实验数据",
+        noDataSubtext: "前往实验标签页记录您的第一次试验！",
+        trialCount: "{{count}} 次试验",
+        trialCount_plural: "{{count}} 次试验",
+        trialNumber: "试验 #{{number}}",
+        teamConfirmation: "团队确认",
+        confirmSubtext: "所有团队成员必须在提交前确认",
+        confirmed: "已确认",
+        confirmText: "我确认我们团队的提交",
+        confirmNote: "每位成员应独立确认。此为自我报告。",
+        teamReflection: "团队反思",
+        reflectionPlaceholder: "您观察到了什么？有什么令人惊讶的？",
+        submitting: "提交中...",
+        submitMission: "提交任务",
+        missingReflection: "缺少反思",
+        missingReflectionMsg: "请在提交前撰写您的反思。",
+        confirmRequired: "需要团队确认",
+        confirmRequiredMsg: "所有团队成员必须在提交前确认。请勾选确认框。",
+        submitSuccess: "任务已提交！",
+        submitError: "提交失败。请检查您的连接。",
+        deleteTitle: "删除试验",
+        deleteMsg: "要移除此试验吗？",
+        clearAllTitle: "清除全部",
+        clearAllMsg: "要删除此活动的所有试验吗？",
+        velocityMetric: "速度（米/秒）",
+        decibelMetric: "分贝（dB）",
+        forceMetric: "力（N）",
+        swayMetric: "摆动（厘米）",
+        defaultMetric: "测量",
+        recordedTrials: "已记录试验"
+      },
+      errorMessages: {
+        invalidCredential: "邮箱或密码无效",
+        fillInAllFields: "请填写所有字段",
+        userNotFound: "未找到此邮箱的账户",
+        wrongPassword: "密码错误",
+        invalidEmail: "请输入有效邮箱",
+        tooManyRequests: "尝试次数过多。请稍后再试。",
+        defaultError: "出现错误",
+        weakPassword: "密码至少6个字符",
+        emailAlreadyInUse: "此邮箱已注册",
+        failedPasswordUpdate: "密码更新失败",
+        passwordsDoNotMatch: "密码不匹配",
+        emptyFirstName: "名字不能为空"
+      },
+      countdown: {
+        getReady: "准备"
+      },
+      about: {
+        appName: "应用名称：",
+        version: "版本：",
+        description: "描述：",
+        descriptionValue: "专为协作活动和竞赛设计的互动STEM学习平台。",
+        privacyPolicy: "隐私政策",
+        termsOfService: "服务条款",
+        contactSupport: "联系支持"
+      },
+      account: {
+        profileInformation: "个人信息",
+        teamInformation: "团队信息",
+        changePassword: "修改密码",
+        logout: "退出登录"
+      },
+      appearance: {
+        lightMode: "浅色模式",
+        darkMode: "深色模式"
+      },
+      team: {
+        teamInformation: "团队信息",
+        members: "成员",
+        teamRoles: "团队角色",
+        leaveTeam: "离开团队"
+      },
+      changePassword: {
+        currentPassword: "当前密码",
+        currentPasswordPlaceholder: "输入当前密码",
+        newPassword: "新密码",
+        newPasswordPlaceholder: "输入新密码",
+        confirmPassword: "确认密码",
+        confirmPasswordPlaceholder: "确认新密码"
+      },
+      results: {
+        attempts: "尝试次数",
+        ranking: "排名",
+        theoryExplanation: "理论解释",
+        rating: "评价此活动",
+        ratingPrompt: "这个活动怎么样？",
+        accuracy: "准确度",
+        noData: "暂无记录",
+        entryNumber: "#{{number}}",
+        ratingHint: "点击星星评价此活动",
+        compare: "将您的结果与团队和排行榜进行比较！",
+        compareNoise: "将您团队的噪音图与排行榜上的其他人进行比较！",
+        velocity: "速度",
+        gForce: "G力",
+        time: "时间",
+        surfaceArea: "表面积",
+        backToActivities: "返回活动",
+        parachuteTheory: "降落伞工作原理\n\n当您不带降落伞投掷玩具时，重力直接将其拉下。作用在它上面的唯一力是重力，因此它以9.8 m/s²加速直到撞击地面。降落伞通过增加表面积来增加阻力。阻力向上推，对抗重力，减缓下落。伞面越大，空气阻力越大，下降越慢。\n\n关键公式：\n• 速度：v = d / t\n• 加速度：a = v / t\n• 重量：W = m × 9.8\n• 净力：F = m × a\n• 阻力：F_drag = W - F_net\n• G力（无弹跳）：(v / 接触时间) / 9.8\n• G力（有弹跳）：((v + v_反弹) / 接触时间) / 9.8",
+        soundTheory: "噪音污染的工作原理\n\n声音以分贝（dB）测量，为对数标度。每增加10 dB代表声音强度增加十倍。正常对话约为60 dB，而摇滚音乐会可能超过120 dB。长时间暴露在85 dB以上可能导致听力损伤。\n\n关键概念：\n• 分贝（dB）：声音强度单位\n• 对数标度：20 dB比10 dB强10倍\n• 安全：0-60 dB（耳语、安静房间）\n• 警告：60-85 dB（繁忙交通）\n• 危险：85+ dB（机械、音乐会）",
+        fanTheory: "手扇的工作原理\n\n当您向纸目标扇风时，移动的空气施加力。力的大小取决于空气速度、扇子材料的刚度以及与目标的距离。更硬的材料每次挥动推动更多空气，产生更大的力。\n\n关键公式：\n• 估计力：F ≈ k × θ（k = 刚度系数，θ = 弯曲角度弧度）\n• 材料：薄纸（k=0.05）、卡片纸（k=0.20）、薄纸板（k=0.50）、瓦楞纸板（k=2.50）",
+        earthquakeTheory: "抗震结构的工作原理\n\n地震发生时，建筑物经历多个方向的振动。工程师设计结构来吸收和消散这些能量，而不是刚性抵抗。折叠和支柱通过更均匀地分布力来增加结构稳定性。\n\n关键概念：\n• 基础隔离：将建筑与地面分离\n• 交叉支撑：对角支撑增加稳定性\n• 能量耗散：折叠和柔性接头吸收振动\n• 重心：降低重心提高稳定性",
+        breathingTheory: "呼吸的工作原理\n\n呼吸频率随体力活动变化。静息时，人每分钟呼吸12-20次。运动中，身体需要更多氧气，呼吸频率增加。手机加速度计可以检测呼吸引起的细微胸部运动来测量呼吸频率。\n\n关键概念：\n• BPM：每分钟呼吸次数 — 您的呼吸频率\n• 静息：典型12-20 BPM\n• 轻度运动：20-40 BPM\n• 剧烈运动：40-60 BPM",
+        reactionTheory: "反应时间的工作原理\n\n反应时间是刺激与您反应之间的间隔。它涉及您的感官检测刺激、大脑处理信息以及神经向肌肉发出信号。人类对视觉刺激的平均反应时间约为200-250毫秒。\n\n关键因素：\n• 惯用手：通常比非惯用手快10-20毫秒\n• 年龄：反应时间在20岁出头达到峰值\n• 疲劳：显著减慢反应时间\n• 练习：可提高反应时间10-15%",
+        movementTheory: "运动流畅度的工作原理\n\n运动流畅度通过加速度的突然变化来衡量。手机加速度计检测振动和颠簸。流畅的运动产生更少、更小的加速度变化。流畅度评分（0-100%）衡量您移动的优雅程度。\n\n关键概念：\n• 振动：突然的加速度变化\n• 流畅度：无过度振动的时间百分比\n• 评分：从100%开始，每次颠簸减少"
+      },
+      leaderboard: {
+        title: "排行榜",
+        global: "全球排名",
+        byActivity: "按活动",
+        rank: "排名",
+        team: "团队",
+        score: "分数",
+        members: "成员",
+        noData: "暂无提交",
+        selectActivity: "选择活动"
+      },
+      teamSettings: {
+        title: "团队设置",
+        teamName: "团队名称",
+        teamId: "团队ID",
+        inviteCode: "邀请码",
+        gradeLevel: "年级",
+        members: "成员",
+        maxReached: "团队已满（最多4人）",
+        shareQR: "分享二维码",
+        qrInstructions: "其他学生可以扫描此二维码加入您的团队",
+        leaveTeam: "离开团队",
+        leaveConfirm: "您确定要离开团队吗？",
+        noTeam: "未加入团队",
+        member: "成员",
+        leader: "队长",
+        remove: "移除"
       }
     }
   },

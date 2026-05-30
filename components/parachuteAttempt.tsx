@@ -199,14 +199,14 @@ export default function ParachuteAttemptScreen() {
               <Text style={[styles.timerBtnText, { color: theme.textMuted }]}>RESET</Text>
             </Pressable>
             <Pressable style={[styles.timerBtn, { flex: 2, backgroundColor: isTimerRunning ? theme.danger : theme.primary }]} onPress={toggleTimer}>
-              <Text style={styles.timerBtnText}>{isTimerRunning ? "STOP" : "START"}</Text>
+              <Text style={styles.timerBtnText}>{isTimerRunning ? t("buttons.stop") : t("buttons.start")}</Text>
             </Pressable>
           </View>
 
           {/* PDF: Parameters */}
           <Text style={styles.sectionHeader}>{t("activities.parachuteDropChallenge.parameters")}</Text>
-          <TextInput style={styles.input} value={dropHeight} onChangeText={setDropHeight} keyboardType="numeric" placeholder="Drop Height (m)" placeholderTextColor={theme.textMuted} />
-          <TextInput style={styles.input} value={toyMass} onChangeText={setToyMass} keyboardType="numeric" placeholder="Toy Mass (kg)" placeholderTextColor={theme.textMuted} />
+          <TextInput style={styles.input} value={dropHeight} onChangeText={setDropHeight} keyboardType="numeric" placeholder={t("activities.parachuteDropChallenge.dropHeightPlaceholder")} placeholderTextColor={theme.textMuted} />
+          <TextInput style={styles.input} value={toyMass} onChangeText={setToyMass} keyboardType="numeric" placeholder={t("activities.parachuteDropChallenge.toyMassPlaceholder")} placeholderTextColor={theme.textMuted} />
           <TextInput style={styles.input} value={surfaceArea} onChangeText={setSurfaceArea} keyboardType="numeric" placeholder={t("activities.parachuteDropChallenge.surfaceAreaPlaceholder")} placeholderTextColor={theme.textMuted} />
 
           {/* PDF: Physics Analytics */}
@@ -272,7 +272,7 @@ export default function ParachuteAttemptScreen() {
           {/* Logged entries display - PDF write-up table */}
           {writeUpEntries.length > 0 && (
             <View style={styles.writeUpTable}>
-              <Text style={styles.tableTitle}>Recorded Trials</Text>
+              <Text style={styles.tableTitle}>{t("journal.recordedTrials")}</Text>
               {writeUpEntries.map((entry, i) => (
                 <View key={i} style={styles.writeUpRow}>
                   <Text style={styles.trialName}>{entry.trialNumber}</Text>
@@ -291,7 +291,7 @@ export default function ParachuteAttemptScreen() {
           )}
 
           {/* PDF: Write-up reflection */}
-          <Text style={styles.subSectionHeader}>Reflection</Text>
+          <Text style={styles.subSectionHeader}>{t("activities.parachuteDropChallenge.writeUpPrediction")}</Text>
           <TextInput
             style={styles.input}
             value={easiestDesign}
@@ -301,7 +301,7 @@ export default function ParachuteAttemptScreen() {
           />
 
           <View style={styles.buttonContainer}>
-            <Button text="Log Trial" action={logExperiment} />
+            <Button text={t("buttons.logTrial")} action={logExperiment} />
             {writeUpEntries.length > 0 && (
               <View style={{ marginTop: 12 }}>
                 <Button text={t("buttons.finishActivity")} action={handleFinish} />

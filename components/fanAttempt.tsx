@@ -207,7 +207,7 @@ export default function FanAttemptScreen() {
           <Text style={styles.stiffnessNote}>{t("activities.handFanChallenge.stiffnessNote")}</Text>
 
           <View style={styles.buttonContainer}>
-            <Button text="Log Trial" action={logTrial} />
+            <Button text={t("buttons.logTrial")} action={logTrial} />
           </View>
 
           {/* PDF: Write-up logged trials */}

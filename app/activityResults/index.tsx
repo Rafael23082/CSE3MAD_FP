@@ -20,7 +20,6 @@ export default function ActivityResultsRedirect() {
             };
             const route = routeMap[activityKey];
             if (route) {
-                // Using setTimeout to avoid re-render issues during redirect
                 setTimeout(() => router.replace(route as any), 0);
                 return;
             }

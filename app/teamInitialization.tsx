@@ -178,10 +178,10 @@ export default function TeamInitializationPage() {
                                 style={[ styles.toggleButton, mode === "create" && styles.activeToggle ]}
                                 onPress={() => setMode("create")}
                             >
-                                <Text style={[styles.toggleText, mode === "create" && styles.activeToggleText]}>Create</Text>
+                                <Text style={[styles.toggleText, mode === "create" && styles.activeToggleText]}>{t("buttons.createTeam")}</Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={[styles.toggleButton, mode === "join" && styles.activeToggle]} onPress={() => setMode("join")}>
-                                <Text style={[ styles.toggleText, mode === "join" && styles.activeToggleText ]}>Join</Text>
+                                <Text style={[ styles.toggleText, mode === "join" && styles.activeToggleText ]}>{t("buttons.joinTeam")}</Text>
                             </TouchableOpacity>
                         </View>
 
@@ -275,11 +275,11 @@ export default function TeamInitializationPage() {
                                                 />
                                             ) : (
                                                 <Pressable style={styles.permissionBtn} onPress={requestCameraPermission}>
-                                                    <Text style={styles.permissionBtnText}>Grant Camera Permission</Text>
+                                                    <Text style={styles.permissionBtnText}>{t("teamInitialization.grantCamera")}</Text>
                                                 </Pressable>
                                             )}
                                             <Pressable style={styles.cancelBtn} onPress={() => setIsScanning(false)}>
-                                                <Text style={styles.cancelBtnText}>Cancel Scan</Text>
+                                                <Text style={styles.cancelBtnText}>{t("teamInitialization.cancelScan")}</Text>
                                             </Pressable>
                                         </View>
                                     ) : (
@@ -289,7 +289,7 @@ export default function TeamInitializationPage() {
                                             }
                                             setIsScanning(true);
                                         }}>
-                                            <Text style={styles.scanBtnText}>Scan QR Code</Text>
+                                            <Text style={styles.scanBtnText}>{t("teamInitialization.scanQR")}</Text>
                                         </Pressable>
                                     )}
                                 </View>

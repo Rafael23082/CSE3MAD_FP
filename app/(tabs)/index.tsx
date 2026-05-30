@@ -1,6 +1,4 @@
-import { getActivities } from "@/assets/activities";
 import Button from "@/components/button";
-import Card from "@/components/card";
 import { AuthContext } from "@/context/AuthContext";
 import { db } from "@/firebase";
 import { useTheme } from "@/hooks/useTheme";
@@ -9,7 +7,7 @@ import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { useRouter } from "expo-router";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
+import { RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
@@ -50,8 +48,6 @@ export default function HomeScreen() {
   }, [team?.teamId]);
 
   const completedCount = submissions.length;
-  const activities = getActivities();
-  const activityKeys = Object.keys(activities);
 
   // Rank calculation (placeholder - would need all teams' submissions for real ranking)
   const rank = team ? Math.max(1, 5 - completedCount) : 0;
@@ -62,7 +58,7 @@ export default function HomeScreen() {
           contentContainerStyle={styles.scrollContent}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.primary} />}
         >
-          {/* Welcome + Team Card */}
+          {/* Team Card - only shown when user has a team */}
           {team ? (
             <View style={styles.teamCard}>
               <View style={styles.teamHeader}>
@@ -91,43 +87,8 @@ export default function HomeScreen() {
           ) : (
             <View style={styles.teamCard}>
               <Text style={styles.welcomeMessage}>{t("home.welcome")}, {formattedName}!</Text>
-              <Text style={styles.subtitle}>{t("home.noTeam")}</Text>
-              <Text style={styles.bodyText}>{t("home.joinOrCreate")}</Text>
-              <View style={{ marginTop: 16 }}>
-                <Button text="Create / Join Team" action={() => router.push("/teamInitialization")} />
-              </View>
             </View>
           )}
-
-          {/* Activity Progress Grid */}
-          <Text style={styles.sectionHeader}>{t("activities.selectActivity")}</Text>
-          <View style={styles.activityGrid}>
-            {activityKeys.map((key) => {
-              const act = activities[key];
-              const submitted = submissions.some(s => s.activityKey === key);
-              return (
-                <Pressable
-                  key={key}
-                  style={[styles.actCard, submitted && styles.actDone]}
-                  onPress={() => {
-                    if (team) {
-                      // Navigate to the activity
-                      router.push("/(tabs)/activities");
-                    }
-                  }}
-                >
-                  <MaterialCommunityIcons
-                    name={submitted ? "check-circle" : "circle-outline"}
-                    size={20}
-                    color={submitted ? theme.tertiary : theme.textMuted}
-                  />
-                  <Text style={[styles.actName, submitted && { color: theme.tertiary }]} numberOfLines={2}>
-                    {act.name}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </View>
 
           {/* Recent Activity */}
           <Text style={styles.sectionHeader}>{t("home.recentActivity")}</Text>
@@ -232,52 +193,12 @@ const createStyles = (colors: ThemeColors) => {
       fontSize: 12,
       color: colors.textMuted,
     },
-    subtitle: {
-      fontFamily: "InterRegular",
-      color: colors.secondary,
-      marginTop: 5,
-      fontSize: 16,
-    },
-    bodyText: {
-      fontFamily: "InterRegular",
-      color: colors.textMuted,
-      fontSize: 14,
-      marginTop: 4,
-    },
     sectionHeader: {
       color: colors.secondary,
       fontFamily: "PoppinsRegular",
       fontSize: 18,
       paddingTop: 24,
       paddingBottom: 12,
-    },
-    activityGrid: {
-      flexDirection: "row",
-      flexWrap: "wrap",
-      gap: 10,
-      marginBottom: 8,
-    },
-    actCard: {
-      flexDirection: "row",
-      alignItems: "center",
-      backgroundColor: colors.card,
-      paddingHorizontal: 12,
-      paddingVertical: 10,
-      borderRadius: 10,
-      gap: 8,
-      width: "48%",
-      borderWidth: 1,
-      borderColor: colors.borderColor,
-    },
-    actDone: {
-      borderColor: colors.tertiary,
-      backgroundColor: colors.surfaceContainer,
-    },
-    actName: {
-      fontFamily: "InterRegular",
-      fontSize: 11,
-      color: colors.secondary,
-      flex: 1,
     },
     emptyCard: {
       alignItems: "center",

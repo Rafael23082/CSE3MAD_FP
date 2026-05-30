@@ -236,7 +236,7 @@ export default function EarthquakeAttemptScreen() {
           />
 
           <View style={styles.buttonContainer}>
-            <Button text="Log Design" action={logDesign} />
+            <Button text={t("buttons.logDesign")} action={logDesign} />
           </View>
 
           {/* PDF: Design History */}

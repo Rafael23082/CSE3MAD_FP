@@ -58,7 +58,7 @@ export default function MembersScreen() {
           <MemberCard member={member} marginTop={index != 0} key={index} /> 
         ))}
         {isLoading && (
-          <Text>Loading...</Text>
+          <Text>{t("common.loading")}</Text>
         )}
     </ScrollView>
   );

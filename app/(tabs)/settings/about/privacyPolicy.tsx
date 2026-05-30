@@ -12,7 +12,7 @@ export default function PrivacyPolicyScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-        <Text>Privacy Policy</Text>
+        <Text>{t("about.privacyPolicy")}</Text>
     </ScrollView>
   );
 }

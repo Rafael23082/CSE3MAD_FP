@@ -12,7 +12,7 @@ export default function TermsOfServiceScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-        <Text>Terms of Service</Text>
+        <Text>{t("about.termsOfService")}</Text>
     </ScrollView>
   );
 }

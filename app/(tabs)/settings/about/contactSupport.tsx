@@ -12,7 +12,7 @@ export default function ContactSupportScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-        <Text>Contact Support</Text>
+        <Text>{t("about.contactSupport")}</Text>
     </ScrollView>
   );
 }

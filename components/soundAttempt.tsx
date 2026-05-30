@@ -188,12 +188,12 @@ export default function SoundAttemptScreen() {
             style={styles.input}
             value={location}
             onChangeText={setLocation}
-            placeholder="e.g. Cafeteria, Library, Gym"
+            placeholder={t("activities.soundPollutionHunter.locationPlaceholder")}
             placeholderTextColor={theme.textMuted}
           />
 
           <View style={styles.buttonContainer}>
-            <Button text="Log Reading" action={logReading} />
+            <Button text={t("buttons.logReading")} action={logReading} />
           </View>
 
           {/* PDF: Hearing Risk Scale - toggle */}

@@ -12,6 +12,7 @@ export default function ResultsLayout() {
         headerTintColor: theme.secondary,
       }}
     >
+      <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen name="parachuteResults" options={{ title: 'Parachute Results' }} />
       <Stack.Screen name="soundResults" options={{ title: 'Sound Results' }} />
       <Stack.Screen name="fanResults" options={{ title: 'Fan Results' }} />
