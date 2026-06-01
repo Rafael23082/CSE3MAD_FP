@@ -116,6 +116,70 @@ export const ACTIVITIES: Record<string, ActivityMetadata> = {
     theoryContent: 'Build anti-vibration structures and use the phone\'s accelerometer to measure stability. Modify designs to reduce movement across iterations to learn principles of earthquake-resistant design.',
     accentColor: 'border-l-secondary-container',
     discussionContent: 'Earthquakes cause ground vibrations that can collapse poorly designed structures. Engineers design buildings to absorb and distribute energy safely.'
+  },
+  humanPerformance: {
+    id: 'humanPerformance',
+    title: 'Human Performance Lab',
+    category: 'Medical Science + Biomechanics',
+    subTitle: 'Measure speed, smoothness, and coordination during controlled stretching activities.',
+    curriculumCode: ['ACPPS051', 'ACPPS054', 'ACSSU176'],
+    overview: 'Students investigate how the human body moves by measuring speed, smoothness, and coordination during controlled stretching activities using the phone\'s vibration sensor.',
+    equipment: [
+      { name: 'Mobile phone (Vibration sensor)', icon: 'smartphone' },
+      { name: 'Open space to move safely', icon: 'open_in_full' }
+    ],
+    procedure: [
+      { stepNumber: 1, title: 'Setup', description: 'Hold the phone firmly in one hand. Activate the vibration sensor in the STEMM App.' },
+      { stepNumber: 2, title: 'Perform Movement 1', description: 'Perform guided movement slowly as shown in the app. Record vibration amplitude.' },
+      { stepNumber: 3, title: 'Repeat with Feedback', description: 'Repeat the activity with real-time vibration feedback enabled.' },
+      { stepNumber: 4, title: 'Review Data', description: 'Review speed, smoothness, and range-of-motion data from all attempts.' },
+      { stepNumber: 5, title: 'Reflect', description: 'Upload results and discuss as a group.' }
+    ],
+    theoryTitle: 'Biomechanics Overview',
+    theoryContent: 'Muscles and joints work together to create movement. Faster movements often reduce control, while smoother movements show better coordination.',
+    accentColor: 'border-l-tertiary'
+  },
+  reactionBoard: {
+    id: 'reactionBoard',
+    title: 'Reaction Board Challenge',
+    category: 'Neuroscience + Mathematics',
+    subTitle: 'Measure reaction time, coordination, and improvement through repeated digital and physical challenges.',
+    curriculumCode: ['ACSIS130', 'ACMSP147', 'ACPPS057'],
+    overview: 'Students measure reaction time by tapping a hidden button, compare dominant vs non-dominant hands, and trace moving shapes to evaluate coordination.',
+    equipment: [
+      { name: 'Mobile phone', icon: 'smartphone' },
+      { name: 'Clear working space', icon: 'open_in_full' }
+    ],
+    procedure: [
+      { stepNumber: 1, title: 'Phase 1 — Tap Reaction', description: 'Tap the screen as soon as the hidden button appears. Record reaction time for each team member.' },
+      { stepNumber: 2, title: 'Phase 2 — Swap Hands', description: 'Repeat using your non-dominant hand. Compare results with Phase 1.' },
+      { stepNumber: 3, title: 'Phase 3 — Tracing', description: 'Trace a moving shape on the screen. Review accuracy and delay.' }
+    ],
+    theoryTitle: 'Reaction Time Science',
+    theoryContent: 'Reaction time measures how quickly the brain processes information and sends signals to muscles. Practice can improve speed and coordination.',
+    accentColor: 'border-l-secondary'
+  },
+  breathing: {
+    id: 'breathing',
+    title: 'Breathing Pace Trainer',
+    category: 'Medical Science',
+    subTitle: 'Analyse breathing patterns at rest and after exercise using the phone\'s motion sensor.',
+    curriculumCode: ['ACSSU176', 'ACPPS054'],
+    overview: 'Students record breathing patterns at rest and after physical activity using the phone placed on their chest, then compare and analyse the changes.',
+    equipment: [
+      { name: 'Mobile phone (Motion sensor)', icon: 'smartphone' },
+      { name: 'Flat surface or mat', icon: 'floor' }
+    ],
+    procedure: [
+      { stepNumber: 1, title: 'Resting Baseline', description: 'Place the phone gently on your chest. Record breathing pattern for 30 seconds while at rest.' },
+      { stepNumber: 2, title: 'Exercise Phase 1', description: 'Jog one minute on the spot. Immediately record breathing again.' },
+      { stepNumber: 3, title: 'Exercise Phase 2', description: 'Perform 100 star jumps. Record breathing one more time.' },
+      { stepNumber: 4, title: 'Compare & Analyse', description: 'Review all three recordings. Compare breathing rates and amplitudes.' },
+      { stepNumber: 5, title: 'Reflect', description: 'Rotate for each team member and compare results as a group.' }
+    ],
+    theoryTitle: 'Respiratory Response',
+    theoryContent: 'Breathing rate increases during exercise to supply more oxygen to muscles. Sensors detect chest movement, helping students visualise breathing patterns.',
+    accentColor: 'border-l-secondary-container'
   }
 };
 
