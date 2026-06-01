@@ -152,3 +152,35 @@ export function degreesToRadians(degrees: number): number {
 export function formatPhysicsValue(value: number, decimals: number = 2): string {
   return value.toFixed(decimals);
 }
+
+// ==========================================
+// Activity 6: Reaction Board — Statistics
+// ==========================================
+
+/**
+ * Calculate mean reaction time from an array of times in ms
+ */
+export function calcMeanReactionTime(times: number[]): number {
+  if (!times.length) return 0;
+  return times.reduce((a, b) => a + b, 0) / times.length;
+}
+
+/**
+ * Calculate improvement percentage between two phases
+ * Positive value means improvement (faster)
+ */
+export function calcReactionImprovement(initialMs: number, finalMs: number): number {
+  if (initialMs <= 0) return 0;
+  return ((initialMs - finalMs) / initialMs) * 100;
+}
+
+/**
+ * Get reaction time rating
+ */
+export function rateReactionTime(ms: number): { level: string; emoji: string } {
+  if (ms < 200) return { level: 'Excellent', emoji: '🏆' };
+  if (ms < 300) return { level: 'Good', emoji: '👍' };
+  if (ms < 400) return { level: 'Average', emoji: '👌' };
+  if (ms < 600) return { level: 'Below Average', emoji: '💪' };
+  return { level: 'Needs Practice', emoji: '🎯' };
+}
