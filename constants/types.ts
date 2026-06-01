@@ -125,6 +125,69 @@ export interface EarthquakeJournal {
   evidenceImages: string[];
 }
 
+// ==========================================
+// Activity 5 Types (Human Performance Lab)
+// ==========================================
+export interface HumanPerformanceTrial {
+  id: string;
+  movementLabel: string;
+  vibrationPrediction: string;
+  attemptNumber: number;
+  vibrationMm: number;
+  durationSec: number;
+  timestamp: string;
+  wasRight?: 'Yes' | 'No' | 'Close' | '';
+}
+
+export interface HumanPerformanceJournal {
+  q1: string;
+  q2: string;
+  q3: string;
+  evidenceImages: string[];
+}
+
+// ==========================================
+// Activity 6 Types (Reaction Board)
+// ==========================================
+export interface ReactionPhase {
+  id: string;
+  phase: 'tap-dominant' | 'tap-non-dominant' | 'tracing';
+  memberName: string;
+  predictedMs: number;
+  recordedMs: number;
+  accuracyPercent?: number;
+  wasRight?: 'Yes' | 'No' | 'Close' | '';
+}
+
+export interface ReactionJournal {
+  q1: string;
+  q2: string;
+  q3: string;
+  evidenceImages: string[];
+}
+
+// ==========================================
+// Activity 7 Types (Breathing Pace Trainer)
+// ==========================================
+export interface BreathingTrial {
+  id: string;
+  phase: 'rest' | 'post-exercise-1' | 'post-exercise-2';
+  memberName: string;
+  breathsPerMinute: number;
+  chestMovementMm: number;
+  durationSec: number;
+  timestamp: string;
+  predictedBpm: number;
+  wasRight?: 'Yes' | 'No' | 'Close' | '';
+}
+
+export interface BreathingJournal {
+  q1: string;
+  q2: string;
+  q3: string;
+  evidenceImages: string[];
+}
+
 export type TeamMember = {
   uid: string;
   role: 'leader' | 'member';
