@@ -14,8 +14,10 @@ export default function Button({text, action}: ButtonProps){
     return(
         <Pressable 
             style={styles.button}
-            onPress={()=> {action()}
-        }>
+            onPress={()=> {action()}}
+            accessibilityRole="button"
+            accessibilityLabel={text}
+        >
             <Text style={styles.buttonText}>{text}</Text>
         </Pressable>
     );
