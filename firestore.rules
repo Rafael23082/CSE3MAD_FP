@@ -68,15 +68,22 @@ service cloud.firestore {
         && request.resource.data.members[0].uid == uid()
         && request.resource.data.members[0].role == 'leader'
         && request.resource.data.memberUids.hasAny([uid()])
+        && request.resource.data.memberUids.size() >= 1
+        && request.resource.data.memberUids.size() <= 10
         && request.resource.data.teamName is string
         && request.resource.data.teamName.size() >= 1
         && request.resource.data.teamName.size() <= 50
         && request.resource.data.gradeLevel is string
+        && request.resource.data.gradeLevel in ['Primary', 'Year 7', 'Year 8', 'Year 9', 'Year 10']
         && request.resource.data.inviteCode is string
         && request.resource.data.inviteCode.size() == 6;
 
       // Update: team members can update (for joining, modifying)
-      allow update: if isAuth() && isTeamMember(teamId);
+      // Members cannot remove the leader unless they are the leader
+      allow update: if isAuth() && isTeamMember(teamId)
+        && (!request.resource.data.keys().hasAny(['members'])
+          || request.resource.data.members[0].uid == resource.data.members[0].uid
+          || isTeamLeader(teamId));
 
       // Only the leader can delete
       allow delete: if isAuth() && isTeamLeader(teamId);
@@ -93,6 +100,10 @@ service cloud.firestore {
       allow create: if isAuth()
         && request.resource.data.keys().hasAll(['userId', 'activityKey', 'submittedAt'])
         && request.resource.data.userId == uid()
+        && request.resource.data.activityKey is string
+        && request.resource.data.activityKey.size() >= 1
+        && request.resource.data.reflection is string
+        && request.resource.data.reflection.size() <= 2000
         && request.resource.data.submittedAt is timestamp;
 
       // Only the submitter can update their own submission
