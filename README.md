@@ -1,50 +1,169 @@
-# Welcome to your Expo app 👋
+# CSE3MAD_FP
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A cross-platform mobile application built with React Native and Expo, featuring Firebase integration, internationalization support, and comprehensive testing infrastructure.
 
-## Get started
+## Overview
 
-1. Install dependencies
+CSE3MAD_FP is a full-stack mobile application that leverages modern web and mobile technologies. The project is written primarily in TypeScript with additional JavaScript, HTML, and CSS components, providing a robust and type-safe codebase.
 
+## Technology Stack
+
+- **Framework**: React Native with Expo
+- **Language**: TypeScript (69.3%), JavaScript (23.9%), HTML (5.6%), CSS (1.2%)
+- **Navigation**: React Navigation with Expo Router
+- **State Management**: TanStack React Query
+- **Backend**: Firebase (Firestore, Storage)
+- **Internationalization**: i18next with react-i18next
+- **Testing**: Jest with Testing Library
+- **Linting**: ESLint with Expo config
+- **UI Libraries**: React Native Skia, Victory Native
+- **Icons**: Expo Vector Icons
+
+## Project Structure
+
+```
+CSE3MAD_FP/
+├── app/                    # Expo Router app configuration and screens
+├── components/             # Reusable React components
+├── constants/              # Application constants
+├── context/                # React Context providers
+├── hooks/                  # Custom React hooks
+├── utils/                  # Utility functions
+├── theme/                  # Theme configuration and styling
+├── assets/                 # Images, fonts, and other static assets
+├── scripts/                # Build and utility scripts
+├── coverage/               # Test coverage reports
+├── package.json            # Dependencies and scripts
+├── tsconfig.json           # TypeScript configuration
+├── jest.config.js          # Jest testing configuration
+├── babel.config.js         # Babel transpilation config
+├── eslint.config.js        # ESLint configuration
+├── app.json                # Expo app configuration
+├── firebase.js.example     # Firebase configuration template
+├── firestore.rules         # Firestore security rules
+├── storage.rules           # Firebase Storage security rules
+└── i18n.js                 # Internationalization configuration
+```
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v16 or higher)
+- npm or yarn
+- Expo CLI (`npm install -g expo-cli`)
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Rafael23082/CSE3MAD_FP.git
+   cd CSE3MAD_FP
+   ```
+
+2. Install dependencies:
    ```bash
    npm install
    ```
 
-2. Start the app
+3. Configure Firebase:
+   - Copy `firebase.js.example` to `firebase.js`
+   - Update with your Firebase project credentials
 
-   ```bash
-   npx expo start
-   ```
+4. Set up environment variables:
+   - Copy `.env.example` to `.env`
+   - Fill in required configuration values
 
-In the output, you'll find options to open the app in a
+### Development
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
+Start the development server:
 ```bash
-npm run reset-project
+npm start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Run on specific platforms:
+- **iOS**: `npm run ios`
+- **Android**: `npm run android`
+- **Web**: `npm run web`
 
-## Learn more
+### Testing
 
-To learn more about developing your project with Expo, look at the following resources:
+Run tests:
+```bash
+npm test
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Run tests in watch mode:
+```bash
+npm run test:watch
+```
 
-## Join the community
+Generate coverage report:
+```bash
+npm run test:coverage
+```
 
-Join our community of developers creating universal apps.
+### Linting
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Check code quality:
+```bash
+npm run lint
+```
+
+## Key Features
+
+- Cross-platform compatibility (iOS, Android, Web)
+- Type-safe development with TypeScript
+- Firebase integration for backend services
+- Multi-language support via i18next
+- Gesture handling and animations with React Native Reanimated
+- Camera and sensor access
+- QR code generation and scanning
+- Data visualization with Victory Native charts
+- Comprehensive test coverage with Jest
+- Bottom tab navigation
+
+## Configuration Files
+
+- **app.json**: Expo project configuration with platform-specific settings
+- **package.json**: Project dependencies and npm scripts
+- **tsconfig.json**: TypeScript compiler options
+- **jest.config.js**: Testing framework configuration
+- **babel.config.js**: JavaScript transpilation configuration
+- **eslint.config.js**: Code linting rules
+- **firestore.rules**: Firebase Firestore security rules
+- **storage.rules**: Firebase Storage security rules
+
+## Development Workflow
+
+1. Create feature branches for development
+2. Write tests for new features
+3. Ensure linting passes with `npm run lint`
+4. Run test suite with `npm test`
+5. Submit pull requests for review
+
+## Security
+
+- Firebase security rules are configured in `firestore.rules` and `storage.rules`
+- Environment variables should never be committed; use `.env.example` as a template
+- Sensitive Firebase configuration should be stored securely
+
+## Build and Deployment
+
+The project uses Expo for streamlined builds and deployments. Refer to the Expo documentation for iOS TestFlight and Google Play Store distribution.
+
+## Contributing
+
+When contributing to this project:
+1. Follow the existing code style and TypeScript conventions
+2. Add tests for new functionality
+3. Run linting and tests before submitting changes
+4. Update documentation as needed
+
+## License
+
+This project is private. See repository settings for license information.
+
+## Support
+
+For issues and questions, please refer to the project's GitHub issues page or documentation.
