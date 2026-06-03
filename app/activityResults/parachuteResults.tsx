@@ -1,14 +1,14 @@
+import Button from "@/components/button";
 import { ActivityContext } from "@/context/ActivityContext";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import React, { useCallback, useContext, useMemo, useState } from "react";
+import React, { useCallback, useContext, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Button from "@/components/button";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const RATING_KEY = '@stemm_rating_';
 
@@ -167,7 +167,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   metricsGrid: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
   metric: { minWidth: 80 },
   metricLabel: { fontSize: 10, color: colors.textMuted },
-  metricValue: { fontSize: 14, fontFamily: "InterRegular", color: colors.textPrimary, fontWeight: "bold" },
+  metricValue: { fontSize: 14, fontFamily: "InterRegular", color: colors.secondary, fontWeight: "bold" },
   accuracyRow: { flexDirection: "row", justifyContent: "space-between", paddingVertical: 6, borderBottomWidth: 1, borderBottomColor: colors.borderColor },
   accuracyLabel: { fontSize: 12, color: colors.secondary },
   accuracyValue: { fontSize: 11, color: colors.textMuted },

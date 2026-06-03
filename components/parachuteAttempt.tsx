@@ -5,7 +5,7 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter } from "expo-router";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View, Alert } from "react-native";
+import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "./button";
 import Card from "./card";
@@ -235,7 +235,7 @@ export default function ParachuteAttemptScreen() {
             style={[styles.bounceToggle, { backgroundColor: didBounce ? theme.primary : theme.surfaceContainer }]}
             onPress={() => setDidBounce(!didBounce)}
           >
-            <Text style={[styles.toggleText, { color: didBounce ? theme.buttonText : theme.textPrimary }]}>
+            <Text style={[styles.toggleText, { color: didBounce ? theme.buttonText : theme.secondary }]}>
               {didBounce ? "✓ " : ""}{t("activities.parachuteDropChallenge.didBounce")}
             </Text>
           </Pressable>
@@ -253,7 +253,7 @@ export default function ParachuteAttemptScreen() {
             {GFORCE_RISK.map((item, i) => (
               <View key={i} style={[styles.riskRow, { borderLeftColor: item.colorClass === "tertiary" ? theme.tertiary : theme.danger }]}>
                 <Text style={[styles.riskRange, { color: theme.textMuted }]}>{item.range}</Text>
-                <Text style={[styles.riskDesc, { color: theme.textPrimary }]}>{item.risk}</Text>
+                <Text style={[styles.riskDesc, { color: theme.secondary }]}>{item.risk}</Text>
               </View>
             ))}
           </View>
@@ -327,8 +327,8 @@ const createStyles = (colors: ThemeColors) => {
     cardRow: { flexDirection: "row", gap: 12, marginBottom: 8 },
     timerRow: { flexDirection: "row", gap: 12, marginBottom: 16 },
     timerBtn: { flex: 1, padding: 16, borderRadius: 8, alignItems: "center" },
-    timerBtnText: { color: colors.textPrimary, fontWeight: "bold", fontSize: 15 },
-    input: { backgroundColor: colors.surfaceContainer, color: colors.textPrimary, padding: 14, borderRadius: 8, marginBottom: 10, borderWidth: 1, borderColor: colors.borderColor, fontSize: 14 },
+    timerBtnText: { color: colors.buttonText, fontWeight: "bold", fontSize: 15 },
+    input: { backgroundColor: colors.surfaceContainer, color: colors.secondary, padding: 14, borderRadius: 8, marginBottom: 10, borderWidth: 1, borderColor: colors.borderColor, fontSize: 14 },
     analyticsGrid: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
     gForceTip: { fontFamily: "InterRegular", fontSize: 12, color: colors.primary, marginBottom: 8, fontStyle: "italic" },
     bounceToggle: { padding: 14, borderRadius: 8, marginBottom: 10, alignItems: "center" },

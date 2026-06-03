@@ -1,13 +1,13 @@
-import React, { useContext, useState, useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { ActivityContext } from '@/context/ActivityContext';
 import { AuthContext } from '@/context/AuthContext';
+import { db } from '@/firebase';
 import { useTheme } from '@/hooks/useTheme';
 import { ThemeColors } from '@/theme/colors';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { collection, addDoc } from 'firebase/firestore';
-import { db } from '@/firebase';
+import { addDoc, collection } from 'firebase/firestore';
+import React, { useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function JournalScreen() {
     const { t } = useTranslation();
@@ -245,7 +245,7 @@ export default function JournalScreen() {
                 onPress={handleSubmit}
                 disabled={isSubmitting}
             >
-                <MaterialCommunityIcons name="send" size={18} color={theme.textPrimary} style={{marginRight: 8}} />
+                <MaterialCommunityIcons name="send" size={18} color={theme.secondary} style={{marginRight: 8}} />
                 <Text style={styles.buttonText}>{isSubmitting ? t("journal.submitting") : t("journal.submitMission")}</Text>
             </TouchableOpacity>
         </ScrollView>
@@ -272,14 +272,14 @@ const createStyles = (theme: ThemeColors) => StyleSheet.create({
         borderColor: theme.borderColor,
     },
     logHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
-    logNumber: { fontSize: 13, fontWeight: 'bold', color: theme.textPrimary },
+    logNumber: { fontSize: 13, fontWeight: 'bold', color: theme.secondary },
     logTime: { fontSize: 10, color: theme.textMuted },
     logMetric: { fontSize: 12, color: theme.textMuted, marginTop: 2 },
     logValue: { color: theme.primary, fontWeight: 'bold' },
     logDetail: { fontSize: 11, color: theme.textMuted, marginLeft: 8, marginTop: 1 },
     textInput: {
         backgroundColor: theme.surfaceContainer,
-        color: theme.textPrimary,
+        color: theme.secondary,
         padding: 15,
         borderRadius: 8,
         minHeight: 100,
@@ -288,7 +288,7 @@ const createStyles = (theme: ThemeColors) => StyleSheet.create({
         borderColor: theme.borderColor,
     },
     button: { padding: 15, borderRadius: 8, alignItems: 'center', marginTop: 10, flexDirection: 'row', justifyContent: 'center' },
-    buttonText: { color: theme.textPrimary, fontWeight: 'bold' },
+    buttonText: { color: theme.buttonText, fontWeight: 'bold' },
     confirmBtn: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 14, borderRadius: 8 },
     confirmText: { fontSize: 14, fontWeight: 'bold' },
 });

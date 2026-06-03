@@ -273,7 +273,7 @@ const createStyles = (colors: ThemeColors) => {
   const styles = StyleSheet.create({
     outerContainer: { flex: 1, backgroundColor: colors.backgroundColor },
     container: { padding: 24, flexGrow: 1 },
-    head: { fontFamily: "PoppinsBold", fontSize: 22, color: colors.danger, marginBottom: 24 },
+    head: { fontFamily: "PoppinsBold", fontSize: 22, color: colors.primary, marginBottom: 24 },
     sectionHeader: { fontFamily: "PoppinsRegular", fontSize: 18, color: colors.secondary, marginVertical: 12 },
     cardRow: { flexDirection: "row", gap: 12, marginBottom: 8 },
     shakingHint: { fontFamily: "InterRegular", fontSize: 12, color: colors.primary, textAlign: "center", marginTop: 8, fontStyle: "italic" },
@@ -283,7 +283,7 @@ const createStyles = (colors: ThemeColors) => {
     presetItem: { padding: 10, borderBottomWidth: 1, borderBottomColor: colors.borderColor },
     presetName: { color: colors.secondary, fontWeight: "bold", fontSize: 14 },
     presetMeta: { color: colors.textMuted, fontSize: 12, marginTop: 2 },
-    input: { backgroundColor: colors.surfaceContainer, color: colors.textPrimary, padding: 14, borderRadius: 8, marginBottom: 10, borderWidth: 1, borderColor: colors.borderColor, fontSize: 14 },
+    input: { backgroundColor: colors.surfaceContainer, color: colors.secondary, padding: 14, borderRadius: 8, marginBottom: 10, borderWidth: 1, borderColor: colors.borderColor, fontSize: 14 },
     configRow: { flexDirection: "row", gap: 12 },
     buttonContainer: { marginTop: 12 },
     designsList: { marginTop: 24 },

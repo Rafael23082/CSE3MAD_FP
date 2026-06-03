@@ -51,7 +51,8 @@ const resources = {
         start: "START",
         edit: "Edit",
         save: "Save",
-        openCamera: "Open Camera"
+        openCamera: "Open Camera",
+        closeCamera: "Close Camera"
       },
       landing: {
         slogan: "Experiment. Measure. Improve."
@@ -544,7 +545,8 @@ const resources = {
         start: "開始",
         edit: "編集",
         save: "保存",
-        openCamera: "カメラを開く"
+        openCamera: "カメラを開く",
+        closeCamera: "クローズアップカメラ"
       },
       landing: {
         slogan: "試行。測定。改善。"
@@ -885,7 +887,8 @@ const resources = {
         start: "MULAI",
         edit: "Ubah",
         save: "Simpan",
-        openCamera: "Buka Kamera"
+        openCamera: "Buka Kamera",
+        closeCamera: "Tutup Kamera"
       },
       landing: {
         slogan: "Eksperimen. Ukur. Tingkatkan."
@@ -1382,7 +1385,8 @@ const resources = {
         stop: "停止",
         edit: "编辑",
         save: "节省",
-        openCamera: "打开摄像头"
+        openCamera: "打开摄像头",
+        closeCamera: "近景镜头"
       },
       landing: {
         slogan: "实验。测量。改进。"

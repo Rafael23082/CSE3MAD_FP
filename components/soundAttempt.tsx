@@ -8,7 +8,6 @@ import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "./button";
-import Card from "./card";
 
 // PDF: Hearing damage risk table
 const HEARING_RISK_TABLE = [
@@ -147,7 +146,7 @@ export default function SoundAttemptScreen() {
           {/* PDF: Action selection */}
           <Text style={styles.sectionHeader}>{t("activities.soundPollutionHunter.actionLabel")}</Text>
           <Pressable style={styles.dropdown} onPress={() => setShowActions(!showActions)}>
-            <Text style={[styles.dropdownText, { color: selectedAction ? theme.textPrimary : theme.textMuted }]}>
+            <Text style={[styles.dropdownText, { color: selectedAction ? theme.secondary : theme.textMuted }]}>
               {selectedAction || t("activities.soundPollutionHunter.actionPlaceholder")}
             </Text>
           </Pressable>
@@ -155,7 +154,7 @@ export default function SoundAttemptScreen() {
             <View style={styles.dropdownList}>
               {ACTION_PRESETS.map((action, i) => (
                 <Pressable key={i} style={styles.dropdownItem} onPress={() => { setSelectedAction(action); setShowActions(false); }}>
-                  <Text style={{ color: theme.textPrimary, padding: 8 }}>{action}</Text>
+                  <Text style={{ color: theme.secondary, padding: 8 }}>{action}</Text>
                 </Pressable>
               ))}
             </View>
@@ -207,7 +206,7 @@ export default function SoundAttemptScreen() {
               {HEARING_RISK_TABLE.map((row, i) => (
                 <View key={i} style={[styles.riskRow, { borderLeftColor: riskColor(row.color) }]}>
                   <Text style={[styles.riskRange, { color: theme.textMuted }]}>{row.range}</Text>
-                  <Text style={[styles.riskDesc, { color: theme.textPrimary }]}>{row.risk}</Text>
+                  <Text style={[styles.riskDesc, { color: theme.secondary }]}>{row.risk}</Text>
                   <Text style={[styles.riskExamples, { color: theme.textMuted }]}>{row.examples}</Text>
                 </View>
               ))}
@@ -247,7 +246,7 @@ const createStyles = (colors: ThemeColors) => {
   const styles = StyleSheet.create({
     outerContainer: { flex: 1, backgroundColor: colors.backgroundColor },
     container: { padding: 24, flexGrow: 1 },
-    head: { fontFamily: "PoppinsBold", fontSize: 22, color: colors.secondary, marginBottom: 24 },
+    head: { fontFamily: "PoppinsBold", fontSize: 22, color: colors.primary, marginBottom: 24 },
     sectionHeader: { fontFamily: "PoppinsRegular", fontSize: 18, color: colors.secondary, marginVertical: 12 },
     subSectionHeader: { fontFamily: "PoppinsRegular", fontSize: 16, color: colors.textMuted, marginTop: 16, marginBottom: 8 },
     dbMeter: { flexDirection: "row", alignItems: "baseline", justifyContent: "center", gap: 4, marginBottom: 8 },
@@ -261,7 +260,7 @@ const createStyles = (colors: ThemeColors) => {
     predictionRow: { flexDirection: "row", gap: 12, marginBottom: 10 },
     predBtn: { flex: 1, padding: 14, borderRadius: 8, alignItems: "center" },
     predText: { fontWeight: "bold", fontSize: 14 },
-    input: { backgroundColor: colors.surfaceContainer, color: colors.textPrimary, padding: 14, borderRadius: 8, marginBottom: 10, borderWidth: 1, borderColor: colors.borderColor, fontSize: 14 },
+    input: { backgroundColor: colors.surfaceContainer, color: colors.secondary, padding: 14, borderRadius: 8, marginBottom: 10, borderWidth: 1, borderColor: colors.borderColor, fontSize: 14 },
     buttonContainer: { marginTop: 12 },
     riskToggle: { marginTop: 20, padding: 10, backgroundColor: colors.card, borderRadius: 8, borderWidth: 1, borderColor: colors.borderColor },
     riskToggleText: { color: colors.primary, fontWeight: "bold", fontSize: 14 },

@@ -19,7 +19,7 @@ type RankEntry = {
   membersCount: number;
 };
 
-const ACTIVITIES = [
+const activities = [
   { key: '', label: i18n.t("activities.allActivities") },
   { key: 'parachute-drop-challenge', label: i18n.t("activities.parachuteDropChallenge.name") },
   { key: 'sound-pollution-hunter', label: i18n.t("activities.soundPollutionHunter.name") },
@@ -132,7 +132,7 @@ export default function LeaderboardScreen() {
       {/* Activity Picker (for activity mode) */}
       {mode === 'activity' && (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.activityPicker}>
-          {ACTIVITIES.map((act) => (
+          {activities.map((act) => (
             <Pressable
               key={act.key}
               style={[styles.actChip, selectedActivity === act.key && styles.actChipActive]}
@@ -218,5 +218,5 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   rankNum: { fontFamily: "PoppinsBold", fontSize: 14, color: colors.textMuted },
   teamName: { fontFamily: "PoppinsRegular", fontSize: 14, color: colors.secondary },
   userTeamName: { color: colors.primary, fontWeight: "bold" },
-  score: { fontFamily: "PoppinsRegular", fontSize: 14, color: colors.textPrimary },
+  score: { fontFamily: "PoppinsRegular", fontSize: 14, color: colors.secondary },
 });

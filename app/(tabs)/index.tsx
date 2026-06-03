@@ -186,7 +186,7 @@ const createStyles = (colors: ThemeColors) => {
     statValue: {
       fontFamily: "PoppinsRegular",
       fontSize: 16,
-      color: colors.textPrimary,
+      color: colors.secondary,
     },
     statLabel: {
       fontFamily: "InterRegular",

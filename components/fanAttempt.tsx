@@ -128,13 +128,13 @@ export default function FanAttemptScreen() {
           {/* PDF: Target Material selector */}
           <Text style={styles.subSectionHeader}>{t("activities.handFanChallenge.selectMaterial")} (k={kValue})</Text>
           <Pressable style={styles.dropdown} onPress={() => setShowMaterials(!showMaterials)}>
-            <Text style={[styles.dropdownText, { color: theme.textPrimary }]}>{selectedMaterial.name}</Text>
+            <Text style={[styles.dropdownText, { color: theme.secondary }]}>{selectedMaterial.name}</Text>
           </Pressable>
           {showMaterials && (
             <View style={styles.dropdownList}>
               {MATERIALS.map((mat, i) => (
                 <Pressable key={i} style={styles.dropdownItem} onPress={() => { setSelectedMaterial(mat); setShowMaterials(false); }}>
-                  <Text style={{ color: theme.textPrimary, padding: 8 }}>{mat.name} (k={mat.k})</Text>
+                  <Text style={{ color: theme.secondary, padding: 8 }}>{mat.name} (k={mat.k})</Text>
                   <Text style={{ color: theme.textMuted, paddingHorizontal: 8, paddingBottom: 8, fontSize: 12 }}>Thickness: {mat.thickness}</Text>
                 </Pressable>
               ))}
@@ -249,7 +249,7 @@ const createStyles = (colors: ThemeColors) => {
     cameraToggle: { backgroundColor: colors.surfaceContainer, padding: 12, borderRadius: 8, marginBottom: 12, alignItems: "center" },
     cameraToggleText: { color: colors.primary, fontWeight: "bold", fontSize: 14 },
     cameraBox: { height: 200, borderRadius: 10, overflow: "hidden", marginBottom: 12 },
-    input: { backgroundColor: colors.surfaceContainer, color: colors.textPrimary, padding: 14, borderRadius: 8, marginBottom: 10, borderWidth: 1, borderColor: colors.borderColor, fontSize: 14 },
+    input: { backgroundColor: colors.surfaceContainer, color: colors.secondary, padding: 14, borderRadius: 8, marginBottom: 10, borderWidth: 1, borderColor: colors.borderColor, fontSize: 14 },
     dropdown: { backgroundColor: colors.card, padding: 14, borderRadius: 8, marginBottom: 10, borderWidth: 1, borderColor: colors.borderColor },
     dropdownText: { fontSize: 14, fontWeight: "bold" },
     dropdownList: { backgroundColor: colors.card, borderRadius: 8, marginBottom: 10, borderWidth: 1, borderColor: colors.borderColor },

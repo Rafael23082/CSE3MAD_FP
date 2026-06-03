@@ -4,6 +4,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { useRouter } from "expo-router";
 import { useContext } from "react";
+import { useTranslation } from "react-i18next";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 type activityScreenProps = {
@@ -18,7 +19,8 @@ export default function ActivityGroup({activityKey, activityName, description, i
     const router = useRouter(); 
     const {theme} = useTheme();
     const styles = createStyles(theme);
-    const activities = getActivities();
+    const {t} = useTranslation();
+    const activities = getActivities(t);
 
     const activityContext = useContext(ActivityContext);
     if (!activityContext) return null;
