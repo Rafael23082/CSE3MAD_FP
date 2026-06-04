@@ -5,7 +5,7 @@ import { BreathingTrial } from "@/constants/types";
 import { useRouter } from "expo-router";
 import { Accelerometer } from 'expo-sensors';
 import { Subscription } from "expo-sensors/build/Pedometer";
-import { use, useEffect, useRef, useState } from "react";
+import { use, useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -38,6 +38,21 @@ export default function BreathingAttemptScreen(){
     const [time, setTime] = useState(30)
     const [centered, setCentered] = useState<number[]>([]);
 
+    const _subscribe = useCallback(() => {
+        Accelerometer.setUpdateInterval(100);
+        setSubscription(Accelerometer.addListener(({x, y, z}) => {
+            setData({x, y, z});
+            zValues.current.push(z);
+        }));
+    }, []);
+
+    const _unsubscribe = useCallback(() => {
+        setSubscription(prev => {
+            prev?.remove();
+            return null;
+        });
+    }, []);
+
     useEffect(() => {
         if (countdown === null) return;
 
@@ -58,7 +73,7 @@ export default function BreathingAttemptScreen(){
         }, 1000);
 
         return () => clearTimeout(timer);
-    }, [countdown]);
+    }, [countdown, _unsubscribe]);
 
     useEffect(() => {
         let interval: ReturnType<typeof setInterval>;
@@ -93,7 +108,7 @@ export default function BreathingAttemptScreen(){
             _unsubscribe();
             clearInterval(interval);
         };
-    }, [recordingState]);
+    }, [recordingState, _subscribe, _unsubscribe]);
 
     if (!activityContext) return null;
     const { activity } = activityContext;
@@ -102,19 +117,6 @@ export default function BreathingAttemptScreen(){
     let currentPhase;
     if (activity.phases){
         currentPhase = activity.phases[currentPhaseIndex]
-    }
-
-    const _subscribe = () => {
-        Accelerometer.setUpdateInterval(100);
-        setSubscription(Accelerometer.addListener(({x, y, z}) => {
-            setData({x, y, z});
-            zValues.current.push(z);
-        }));
-    }
-
-    const _unsubscribe = () => {
-        subscription && subscription.remove();
-        setSubscription(null);
     }
 
     const formatNumber = (s: number) => {

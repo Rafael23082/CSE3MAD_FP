@@ -4,7 +4,7 @@ import { ThemeColors } from "@/theme/colors";
 import { useRouter } from "expo-router";
 import { Accelerometer } from 'expo-sensors';
 import { Subscription } from "expo-sensors/build/Pedometer";
-import React, { use, useEffect, useRef, useState } from "react";
+import React, { use, useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -55,13 +55,20 @@ export default function EarthquakeAttemptScreen() {
 
   const [showPresets, setShowPresets] = useState(false);
 
+  const _unsubscribe = useCallback(() => {
+    setSubscription(prev => {
+      prev?.remove();
+      return null;
+    });
+  }, []);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       _unsubscribe();
       if (shakeInterval.current) clearInterval(shakeInterval.current);
     };
-  }, []);
+  }, [_unsubscribe]);
 
   if (!activityContext || !activityContext.activity) return null;
 
@@ -74,11 +81,6 @@ export default function EarthquakeAttemptScreen() {
       magnitudeHistory.current.push(magnitude);
       if (magnitude > peakAccel) setPeakAccel(magnitude);
     }));
-  };
-
-  const _unsubscribe = () => {
-    subscription && subscription.remove();
-    setSubscription(null);
   };
 
   // PDF: Start/stop vibration + accelerometer tracking

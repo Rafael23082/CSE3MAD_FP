@@ -61,7 +61,6 @@ export default function ParachuteAttemptScreen() {
 
   useEffect(() => {
     if (isTimerRunning) {
-      startRef.current = Date.now() - (timeValue * 1000);
       intervalRef.current = setInterval(() => {
         setTimeValue((Date.now() - startRef.current) / 1000);
       }, 30);
@@ -79,7 +78,12 @@ export default function ParachuteAttemptScreen() {
 
   if (!activityContext || !activityContext.activity) return null;
 
-  const toggleTimer = () => setIsTimerRunning(prev => !prev);
+  const toggleTimer = () => {
+    if (!isTimerRunning) {
+      startRef.current = Date.now() - (timeValue * 1000);
+    }
+    setIsTimerRunning(prev => !prev);
+  };
   const resetTimer = () => { setIsTimerRunning(false); setTimeValue(0); };
 
   const height = parseFloat(dropHeight) || 1.5;
