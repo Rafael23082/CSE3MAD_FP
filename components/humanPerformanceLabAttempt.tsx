@@ -4,7 +4,7 @@ import { ThemeColors } from "@/theme/colors";
 import { useRouter } from "expo-router";
 import { Accelerometer } from 'expo-sensors';
 import { Subscription } from "expo-sensors/build/Pedometer";
-import { use, useEffect, useRef, useState } from "react";
+import { use, useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -39,6 +39,34 @@ export default function HumanPerformanceLabAttemptScreen(){
     const previousMagnitude = useRef(0);
     const [time, setTime] = useState(20);
 
+    const _subscribe = useCallback(() => {
+        Accelerometer.setUpdateInterval(100);
+        setSubscription(
+            Accelerometer.addListener(({x, y, z}) => {
+                setData({x, y, z});
+                const magnitude = Math.sqrt(x*x + y*y + z*z);
+                const delta = Math.abs(magnitude - previousMagnitude.current);
+                previousMagnitude.current = magnitude;
+                movementValues.current.push(delta);
+                if (delta > 0.25){
+                    setVibrations((prev) => prev + 1);
+                }
+                setLargestMovement((prev) => Math.max(prev, delta));
+                setSmoothness((prev) => {
+                    const updated = prev - delta * 1.5;
+                    return Math.max(0, Math.min(100, updated));
+                });
+            })
+        );
+    }, []);
+
+    const _unsubscribe = useCallback(() => {
+        setSubscription(prev => {
+            prev?.remove();
+            return null;
+        });
+    }, []);
+
     useEffect(() => {
         if (countdown === null) return;
 
@@ -66,7 +94,7 @@ export default function HumanPerformanceLabAttemptScreen(){
         }, 1000);
 
         return () => clearTimeout(timer);
-    }, [countdown]);
+    }, [countdown, _unsubscribe]);
 
     useEffect(() => {
         let interval: ReturnType<typeof setInterval>;
@@ -112,7 +140,7 @@ export default function HumanPerformanceLabAttemptScreen(){
             clearInterval(interval);
         };
 
-    }, [recordingState]);
+    }, [recordingState, _subscribe, _unsubscribe]);
 
     if (!activityContext) return null;
 
@@ -124,7 +152,7 @@ export default function HumanPerformanceLabAttemptScreen(){
         currentPhase = activity.phases[currentPhaseIndex]
     }
 
-    const _subscribe = () => {
+    const _subscribe = useCallback(() => {
         Accelerometer.setUpdateInterval(100);
 
         setSubscription(
@@ -151,12 +179,14 @@ export default function HumanPerformanceLabAttemptScreen(){
                 });
             })
         );
-    }
+    }, []);
 
-    const _unsubscribe = () => {
-        subscription && subscription.remove();
-        setSubscription(null);
-    }
+    const _unsubscribe = useCallback(() => {
+        setSubscription(prev => {
+            prev?.remove();
+            return null;
+        });
+    }, []);
 
     const formatNumber = (s: number) => {
         const min = Math.floor(s / 60);
