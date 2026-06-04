@@ -29,7 +29,6 @@ export default function SoundAttemptScreen() {
   const { t } = useTranslation();
 
   const activityContext = use(ActivityContext);
-  if (!activityContext || !activityContext.activity) return null;
 
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [permissionResponse, requestPermission] = Audio.usePermissions();
@@ -40,6 +39,12 @@ export default function SoundAttemptScreen() {
   const [prediction, setPrediction] = useState<"Louder" | "Softer" | "">("");
   const [showActions, setShowActions] = useState(false);
   const [showRiskScale, setShowRiskScale] = useState(false);
+
+  useEffect(() => {
+    return () => { if (recording) recording.stopAndUnloadAsync().catch(() => {}); };
+  }, [recording]);
+
+  if (!activityContext || !activityContext.activity) return null;
 
   const startRecording = async () => {
     try {
@@ -70,10 +75,6 @@ export default function SoundAttemptScreen() {
       }
     }
   };
-
-  useEffect(() => {
-    return () => { if (recording) recording.stopAndUnloadAsync().catch(() => {}); };
-  }, [recording]);
 
   // PDF: Determine risk level
   const getRiskLevel = (db: number) => {

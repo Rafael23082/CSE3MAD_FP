@@ -26,7 +26,6 @@ export default function ParachuteAttemptScreen() {
   const { t } = useTranslation();
 
   const activityContext = use(ActivityContext);
-  if (!activityContext || !activityContext.activity) return null;
 
   const [permission, requestPermission] = useCameraPermissions();
   const [dropHeight, setDropHeight] = useState("1.5");
@@ -76,6 +75,8 @@ export default function ParachuteAttemptScreen() {
       }
     };
   }, [isTimerRunning]);
+
+  if (!activityContext || !activityContext.activity) return null;
 
   const toggleTimer = () => setIsTimerRunning(prev => !prev);
   const resetTimer = () => { setIsTimerRunning(false); setTimeValue(0); };

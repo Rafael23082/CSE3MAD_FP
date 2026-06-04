@@ -24,7 +24,6 @@ export default function EarthquakeAttemptScreen() {
   const { t } = useTranslation();
 
   const activityContext = use(ActivityContext);
-  if (!activityContext || !activityContext.activity) return null;
 
   // PDF: Accelerometer-based tracking
   const [isShaking, setIsShaking] = useState(false);
@@ -55,6 +54,16 @@ export default function EarthquakeAttemptScreen() {
 
   const [showPresets, setShowPresets] = useState(false);
 
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      _unsubscribe();
+      if (shakeInterval.current) clearInterval(shakeInterval.current);
+    };
+  }, []);
+
+  if (!activityContext || !activityContext.activity) return null;
+
   // PDF: Accelerometer subscription
   const _subscribe = () => {
     Accelerometer.setUpdateInterval(100);
@@ -70,14 +79,6 @@ export default function EarthquakeAttemptScreen() {
     subscription && subscription.remove();
     setSubscription(null);
   };
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      _unsubscribe();
-      if (shakeInterval.current) clearInterval(shakeInterval.current);
-    };
-  }, []);
 
   // PDF: Start/stop vibration + accelerometer tracking
   const triggerShake = () => {

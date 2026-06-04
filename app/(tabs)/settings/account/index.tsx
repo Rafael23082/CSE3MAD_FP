@@ -18,8 +18,6 @@ export default function AccountSettingsScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const authContext = use(AuthContext);
-  if (!authContext) return;
-  const { userProfile, user } = authContext;
   const [error, setError] = useState("");
 
   useFocusEffect(
@@ -27,6 +25,9 @@ export default function AccountSettingsScreen() {
       return () => setError("");
     }, [])
   )
+
+  if (!authContext) return;
+  const { userProfile, user } = authContext;
 
   async function handleLogout() {
     try {

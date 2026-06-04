@@ -19,21 +19,13 @@ export default function TeamInitializationPage() {
 
     const styles = createStyles(theme);
     const router = useRouter();
+    const queryClient = useQueryClient();
+    const { mode: initialMode } = useLocalSearchParams();
+    const {t} = useTranslation();
 
     const auth = use(AuthContext);
-    if (!auth) return null;
-    const { user } = auth;
 
     const [mode, setMode] = useState<"create" | "join">("create");
-    const queryClient = useQueryClient();
-
-    const { mode: initialMode } = useLocalSearchParams();
-    useEffect(() => {
-    if (initialMode === "join" || initialMode === "create") {
-        setMode(initialMode);
-    }
-    }, [initialMode]);
-
     const [teamName, setTeamName] = useState("");
     const [gradeLevel, setGradeLevel] = useState("");
 
@@ -44,7 +36,14 @@ export default function TeamInitializationPage() {
     const [isScanning, setIsScanning] = useState(false);
     const [cameraPermission, requestCameraPermission] = useCameraPermissions();
 
-    const {t} = useTranslation();
+    useEffect(() => {
+        if (initialMode === "join" || initialMode === "create") {
+            setMode(initialMode);
+        }
+    }, [initialMode]);
+
+    if (!auth) return null;
+    const { user } = auth;
 
     function generateInviteCode(length = 6) {
         const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

@@ -28,7 +28,6 @@ export default function FanAttemptScreen() {
   const { t } = useTranslation();
 
   const activityContext = use(ActivityContext);
-  if (!activityContext || !activityContext.activity) return null;
 
   const [permission, requestPermission] = useCameraPermissions();
   const [isCameraActive, setIsCameraActive] = useState(false);
@@ -53,6 +52,8 @@ export default function FanAttemptScreen() {
 
   const [showMaterials, setShowMaterials] = useState(false);
   const [showDistances, setShowDistances] = useState(false);
+
+  if (!activityContext || !activityContext.activity) return null;
 
   // PDF: Force calculation F ≈ k × θ
   const kValue = selectedMaterial.k;

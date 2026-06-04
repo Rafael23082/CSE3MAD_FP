@@ -20,76 +20,24 @@ export type movementValue = {
 export default function HumanPerformanceLabAttemptScreen(){
     const {theme} = useTheme();
     const styles = createStyles(theme);
-
-    const activityContext = use(ActivityContext);
-    if (!activityContext) return null;
-
-    const { activity } = activityContext;
-    if (!activity) return null;
-
-    const [recordingState, setRecordingState] = useState<"idle" | "recording" | "completed">("idle");
-    const [currentPhaseIndex, setCurrentPhaseIndex] = useState(0);
-
-    let currentPhase;
-    if (activity.phases){
-        currentPhase = activity.phases[currentPhaseIndex]
-    }
-
-    const [{ x, y, z }, setData] = useState({ x: 0, y: 0, z: 0 });
-
-    const [subscription, setSubscription] = useState<Subscription | null>(null);
-
-    const movementValues = useRef<number[]>([]);
-    const vibrationHistory = useRef<movementValue[]>([]);
-
-    const [countdown, setCountdown] = useState<number | null>(null);
-
-    const [vibrations, setVibrations] = useState(0);
-    const [smoothness, setSmoothness] = useState(100);
-    const [largestMovement, setLargestMovement] = useState(0);
-
-    const [graphValues, setGraphValues] = useState<number[]>([]);
-
-    const previousMagnitude = useRef(0);
-
-    const [time, setTime] = useState(20);
-
     const router = useRouter();
     const {t} = useTranslation();
 
-    const _subscribe = () => {
-        Accelerometer.setUpdateInterval(100);
+    const activityContext = use(ActivityContext);
 
-        setSubscription(
-            Accelerometer.addListener(({x, y, z}) => {
-                setData({x, y, z});
-
-                const magnitude = Math.sqrt(x*x + y*y + z*z);
-
-                const delta = Math.abs(magnitude - previousMagnitude.current);
-
-                previousMagnitude.current = magnitude;
-
-                movementValues.current.push(delta);
-
-                if (delta > 0.25){
-                    setVibrations((prev) => prev + 1);
-                }
-
-                setLargestMovement((prev) => Math.max(prev, delta));
-
-                setSmoothness((prev) => {
-                    const updated = prev - delta * 1.5;
-                    return Math.max(0, Math.min(100, updated));
-                });
-            })
-        );
-    }
-
-    const _unsubscribe = () => {
-        subscription && subscription.remove();
-        setSubscription(null);
-    }
+    const [recordingState, setRecordingState] = useState<"idle" | "recording" | "completed">("idle");
+    const [currentPhaseIndex, setCurrentPhaseIndex] = useState(0);
+    const [{ x, y, z }, setData] = useState({ x: 0, y: 0, z: 0 });
+    const [subscription, setSubscription] = useState<Subscription | null>(null);
+    const movementValues = useRef<number[]>([]);
+    const vibrationHistory = useRef<movementValue[]>([]);
+    const [countdown, setCountdown] = useState<number | null>(null);
+    const [vibrations, setVibrations] = useState(0);
+    const [smoothness, setSmoothness] = useState(100);
+    const [largestMovement, setLargestMovement] = useState(0);
+    const [graphValues, setGraphValues] = useState<number[]>([]);
+    const previousMagnitude = useRef(0);
+    const [time, setTime] = useState(20);
 
     useEffect(() => {
         if (countdown === null) return;
@@ -165,6 +113,50 @@ export default function HumanPerformanceLabAttemptScreen(){
         };
 
     }, [recordingState]);
+
+    if (!activityContext) return null;
+
+    const { activity } = activityContext;
+    if (!activity) return null;
+
+    let currentPhase;
+    if (activity.phases){
+        currentPhase = activity.phases[currentPhaseIndex]
+    }
+
+    const _subscribe = () => {
+        Accelerometer.setUpdateInterval(100);
+
+        setSubscription(
+            Accelerometer.addListener(({x, y, z}) => {
+                setData({x, y, z});
+
+                const magnitude = Math.sqrt(x*x + y*y + z*z);
+
+                const delta = Math.abs(magnitude - previousMagnitude.current);
+
+                previousMagnitude.current = magnitude;
+
+                movementValues.current.push(delta);
+
+                if (delta > 0.25){
+                    setVibrations((prev) => prev + 1);
+                }
+
+                setLargestMovement((prev) => Math.max(prev, delta));
+
+                setSmoothness((prev) => {
+                    const updated = prev - delta * 1.5;
+                    return Math.max(0, Math.min(100, updated));
+                });
+            })
+        );
+    }
+
+    const _unsubscribe = () => {
+        subscription && subscription.remove();
+        setSubscription(null);
+    }
 
     const formatNumber = (s: number) => {
         const min = Math.floor(s / 60);

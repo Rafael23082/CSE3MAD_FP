@@ -6,23 +6,21 @@ import { ActivityIndicator, View } from "react-native";
 export default function Index() {
     const context = use(AuthContext);
     const router = useRouter();
-
-    if (!context) return null;
-
-    const { user, loading } = context;
-
     const pathname = usePathname();
 
     useEffect(() => {
-        if (loading) return;
+        if (!context || context.loading) return;
         if (pathname !== "/") return;
 
-        if (!user) {
+        if (!context.user) {
             router.replace("/home");
         } else {
             router.replace("/(tabs)");
         }
-    }, [user, loading, pathname]);
+    }, [context, pathname]);
+
+    if (!context) return null;
+    const { user, loading } = context;
 
     if (loading) {
         return (

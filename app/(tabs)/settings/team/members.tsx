@@ -17,14 +17,12 @@ export default function MembersScreen() {
   const {t} = useTranslation();
 
   const authContext = use(AuthContext);
-  if (!authContext) return null;
-  const {user} = authContext;
 
   const getTeamMembers = async() => {
     try{
-      if (!user) return null;
+      if (!authContext?.user) return null;
 
-      const userRef = doc(db, "users", user.uid);
+      const userRef = doc(db, "users", authContext.user.uid);
       const userSnap = await getDoc(userRef);
 
       const userData = userSnap.data();
@@ -48,9 +46,12 @@ export default function MembersScreen() {
   }
 
   const {data: members, isLoading} = useQuery({
-    queryKey: ["members", user?.uid],
+    queryKey: ["members", authContext?.user?.uid],
     queryFn: getTeamMembers,
   })
+
+  if (!authContext) return null;
+  const {user} = authContext;
 
   return (
     <ScrollView contentContainerStyle={styles.container}>

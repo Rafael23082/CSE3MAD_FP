@@ -20,14 +20,15 @@ export default function JournalScreen() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [teamConfirmed, setTeamConfirmed] = useState(false);
 
+    const currentLogs = useMemo(
+        () => (activityContext?.experimentLogs ?? []).filter(log => log.activityKey === activityContext?.activity?.key),
+        [activityContext?.experimentLogs, activityContext?.activity?.key]
+    );
+
     if (!activityContext || !activityContext.activity) return null;
 
     const { activity, experimentLogs, clearExperimentLogs } = activityContext;
     const { team } = auth || {};
-    const currentLogs = useMemo(
-        () => experimentLogs.filter(log => log.activityKey === activity.key),
-        [experimentLogs, activity.key]
-    );
 
     const getMetricLabel = () => {
         switch(activity.key) {

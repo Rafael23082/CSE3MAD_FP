@@ -17,32 +17,13 @@ export default function TeamSettingsScreen() {
   const styles = createStyles(theme);
   const { t } = useTranslation();
   const router = useRouter();
-  const authContext = use(AuthContext);
-  if (!authContext) return null;
-  const {user, userProfile} = authContext;
-
   const queryClient = useQueryClient();
-
-  async function handleLeaveTeam() {
-    try {
-      if (!user) return;
-
-      const userRef = doc(db, "users", user.uid);
-
-      await updateDoc(userRef, {
-        teamId: null,
-      });
-      queryClient.invalidateQueries({ queryKey: ["team", user?.uid] });
-      
-    } catch(err) {
-      console.log(err);
-    }
-  }
+  const authContext = use(AuthContext);
 
   const getTeam = async () => {
-    if (!user) return null;
+    if (!authContext?.user) return null;
 
-    const teamId = userProfile?.teamId;
+    const teamId = authContext.userProfile?.teamId;
 
     if (!teamId) return null;
 
@@ -55,9 +36,28 @@ export default function TeamSettingsScreen() {
   };
 
   const {data: team, isLoading} = useQuery({
-    queryKey: ["team", user?.uid, userProfile?.teamId],
+    queryKey: ["team", authContext?.user?.uid, authContext?.userProfile?.teamId],
     queryFn: getTeam,
-  })
+  });
+
+  if (!authContext) return null;
+  const {user, userProfile} = authContext;
+
+  async function handleLeaveTeam() {
+    try {
+      if (!user) return;
+
+      const userRef = doc(db, "users", user.uid);
+
+      await updateDoc(userRef, {
+        teamId: null,
+      });
+      queryClient.invalidateQueries({ queryKey: ["team", user?.uid] });
+
+    } catch(err) {
+      console.log(err);
+    }
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>

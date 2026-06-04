@@ -10,13 +10,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function ActivityAttemptInstructionsScreen(){
     const { theme } = useTheme();
     const styles = createStyles(theme);
+    const {t} = useTranslation();
 
     const activityContext = use(ActivityContext);
+
     if (!activityContext) return null;
     const { activity } = activityContext;
     if (!activity) return null;
-
-    const {t} = useTranslation();
 
     return(
         <SafeAreaView style={styles.outerContainer} edges={["top"]}>
