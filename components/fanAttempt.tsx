@@ -40,6 +40,7 @@ export default function FanAttemptScreen() {
   const [predictedAngle, setPredictedAngle] = useState("");
   const [angle, setAngle] = useState("");
   const [trials, setTrials] = useState<{
+    id: number;
     name: string;
     material: string;
     targetType: string;
@@ -66,6 +67,7 @@ export default function FanAttemptScreen() {
     const predAng = parseFloat(predictedAngle) || 0;
     const wasRight = predAng > 0 ? (Math.abs(predAng - ang) <= 10 ? "Yes" : "No") : "";
     setTrials(prev => [...prev, {
+      id: Date.now() + Math.random(),
       name: fanDesignName.trim(),
       material: selectedMaterial.name,
       targetType: targetType,
@@ -215,8 +217,8 @@ export default function FanAttemptScreen() {
           {trials.length > 0 && (
             <View style={styles.trialsList}>
               <Text style={styles.sectionHeader}>{t("activities.parachuteDropChallenge.writeUpPrediction")}</Text>
-              {trials.map((t, i) => (
-                <View key={i} style={styles.trialCard}>
+              {trials.map((t) => (
+                <View key={t.id} style={styles.trialCard}>
                   <View style={styles.trialHeader}>
                     <Text style={styles.trialName}>{t.name}</Text>
                     <Text style={styles.trialForce}>{t.force.toFixed(3)}N</Text>

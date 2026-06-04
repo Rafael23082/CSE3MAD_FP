@@ -44,6 +44,7 @@ export default function ParachuteAttemptScreen() {
 
   // PDF: Write-up tracking
   interface ParachuteWriteUpEntry {
+    id: number;
     trialNumber: string;
     surfaceArea: string;
     predictedTime: string;
@@ -129,6 +130,7 @@ export default function ParachuteAttemptScreen() {
     const newCount = trialCount + 1;
     setTrialCount(newCount);
     const entry: ParachuteWriteUpEntry = {
+      id: Date.now() + Math.random(),
       trialNumber: getTrialName(trialCount),
       surfaceArea: surfaceArea || "0",
       predictedTime: predictedTime || "0",
@@ -274,8 +276,8 @@ export default function ParachuteAttemptScreen() {
           {writeUpEntries.length > 0 && (
             <View style={styles.writeUpTable}>
               <Text style={styles.tableTitle}>{t("journal.recordedTrials")}</Text>
-              {writeUpEntries.map((entry, i) => (
-                <View key={i} style={styles.writeUpRow}>
+              {writeUpEntries.map((entry) => (
+                <View key={entry.id} style={styles.writeUpRow}>
                   <Text style={styles.trialName}>{entry.trialNumber}</Text>
                   <View style={styles.trialData}>
                     {entry.surfaceArea !== "0" && <Text style={styles.trialDetail}>SA: {entry.surfaceArea}cm²</Text>}

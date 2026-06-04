@@ -38,9 +38,9 @@ export default function ActivitiesScreen() {
           <Text style={styles.debugButtonText}>Open sensor debug screen</Text>
         </Pressable>
       </View>
-      {Object.entries(activities).map(([key, activity], index) => (
+      {Object.entries(activities).map(([key, activity]) => (
         <ActivityGroup
-          key={index}
+          key={key}
           activityKey={key}
           activityName={activity.name}
           description={activity.description}

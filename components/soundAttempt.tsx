@@ -33,7 +33,7 @@ export default function SoundAttemptScreen() {
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [permissionResponse, requestPermission] = Audio.usePermissions();
   const [liveDb, setLiveDb] = useState(0);
-  const [readings, setReadings] = useState<{ action: string; location: string; db: number; prediction: string; wasRight: string }[]>([]);
+  const [readings, setReadings] = useState<{ id: number; action: string; location: string; db: number; prediction: string; wasRight: string }[]>([]);
   const [location, setLocation] = useState("");
   const [selectedAction, setSelectedAction] = useState("");
   const [prediction, setPrediction] = useState<"Louder" | "Softer" | "">("");
@@ -87,6 +87,7 @@ export default function SoundAttemptScreen() {
   const logReading = () => {
     if (!location.trim() || !selectedAction) return;
     const entry = {
+      id: Date.now() + Math.random(),
       action: selectedAction,
       location: location.trim(),
       db: liveDb,
@@ -218,8 +219,8 @@ export default function SoundAttemptScreen() {
           {readings.length > 0 && (
             <View style={styles.readingsList}>
               <Text style={styles.subSectionHeader}>{t("activities.soundPollutionHunter.predictionCompare")}</Text>
-              {readings.map((r, i) => (
-                <View key={i} style={styles.readingCard}>
+              {readings.map((r) => (
+                <View key={r.id} style={styles.readingCard}>
                   <View style={styles.readingHeader}>
                     <Text style={styles.readingAction}>{r.action}</Text>
                     <Text style={[styles.readingDb, { color: r.db > 85 ? theme.danger : theme.tertiary }]}>{r.db} dB</Text>

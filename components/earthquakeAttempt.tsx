@@ -42,6 +42,7 @@ export default function EarthquakeAttemptScreen() {
 
   // PDF: Write-up tracking
   interface EqEntry {
+    id: number;
     name: string;
     folds: string;
     pillars: string;
@@ -112,6 +113,7 @@ export default function EarthquakeAttemptScreen() {
     const wasRight = pred > 0 ? (Math.abs(pred - sway) <= 2 ? "Yes" : "No") : "";
 
     setDesigns(prev => [...prev, {
+      id: Date.now() + Math.random(),
       name,
       folds: foldCount,
       pillars: pillarCount,
@@ -244,8 +246,8 @@ export default function EarthquakeAttemptScreen() {
           {designs.length > 0 && (
             <View style={styles.designsList}>
               <Text style={styles.sectionHeader}>Structural Iterations</Text>
-              {designs.map((d, i) => (
-                <View key={i} style={styles.designCard}>
+              {designs.map((d) => (
+                <View key={d.id} style={styles.designCard}>
                   <View style={styles.designHeader}>
                     <Text style={styles.designName}>{d.name}</Text>
                     <Text style={[styles.designAccel, { color: d.peakAccel > 3 ? theme.danger : theme.tertiary }]}>

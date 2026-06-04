@@ -56,7 +56,7 @@ export default function MembersScreen() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
         {!isLoading && members?.map((member, index) => (
-          <MemberCard member={member} marginTop={index != 0} key={index} /> 
+          <MemberCard member={member} marginTop={index != 0} key={member.uid} />
         ))}
         {isLoading && (
           <Text>{t("common.loading")}</Text>
