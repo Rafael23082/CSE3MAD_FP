@@ -8,7 +8,7 @@ import { collection, doc, getDoc, setDoc, updateDoc, arrayUnion } from "@firebas
 import { Picker } from "@react-native-picker/picker";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { use, useEffect, useState } from "react";
+import { use, useState } from "react";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -25,7 +25,9 @@ export default function TeamInitializationPage() {
 
     const auth = use(AuthContext);
 
-    const [mode, setMode] = useState<"create" | "join">("create");
+    const [mode, setMode] = useState<"create" | "join">(() =>
+        (initialMode === "join" || initialMode === "create") ? initialMode : "create"
+    );
     const [teamName, setTeamName] = useState("");
     const [gradeLevel, setGradeLevel] = useState("");
 
@@ -35,12 +37,6 @@ export default function TeamInitializationPage() {
 
     const [isScanning, setIsScanning] = useState(false);
     const [cameraPermission, requestCameraPermission] = useCameraPermissions();
-
-    useEffect(() => {
-        if (initialMode === "join" || initialMode === "create") {
-            setMode(initialMode);
-        }
-    }, [initialMode]);
 
     if (!auth) return null;
     const { user } = auth;
