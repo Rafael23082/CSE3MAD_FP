@@ -15,7 +15,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface SensorStatus {
   granted: boolean;
@@ -44,6 +44,7 @@ export default function SensorDebugScreen() {
   const { theme } = useTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const [audioPermission, requestAudioPermission] = Audio.usePermissions();
@@ -298,8 +299,11 @@ export default function SensorDebugScreen() {
   ];
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
-      <ScrollView contentContainerStyle={styles.content}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={[styles.content, { paddingTop: insets.top + 20 }]}
+      contentInsetAdjustmentBehavior="automatic"
+    >
         <View style={styles.headerRow}>
           <View>
             <Text style={styles.title}>Sensor Debug</Text>
@@ -384,7 +388,6 @@ export default function SensorDebugScreen() {
           <Text style={styles.sensorButtonText}>Show validation tip</Text>
         </Pressable>
       </ScrollView>
-    </SafeAreaView>
   );
 }
 

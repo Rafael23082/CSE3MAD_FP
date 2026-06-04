@@ -5,47 +5,50 @@ import { ThemeColors } from "@/theme/colors";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function ActivitiesScreen() {
   const { theme } = useTheme();
   const styles = createStyles(theme);
   const router = useRouter();
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
 
   const activities = getActivities(t);
 
   return (
-    <SafeAreaView style={styles.outerContainer} edges={["top"]}>
-      <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.welcomeMessage}>
-          {t("activities.selectActivity")}
+    <ScrollView
+      style={styles.outerContainer}
+      contentContainerStyle={[styles.container, { paddingTop: insets.top + 24 }]}
+      contentInsetAdjustmentBehavior="automatic"
+    >
+      <Text style={styles.welcomeMessage}>
+        {t("activities.selectActivity")}
+      </Text>
+      <View style={styles.debugCard}>
+        <Text style={styles.debugTitle}>Sensor validation</Text>
+        <Text style={styles.debugBody}>
+          Check camera, microphone, GPS, and accelerometer live on a physical
+          Android device.
         </Text>
-        <View style={styles.debugCard}>
-          <Text style={styles.debugTitle}>Sensor validation</Text>
-          <Text style={styles.debugBody}>
-            Check camera, microphone, GPS, and accelerometer live on a physical
-            Android device.
-          </Text>
-          <Pressable
-            style={styles.debugButton}
-            onPress={() => router.push("/sensor-debug" as never)}
-          >
-            <Text style={styles.debugButtonText}>Open sensor debug screen</Text>
-          </Pressable>
-        </View>
-        {Object.entries(activities).map(([key, activity], index) => (
-          <ActivityGroup
-            key={index}
-            activityKey={key}
-            activityName={activity.name}
-            description={activity.description}
-            imagePath={activity.image}
-            onlyImage={false}
-          />
-        ))}
-      </ScrollView>
-    </SafeAreaView>
+        <Pressable
+          style={styles.debugButton}
+          onPress={() => router.push("/sensor-debug" as never)}
+        >
+          <Text style={styles.debugButtonText}>Open sensor debug screen</Text>
+        </Pressable>
+      </View>
+      {Object.entries(activities).map(([key, activity], index) => (
+        <ActivityGroup
+          key={index}
+          activityKey={key}
+          activityName={activity.name}
+          description={activity.description}
+          imagePath={activity.image}
+          onlyImage={false}
+        />
+      ))}
+    </ScrollView>
   );
 }
 

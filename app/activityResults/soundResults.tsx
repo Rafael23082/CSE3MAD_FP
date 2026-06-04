@@ -6,7 +6,7 @@ import { useRouter } from "expo-router";
 import React, { useCallback, useContext, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Button from "@/components/button";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
@@ -30,6 +30,7 @@ export default function SoundResultsScreen() {
   const styles = createStyles(theme);
   const router = useRouter();
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   const activityContext = useContext(ActivityContext);
   const logs = activityContext?.experimentLogs?.filter(l => l.activityKey === 'sound-pollution-hunter') || [];
   const [rating, setRating] = useState(0);
@@ -46,10 +47,13 @@ export default function SoundResultsScreen() {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.title}>{t("activities.soundPollutionHunter.name")}</Text>
-        <Text style={styles.subtitle}>{t("results.attempts")}</Text>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 20 }]}
+      contentInsetAdjustmentBehavior="automatic"
+    >
+      <Text style={styles.title}>{t("activities.soundPollutionHunter.name")}</Text>
+      <Text style={styles.subtitle}>{t("results.attempts")}</Text>
 
         {logs.length === 0 ? (
           <View style={styles.emptyState}>
@@ -97,7 +101,6 @@ export default function SoundResultsScreen() {
           <Button text={t("results.backToActivities")} action={() => router.push("/(tabs)/activities")} />
         </View>
       </ScrollView>
-    </SafeAreaView>
   );
 }
 

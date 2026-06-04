@@ -9,7 +9,7 @@ import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
   const { theme } = useTheme();
@@ -17,6 +17,7 @@ export default function HomeScreen() {
   const { t } = useTranslation();
   const auth = useContext(AuthContext);
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const { userProfile, team } = auth || {};
   const [submissions, setSubmissions] = useState<any[]>([]);
@@ -53,11 +54,12 @@ export default function HomeScreen() {
   const rank = team ? Math.max(1, 5 - completedCount) : 0;
 
   return (
-      <SafeAreaView style={styles.container} edges={["top"]}>
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.primary} />}
-        >
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 24 }]}
+        contentInsetAdjustmentBehavior="automatic"
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.primary} />}
+      >
           {/* Team Card - only shown when user has a team */}
           {team ? (
             <View style={styles.teamCard}>
@@ -117,7 +119,6 @@ export default function HomeScreen() {
             <Button text={t("home.startActivity")} action={() => router.push("/(tabs)/activities")} />
           </View>
         </ScrollView>
-      </SafeAreaView>
   );
 }
 
