@@ -17,7 +17,7 @@ export default function Index() {
         } else {
             router.replace("/(tabs)");
         }
-    }, [context, pathname]);
+    }, [context?.user, context?.loading, pathname]);
 
     if (!context) return null;
     const { user, loading } = context;

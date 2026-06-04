@@ -46,7 +46,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     console.log("Loading theme....");
     loadTheme();
-  }, [])
+  }, [colorScheme])
 
   return (
     <ThemeContext.Provider value={{theme: isDark ? darkTheme : lightTheme, changeTheme, isDark}}>
