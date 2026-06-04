@@ -43,3 +43,6 @@ app-example
 /android
 
 firebase.js
+
+# test coverage
+coverage/
