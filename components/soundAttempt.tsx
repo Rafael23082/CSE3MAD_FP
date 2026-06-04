@@ -3,7 +3,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { Audio } from 'expo-av';
 import { useRouter } from "expo-router";
-import React, { useContext, useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -28,18 +28,23 @@ export default function SoundAttemptScreen() {
   const router = useRouter();
   const { t } = useTranslation();
 
-  const activityContext = useContext(ActivityContext);
-  if (!activityContext || !activityContext.activity) return null;
+  const activityContext = use(ActivityContext);
 
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [permissionResponse, requestPermission] = Audio.usePermissions();
   const [liveDb, setLiveDb] = useState(0);
-  const [readings, setReadings] = useState<{ action: string; location: string; db: number; prediction: string; wasRight: string }[]>([]);
+  const [readings, setReadings] = useState<{ id: number; action: string; location: string; db: number; prediction: string; wasRight: string }[]>([]);
   const [location, setLocation] = useState("");
   const [selectedAction, setSelectedAction] = useState("");
   const [prediction, setPrediction] = useState<"Louder" | "Softer" | "">("");
   const [showActions, setShowActions] = useState(false);
   const [showRiskScale, setShowRiskScale] = useState(false);
+
+  useEffect(() => {
+    return () => { if (recording) recording.stopAndUnloadAsync().catch(() => {}); };
+  }, [recording]);
+
+  if (!activityContext || !activityContext.activity) return null;
 
   const startRecording = async () => {
     try {
@@ -71,10 +76,6 @@ export default function SoundAttemptScreen() {
     }
   };
 
-  useEffect(() => {
-    return () => { if (recording) recording.stopAndUnloadAsync().catch(() => {}); };
-  }, [recording]);
-
   // PDF: Determine risk level
   const getRiskLevel = (db: number) => {
     if (db <= 60) return "Safe";
@@ -86,6 +87,7 @@ export default function SoundAttemptScreen() {
   const logReading = () => {
     if (!location.trim() || !selectedAction) return;
     const entry = {
+      id: Date.now() + Math.random(),
       action: selectedAction,
       location: location.trim(),
       db: liveDb,
@@ -217,8 +219,8 @@ export default function SoundAttemptScreen() {
           {readings.length > 0 && (
             <View style={styles.readingsList}>
               <Text style={styles.subSectionHeader}>{t("activities.soundPollutionHunter.predictionCompare")}</Text>
-              {readings.map((r, i) => (
-                <View key={i} style={styles.readingCard}>
+              {readings.map((r) => (
+                <View key={r.id} style={styles.readingCard}>
                   <View style={styles.readingHeader}>
                     <Text style={styles.readingAction}>{r.action}</Text>
                     <Text style={[styles.readingDb, { color: r.db > 85 ? theme.danger : theme.tertiary }]}>{r.db} dB</Text>

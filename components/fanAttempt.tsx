@@ -3,7 +3,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter } from "expo-router";
-import React, { useContext, useState } from "react";
+import React, { use, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -27,8 +27,7 @@ export default function FanAttemptScreen() {
   const router = useRouter();
   const { t } = useTranslation();
 
-  const activityContext = useContext(ActivityContext);
-  if (!activityContext || !activityContext.activity) return null;
+  const activityContext = use(ActivityContext);
 
   const [permission, requestPermission] = useCameraPermissions();
   const [isCameraActive, setIsCameraActive] = useState(false);
@@ -41,6 +40,7 @@ export default function FanAttemptScreen() {
   const [predictedAngle, setPredictedAngle] = useState("");
   const [angle, setAngle] = useState("");
   const [trials, setTrials] = useState<{
+    id: number;
     name: string;
     material: string;
     targetType: string;
@@ -54,6 +54,8 @@ export default function FanAttemptScreen() {
   const [showMaterials, setShowMaterials] = useState(false);
   const [showDistances, setShowDistances] = useState(false);
 
+  if (!activityContext || !activityContext.activity) return null;
+
   // PDF: Force calculation F ≈ k × θ
   const kValue = selectedMaterial.k;
   const theta = (parseFloat(angle) || 0) * (Math.PI / 180);
@@ -65,6 +67,7 @@ export default function FanAttemptScreen() {
     const predAng = parseFloat(predictedAngle) || 0;
     const wasRight = predAng > 0 ? (Math.abs(predAng - ang) <= 10 ? "Yes" : "No") : "";
     setTrials(prev => [...prev, {
+      id: Date.now() + Math.random(),
       name: fanDesignName.trim(),
       material: selectedMaterial.name,
       targetType: targetType,
@@ -214,8 +217,8 @@ export default function FanAttemptScreen() {
           {trials.length > 0 && (
             <View style={styles.trialsList}>
               <Text style={styles.sectionHeader}>{t("activities.parachuteDropChallenge.writeUpPrediction")}</Text>
-              {trials.map((t, i) => (
-                <View key={i} style={styles.trialCard}>
+              {trials.map((t) => (
+                <View key={t.id} style={styles.trialCard}>
                   <View style={styles.trialHeader}>
                     <Text style={styles.trialName}>{t.name}</Text>
                     <Text style={styles.trialForce}>{t.force.toFixed(3)}N</Text>

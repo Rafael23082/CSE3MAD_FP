@@ -8,7 +8,7 @@ import { collection, doc, getDoc, setDoc, updateDoc, arrayUnion } from "@firebas
 import { Picker } from "@react-native-picker/picker";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useContext, useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -19,21 +19,13 @@ export default function TeamInitializationPage() {
 
     const styles = createStyles(theme);
     const router = useRouter();
+    const queryClient = useQueryClient();
+    const { mode: initialMode } = useLocalSearchParams();
+    const {t} = useTranslation();
 
-    const auth = useContext(AuthContext);
-    if (!auth) return null;
-    const { user } = auth;
+    const auth = use(AuthContext);
 
     const [mode, setMode] = useState<"create" | "join">("create");
-    const queryClient = useQueryClient();
-
-    const { mode: initialMode } = useLocalSearchParams();
-    useEffect(() => {
-    if (initialMode === "join" || initialMode === "create") {
-        setMode(initialMode);
-    }
-    }, [initialMode]);
-
     const [teamName, setTeamName] = useState("");
     const [gradeLevel, setGradeLevel] = useState("");
 
@@ -44,7 +36,14 @@ export default function TeamInitializationPage() {
     const [isScanning, setIsScanning] = useState(false);
     const [cameraPermission, requestCameraPermission] = useCameraPermissions();
 
-    const {t} = useTranslation();
+    useEffect(() => {
+        if (initialMode === "join" || initialMode === "create") {
+            setMode(initialMode);
+        }
+    }, [initialMode]);
+
+    if (!auth) return null;
+    const { user } = auth;
 
     function generateInviteCode(length = 6) {
         const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

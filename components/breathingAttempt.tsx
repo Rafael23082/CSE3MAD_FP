@@ -5,7 +5,7 @@ import { BreathingTrial } from "@/constants/types";
 import { useRouter } from "expo-router";
 import { Accelerometer } from 'expo-sensors';
 import { Subscription } from "expo-sensors/build/Pedometer";
-import { useContext, useEffect, useRef, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -21,47 +21,22 @@ export type bpmValue = {
 export default function BreathingAttemptScreen(){
     const {theme} = useTheme();
     const styles = createStyles(theme);
+    const router = useRouter();
+    const {t} = useTranslation();
 
-    const activityContext = useContext(ActivityContext);
-    if (!activityContext) return null;
-    const { activity } = activityContext;
-    if (!activity) return null;
+    const activityContext = use(ActivityContext);
 
     const [recordingState, setRecordingState] = useState<"idle" | "recording" | "completed">("idle");
     const [currentPhaseIndex, setCurrentPhaseIndex] = useState(0);
-
-    let currentPhase;
-    if (activity.phases){
-        currentPhase = activity.phases[currentPhaseIndex]
-    }
-
     const [{ x, y, z }, setData] = useState({ x: 0, y: 0, z: 0 });
     const [subscription, setSubscription] = useState<Subscription | null>(null);
     const zValues = useRef<number[]>([]);
     const [countdown, setCountdown] = useState<number | null>(null);
-
     const [breaths, setBreaths] = useState(0);
     const [bpm, setBpm] = useState(0);
-
     const bpmValues = useRef<bpmValue[]>([]);
     const [time, setTime] = useState(30)
     const [centered, setCentered] = useState<number[]>([]);
-
-    const router = useRouter();
-    const {t} = useTranslation();
-
-    const _subscribe = () => {
-        Accelerometer.setUpdateInterval(100);
-        setSubscription(Accelerometer.addListener(({x, y, z}) => {
-            setData({x, y, z});
-            zValues.current.push(z);
-        }));
-    }
-
-    const _unsubscribe = () => {
-        subscription && subscription.remove();
-        setSubscription(null);
-    }
 
     useEffect(() => {
         if (countdown === null) return;
@@ -119,6 +94,28 @@ export default function BreathingAttemptScreen(){
             clearInterval(interval);
         };
     }, [recordingState]);
+
+    if (!activityContext) return null;
+    const { activity } = activityContext;
+    if (!activity) return null;
+
+    let currentPhase;
+    if (activity.phases){
+        currentPhase = activity.phases[currentPhaseIndex]
+    }
+
+    const _subscribe = () => {
+        Accelerometer.setUpdateInterval(100);
+        setSubscription(Accelerometer.addListener(({x, y, z}) => {
+            setData({x, y, z});
+            zValues.current.push(z);
+        }));
+    }
+
+    const _unsubscribe = () => {
+        subscription && subscription.remove();
+        setSubscription(null);
+    }
 
     const formatNumber = (s: number) => {
         const min = Math.floor(s / 60);

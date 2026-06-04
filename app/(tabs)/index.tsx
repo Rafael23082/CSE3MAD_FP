@@ -6,7 +6,7 @@ import { ThemeColors } from "@/theme/colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, use, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -15,7 +15,7 @@ export default function HomeScreen() {
   const { theme } = useTheme();
   const styles = createStyles(theme);
   const { t } = useTranslation();
-  const auth = useContext(AuthContext);
+  const auth = use(AuthContext);
   const router = useRouter();
   const insets = useSafeAreaInsets();
 

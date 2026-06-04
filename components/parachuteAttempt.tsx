@@ -3,7 +3,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter } from "expo-router";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { use, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -25,8 +25,7 @@ export default function ParachuteAttemptScreen() {
   const router = useRouter();
   const { t } = useTranslation();
 
-  const activityContext = useContext(ActivityContext);
-  if (!activityContext || !activityContext.activity) return null;
+  const activityContext = use(ActivityContext);
 
   const [permission, requestPermission] = useCameraPermissions();
   const [dropHeight, setDropHeight] = useState("1.5");
@@ -45,6 +44,7 @@ export default function ParachuteAttemptScreen() {
 
   // PDF: Write-up tracking
   interface ParachuteWriteUpEntry {
+    id: number;
     trialNumber: string;
     surfaceArea: string;
     predictedTime: string;
@@ -76,6 +76,8 @@ export default function ParachuteAttemptScreen() {
       }
     };
   }, [isTimerRunning]);
+
+  if (!activityContext || !activityContext.activity) return null;
 
   const toggleTimer = () => setIsTimerRunning(prev => !prev);
   const resetTimer = () => { setIsTimerRunning(false); setTimeValue(0); };
@@ -128,6 +130,7 @@ export default function ParachuteAttemptScreen() {
     const newCount = trialCount + 1;
     setTrialCount(newCount);
     const entry: ParachuteWriteUpEntry = {
+      id: Date.now() + Math.random(),
       trialNumber: getTrialName(trialCount),
       surfaceArea: surfaceArea || "0",
       predictedTime: predictedTime || "0",
@@ -273,8 +276,8 @@ export default function ParachuteAttemptScreen() {
           {writeUpEntries.length > 0 && (
             <View style={styles.writeUpTable}>
               <Text style={styles.tableTitle}>{t("journal.recordedTrials")}</Text>
-              {writeUpEntries.map((entry, i) => (
-                <View key={i} style={styles.writeUpRow}>
+              {writeUpEntries.map((entry) => (
+                <View key={entry.id} style={styles.writeUpRow}>
                   <Text style={styles.trialName}>{entry.trialNumber}</Text>
                   <View style={styles.trialData}>
                     {entry.surfaceArea !== "0" && <Text style={styles.trialDetail}>SA: {entry.surfaceArea}cm²</Text>}

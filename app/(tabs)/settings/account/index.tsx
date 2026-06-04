@@ -8,7 +8,7 @@ import { ThemeColors } from "@/theme/colors";
 import { useFocusEffect, useRouter } from "expo-router";
 import { signOut } from "firebase/auth";
 import { doc, updateDoc } from "firebase/firestore";
-import { useCallback, useContext, useState } from "react";
+import { useCallback, use, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
@@ -17,9 +17,7 @@ export default function AccountSettingsScreen() {
   const styles = createStyles(theme);
   const router = useRouter();
   const { t } = useTranslation();
-  const authContext = useContext(AuthContext);
-  if (!authContext) return;
-  const { userProfile, user } = authContext;
+  const authContext = use(AuthContext);
   const [error, setError] = useState("");
 
   useFocusEffect(
@@ -27,6 +25,9 @@ export default function AccountSettingsScreen() {
       return () => setError("");
     }, [])
   )
+
+  if (!authContext) return;
+  const { userProfile, user } = authContext;
 
   async function handleLogout() {
     try {

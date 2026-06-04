@@ -4,7 +4,7 @@ import { ThemeColors } from "@/theme/colors";
 import { useRouter } from "expo-router";
 import { Accelerometer } from 'expo-sensors';
 import { Subscription } from "expo-sensors/build/Pedometer";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { use, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -23,8 +23,7 @@ export default function EarthquakeAttemptScreen() {
   const router = useRouter();
   const { t } = useTranslation();
 
-  const activityContext = useContext(ActivityContext);
-  if (!activityContext || !activityContext.activity) return null;
+  const activityContext = use(ActivityContext);
 
   // PDF: Accelerometer-based tracking
   const [isShaking, setIsShaking] = useState(false);
@@ -43,6 +42,7 @@ export default function EarthquakeAttemptScreen() {
 
   // PDF: Write-up tracking
   interface EqEntry {
+    id: number;
     name: string;
     folds: string;
     pillars: string;
@@ -54,6 +54,16 @@ export default function EarthquakeAttemptScreen() {
   const [designs, setDesigns] = useState<EqEntry[]>([]);
 
   const [showPresets, setShowPresets] = useState(false);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      _unsubscribe();
+      if (shakeInterval.current) clearInterval(shakeInterval.current);
+    };
+  }, []);
+
+  if (!activityContext || !activityContext.activity) return null;
 
   // PDF: Accelerometer subscription
   const _subscribe = () => {
@@ -70,14 +80,6 @@ export default function EarthquakeAttemptScreen() {
     subscription && subscription.remove();
     setSubscription(null);
   };
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      _unsubscribe();
-      if (shakeInterval.current) clearInterval(shakeInterval.current);
-    };
-  }, []);
 
   // PDF: Start/stop vibration + accelerometer tracking
   const triggerShake = () => {
@@ -111,6 +113,7 @@ export default function EarthquakeAttemptScreen() {
     const wasRight = pred > 0 ? (Math.abs(pred - sway) <= 2 ? "Yes" : "No") : "";
 
     setDesigns(prev => [...prev, {
+      id: Date.now() + Math.random(),
       name,
       folds: foldCount,
       pillars: pillarCount,
@@ -243,8 +246,8 @@ export default function EarthquakeAttemptScreen() {
           {designs.length > 0 && (
             <View style={styles.designsList}>
               <Text style={styles.sectionHeader}>Structural Iterations</Text>
-              {designs.map((d, i) => (
-                <View key={i} style={styles.designCard}>
+              {designs.map((d) => (
+                <View key={d.id} style={styles.designCard}>
                   <View style={styles.designHeader}>
                     <Text style={styles.designName}>{d.name}</Text>
                     <Text style={[styles.designAccel, { color: d.peakAccel > 3 ? theme.danger : theme.tertiary }]}>

@@ -5,7 +5,7 @@ import { useTheme } from '@/hooks/useTheme';
 import { ThemeColors } from '@/theme/colors';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { addDoc, collection } from 'firebase/firestore';
-import React, { useContext, useMemo, useState } from 'react';
+import React, { use, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
@@ -13,21 +13,22 @@ export default function JournalScreen() {
     const { t } = useTranslation();
     const { theme } = useTheme();
     const styles = createStyles(theme);
-    const activityContext = useContext(ActivityContext);
-    const auth = useContext(AuthContext);
+    const activityContext = use(ActivityContext);
+    const auth = use(AuthContext);
 
     const [reflection, setReflection] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [teamConfirmed, setTeamConfirmed] = useState(false);
 
+    const currentLogs = useMemo(
+        () => (activityContext?.experimentLogs ?? []).filter(log => log.activityKey === activityContext?.activity?.key),
+        [activityContext?.experimentLogs, activityContext?.activity?.key]
+    );
+
     if (!activityContext || !activityContext.activity) return null;
 
     const { activity, experimentLogs, clearExperimentLogs } = activityContext;
     const { team } = auth || {};
-    const currentLogs = useMemo(
-        () => experimentLogs.filter(log => log.activityKey === activity.key),
-        [experimentLogs, activity.key]
-    );
 
     const getMetricLabel = () => {
         switch(activity.key) {

@@ -7,7 +7,7 @@ type ActivityResults = {
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { useRouter } from "expo-router";
-import { useContext, useEffect, useRef, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -19,18 +19,12 @@ import Card from "./card";
 export default function ReactionBoardAttemptScreen(){
     const {theme} = useTheme();
     const styles = createStyles(theme);
+    const router = useRouter();
+    const {t} = useTranslation();
 
-    const activityContext = useContext(ActivityContext);
-    if (!activityContext) return null;
-    const { activity } = activityContext;
-    if (!activity) return null;
+    const activityContext = use(ActivityContext);
 
     const [currentPhaseIndex, setCurrentPhaseIndex] = useState(0);
-    let currentPhase;
-    if (activity.phases){
-        currentPhase = activity.phases[currentPhaseIndex]
-    }
-
     const [challengeState, setChallengeState] = useState<"idle" | "waiting" | "ready" | "finished">("idle");
     const [reactionTime, setReactionTime] = useState<number | null>(null);
     const [startTime, setStartTime] = useState(0);
@@ -52,11 +46,88 @@ export default function ReactionBoardAttemptScreen(){
         touching: boolean;
     }[]>([]);
 
-    const router = useRouter();
-    const {t} = useTranslation();
     const activityResults = useRef<ActivityResults[]>([]);
 
     const [circlePosition, setCirclePosition] = useState({ x: 50, y: 50 });
+
+    useEffect(() => {
+        if (currentPhaseIndex !== 2) return;
+        if (containerSize.width === 0 || containerSize.height === 0) return;
+        if (challengeState !== "ready") return;
+
+        const radius = 30;
+        let x = containerSize.width / 2;
+        let y = containerSize.height / 2;
+        let directionX = 1;
+        let directionY = 1;
+        const speedX = 4;
+        const speedY = 3;
+
+        const movementInterval = setInterval(() => {
+            x += speedX * directionX;
+            y += speedY * directionY;
+
+            const minX = radius;
+            const maxX = containerSize.width - radius;
+            const minY = radius;
+            const maxY = containerSize.height - radius;
+
+            if (x >= maxX || x <= minX) directionX *= -1;
+            if (y >= maxY || y <= minY) directionY *= -1;
+
+            setCirclePosition({ x, y });
+
+            trackingSamples.current.push({
+                fingerX: fingerPosition.current.x,
+                fingerY: fingerPosition.current.y,
+                circleX: x,
+                circleY: y,
+                touching: isTouching.current
+            });
+        }, 16);
+
+        return () => clearInterval(movementInterval);
+    }, [currentPhaseIndex, containerSize, challengeState]);
+
+    useEffect(() => {
+        if (currentPhaseIndex !== 2) return;
+        if (challengeState !== "ready") return;
+
+        const interval = setInterval(() => {
+            setTime((prev) => {
+                if (prev <= 1) {
+                    clearInterval(interval);
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [challengeState, currentPhaseIndex]);
+
+    useEffect(() => {
+        if (currentPhaseIndex !== 2 || time !== 0 || challengeState !== "ready") return;
+        if (!activityContext?.activity?.phases) return;
+
+        const score = calculateAccuracy();
+        setAccuracy(score);
+        setChallengeState("finished");
+
+        activityResults.current.push({
+            label: activityContext.activity.phases[currentPhaseIndex],
+            value: `${score}%`
+        });
+    }, [currentPhaseIndex, time, challengeState, activityContext]);
+
+    if (!activityContext) return null;
+    const { activity } = activityContext;
+    if (!activity) return null;
+
+    let currentPhase;
+    if (activity.phases){
+        currentPhase = activity.phases[currentPhaseIndex]
+    }
 
     const startChallenge = () => {
         setChallengeState("waiting");
@@ -134,81 +205,10 @@ export default function ReactionBoardAttemptScreen(){
         })
         .onUpdate((e) => {
             fingerPosition.current = { x: e.x, y: e.y };
-        })
+         })
         .onEnd(() => {
             isTouching.current = false;
         });
-
-    useEffect(() => {
-        if (currentPhaseIndex !== 2) return;
-        if (containerSize.width === 0 || containerSize.height === 0) return;
-        if (challengeState !== "ready") return; 
-
-        const radius = 30;
-        let x = containerSize.width / 2;
-        let y = containerSize.height / 2;
-        let directionX = 1;
-        let directionY = 1;
-        const speedX = 4;
-        const speedY = 3;
-
-        const movementInterval = setInterval(() => {
-            x += speedX * directionX;
-            y += speedY * directionY;
-
-            const minX = radius;
-            const maxX = containerSize.width - radius;
-            const minY = radius;
-            const maxY = containerSize.height - radius;
-
-            if (x >= maxX || x <= minX) directionX *= -1;
-            if (y >= maxY || y <= minY) directionY *= -1;
-
-            setCirclePosition({ x, y });
-
-            trackingSamples.current.push({
-                fingerX: fingerPosition.current.x,
-                fingerY: fingerPosition.current.y,
-                circleX: x,
-                circleY: y,
-                touching: isTouching.current
-            });
-        }, 16);
-
-        return () => clearInterval(movementInterval);
-    }, [currentPhaseIndex, containerSize, challengeState]);
-
-    useEffect(() => {
-        if (currentPhaseIndex !== 2) return;
-        if (challengeState !== "ready") return;
-
-        const interval = setInterval(() => {
-            setTime((prev) => {
-                if (prev <= 1) {
-                    clearInterval(interval);
-                    return 0;
-                }
-                return prev - 1;
-            });
-        }, 1000);
-
-        return () => clearInterval(interval);
-    }, [challengeState, currentPhaseIndex]);
-
-    useEffect(() => {
-        if (currentPhaseIndex !== 2 || time !== 0 || challengeState !== "ready") return;
-
-        const score = calculateAccuracy();
-        setAccuracy(score);
-        setChallengeState("finished");
-
-        if (activity.phases) {
-            activityResults.current.push({
-                label: activity.phases[currentPhaseIndex],
-                value: `${score}%`
-            });
-        }
-    }, [time, currentPhaseIndex, activity.phases]);
 
     const formatNumber = (s: number) => {
         const min = Math.floor(s / 60);
