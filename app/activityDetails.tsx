@@ -13,12 +13,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function ActivityDetailsScreen(){
     const { theme } = useTheme();
     const styles = createStyles(theme);
+    const router = useRouter();
+    const {t} = useTranslation();
     const activityContext = useContext(ActivityContext);
     if (!activityContext) return null;
     const { activity } = activityContext;
     if (!activity) return null;
-    const router = useRouter();
-    const {t} = useTranslation();
 
     return(
         <SafeAreaView style={styles.outerContainer}>
