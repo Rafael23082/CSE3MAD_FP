@@ -5,7 +5,7 @@ import { BreathingTrial } from "@/constants/types";
 import { useRouter } from "expo-router";
 import { Accelerometer } from 'expo-sensors';
 import { Subscription } from "expo-sensors/build/Pedometer";
-import { useContext, useEffect, useRef, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -22,7 +22,7 @@ export default function BreathingAttemptScreen(){
     const {theme} = useTheme();
     const styles = createStyles(theme);
 
-    const activityContext = useContext(ActivityContext);
+    const activityContext = use(ActivityContext);
     if (!activityContext) return null;
     const { activity } = activityContext;
     if (!activity) return null;

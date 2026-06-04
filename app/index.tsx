@@ -1,10 +1,10 @@
 import { AuthContext } from "@/context/AuthContext";
 import { useRouter, usePathname } from "expo-router";
-import { useContext, useEffect } from "react";
+import { use, useEffect } from "react";
 import { ActivityIndicator, View } from "react-native";
 
 export default function Index() {
-    const context = useContext(AuthContext);
+    const context = use(AuthContext);
     const router = useRouter();
 
     if (!context) return null;

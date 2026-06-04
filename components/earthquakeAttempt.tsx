@@ -4,7 +4,7 @@ import { ThemeColors } from "@/theme/colors";
 import { useRouter } from "expo-router";
 import { Accelerometer } from 'expo-sensors';
 import { Subscription } from "expo-sensors/build/Pedometer";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { use, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -23,7 +23,7 @@ export default function EarthquakeAttemptScreen() {
   const router = useRouter();
   const { t } = useTranslation();
 
-  const activityContext = useContext(ActivityContext);
+  const activityContext = use(ActivityContext);
   if (!activityContext || !activityContext.activity) return null;
 
   // PDF: Accelerometer-based tracking

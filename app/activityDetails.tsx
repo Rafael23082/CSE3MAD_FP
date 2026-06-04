@@ -5,7 +5,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useContext } from "react";
+import { use } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -16,7 +16,7 @@ export default function ActivityDetailsScreen(){
     const router = useRouter();
     const {t} = useTranslation();
     const insets = useSafeAreaInsets();
-    const activityContext = useContext(ActivityContext);
+    const activityContext = use(ActivityContext);
     if (!activityContext) return null;
     const { activity } = activityContext;
     if (!activity) return null;

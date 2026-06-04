@@ -6,7 +6,7 @@ import { ThemeColors } from '@/theme/colors';
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
-import { useContext } from "react";
+import { use } from "react";
 import { useTranslation } from "react-i18next";
 import { ScrollView, StyleSheet, Text } from 'react-native';
 
@@ -16,7 +16,7 @@ export default function MembersScreen() {
   const router = useRouter();
   const {t} = useTranslation();
 
-  const authContext = useContext(AuthContext);
+  const authContext = use(AuthContext);
   if (!authContext) return null;
   const {user} = authContext;
 

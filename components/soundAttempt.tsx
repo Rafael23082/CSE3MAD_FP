@@ -3,7 +3,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { Audio } from 'expo-av';
 import { useRouter } from "expo-router";
-import React, { useContext, useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -28,7 +28,7 @@ export default function SoundAttemptScreen() {
   const router = useRouter();
   const { t } = useTranslation();
 
-  const activityContext = useContext(ActivityContext);
+  const activityContext = use(ActivityContext);
   if (!activityContext || !activityContext.activity) return null;
 
   const [recording, setRecording] = useState<Audio.Recording | null>(null);

@@ -5,7 +5,7 @@ import { useTheme } from '@/hooks/useTheme';
 import { ThemeColors } from '@/theme/colors';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { addDoc, collection } from 'firebase/firestore';
-import React, { useContext, useMemo, useState } from 'react';
+import React, { use, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
@@ -13,8 +13,8 @@ export default function JournalScreen() {
     const { t } = useTranslation();
     const { theme } = useTheme();
     const styles = createStyles(theme);
-    const activityContext = useContext(ActivityContext);
-    const auth = useContext(AuthContext);
+    const activityContext = use(ActivityContext);
+    const auth = use(AuthContext);
 
     const [reflection, setReflection] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);

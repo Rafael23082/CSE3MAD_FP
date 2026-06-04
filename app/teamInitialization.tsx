@@ -8,7 +8,7 @@ import { collection, doc, getDoc, setDoc, updateDoc, arrayUnion } from "@firebas
 import { Picker } from "@react-native-picker/picker";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useContext, useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -20,7 +20,7 @@ export default function TeamInitializationPage() {
     const styles = createStyles(theme);
     const router = useRouter();
 
-    const auth = useContext(AuthContext);
+    const auth = use(AuthContext);
     if (!auth) return null;
     const { user } = auth;
 

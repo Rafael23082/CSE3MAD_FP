@@ -2,7 +2,7 @@ import { AuthContext } from "@/context/AuthContext";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from '@/theme/colors';
 import { useRouter } from "expo-router";
-import { useContext } from "react";
+import { use } from "react";
 import { useTranslation } from "react-i18next";
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
@@ -11,7 +11,7 @@ export default function TeamInformationScreen() {
   const styles = createStyles(theme);
   const router = useRouter();
   const {t} = useTranslation();
-  const auth = useContext(AuthContext);
+  const auth = use(AuthContext);
   const team = auth?.team;
 
   return (

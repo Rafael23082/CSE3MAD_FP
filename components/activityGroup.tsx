@@ -3,7 +3,7 @@ import { ActivityContext } from "@/context/ActivityContext";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { useRouter } from "expo-router";
-import { useContext } from "react";
+import { use } from "react";
 import { useTranslation } from "react-i18next";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -22,7 +22,7 @@ export default function ActivityGroup({activityKey, activityName, description, i
     const {t} = useTranslation();
     const activities = getActivities(t);
 
-    const activityContext = useContext(ActivityContext);
+    const activityContext = use(ActivityContext);
     if (!activityContext) return null;
     const { setActivity } = activityContext;
 

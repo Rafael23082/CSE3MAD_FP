@@ -7,7 +7,7 @@ import { ThemeColors } from "@/theme/colors";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { useContext } from "react";
+import { use } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import QRCode from "react-native-qrcode-svg";
@@ -17,7 +17,7 @@ export default function TeamSettingsScreen() {
   const styles = createStyles(theme);
   const { t } = useTranslation();
   const router = useRouter();
-  const authContext = useContext(AuthContext);
+  const authContext = use(AuthContext);
   if (!authContext) return null;
   const {user, userProfile} = authContext;
 

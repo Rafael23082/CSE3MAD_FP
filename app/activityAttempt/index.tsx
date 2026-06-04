@@ -6,13 +6,13 @@ import SoundAttemptScreen from "@/components/soundAttempt";
 import FanAttemptScreen from "@/components/fanAttempt";
 import EarthquakeAttemptScreen from "@/components/earthquakeAttempt";
 import { ActivityContext } from "@/context/ActivityContext";
-import { useContext } from "react";
+import { use } from "react";
 import { Text } from "react-native";
 import { useTranslation } from "react-i18next";
 
 export default function ActivityAttemptMainScreen(){
   const { t } = useTranslation();
-    const activityContext = useContext(ActivityContext);
+    const activityContext = use(ActivityContext);
     if (!activityContext) return null;
 
     const {activity} = activityContext;

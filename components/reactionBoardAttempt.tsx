@@ -7,7 +7,7 @@ type ActivityResults = {
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { useRouter } from "expo-router";
-import { useContext, useEffect, useRef, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -20,7 +20,7 @@ export default function ReactionBoardAttemptScreen(){
     const {theme} = useTheme();
     const styles = createStyles(theme);
 
-    const activityContext = useContext(ActivityContext);
+    const activityContext = use(ActivityContext);
     if (!activityContext) return null;
     const { activity } = activityContext;
     if (!activity) return null;

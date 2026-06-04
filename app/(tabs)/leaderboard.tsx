@@ -6,7 +6,7 @@ import { ThemeColors } from "@/theme/colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, use, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -36,7 +36,7 @@ export default function LeaderboardScreen() {
   const { theme } = useTheme();
   const styles = createStyles(theme);
   const { t } = useTranslation();
-  const auth = useContext(AuthContext);
+  const auth = use(AuthContext);
   const router = useRouter();
 
   const [mode, setMode] = useState<'global' | 'activity'>('global');

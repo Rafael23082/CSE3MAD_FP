@@ -2,7 +2,7 @@ import { ActivityContext } from "@/context/ActivityContext";
 import { useTheme } from "@/hooks/useTheme";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import React, { useCallback, useContext, useState } from "react";
+import React, { useCallback, use, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -30,7 +30,7 @@ export default function FanResultsScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
-  const activityContext = useContext(ActivityContext);
+  const activityContext = use(ActivityContext);
   const logs = activityContext?.experimentLogs?.filter(l => l.activityKey === 'hand-fan-challenge') || [];
   const [rating, setRating] = useState(0);
 
