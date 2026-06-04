@@ -7,7 +7,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { addDoc, collection } from 'firebase/firestore';
 import React, { useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 export default function JournalScreen() {
     const { t } = useTranslation();
@@ -152,9 +152,11 @@ export default function JournalScreen() {
                     <MaterialCommunityIcons name="chart-line" size={18} color={theme.primary} />
                     <Text style={styles.cardTitle}>{t("journal.experimentRecords")}</Text>
                     {currentLogs.length > 0 && (
-                        <TouchableOpacity onPress={handleClearAll} style={{ marginLeft: 'auto' }}>
+                        <Pressable
+                            onPress={handleClearAll}
+                            style={({ pressed }) => [{ marginLeft: 'auto' }, pressed && { opacity: 0.7 }]}>
                             <Text style={{ color: theme.danger, fontSize: 11 }}>{t("journal.clearAll")}</Text>
-                        </TouchableOpacity>
+                        </Pressable>
                     )}
                 </View>
 
@@ -173,9 +175,11 @@ export default function JournalScreen() {
                                     <Text style={styles.logNumber}>{t("journal.trialNumber", {number: currentLogs.length - i})}</Text>
                                     <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
                                         <Text style={styles.logTime}>{formatTime(log.timestamp)}</Text>
-                                        <TouchableOpacity onPress={() => handleDeleteTrial(log.timestamp)}>
+                                        <Pressable
+                                            onPress={() => handleDeleteTrial(log.timestamp)}
+                                            style={({ pressed }) => pressed && { opacity: 0.7 }}>
                                             <MaterialCommunityIcons name="close-circle" size={18} color={theme.danger} />
-                                        </TouchableOpacity>
+                                        </Pressable>
                                     </View>
                                 </View>
                                 <Text style={styles.logMetric}>
@@ -204,8 +208,12 @@ export default function JournalScreen() {
                     <Text style={{ color: theme.textMuted, fontSize: 12, marginBottom: 10 }}>
                         {t("journal.confirmSubtext")}
                     </Text>
-                    <TouchableOpacity
-                        style={[styles.confirmBtn, { backgroundColor: teamConfirmed ? theme.tertiary + '20' : theme.surfaceContainer }]}
+                    <Pressable
+                        style={({ pressed }) => [
+                            styles.confirmBtn,
+                            { backgroundColor: teamConfirmed ? theme.tertiary + '20' : theme.surfaceContainer },
+                            pressed && { opacity: 0.85 },
+                        ]}
                         onPress={() => setTeamConfirmed(!teamConfirmed)}
                     >
                         <MaterialCommunityIcons
@@ -216,7 +224,7 @@ export default function JournalScreen() {
                         <Text style={[styles.confirmText, { color: teamConfirmed ? theme.tertiary : theme.textMuted }]}>
                             {teamConfirmed ? t("journal.confirmed") : t("journal.confirmText")}
                         </Text>
-                    </TouchableOpacity>
+                    </Pressable>
                     <Text style={{ color: theme.textMuted, fontSize: 10, marginTop: 8, fontStyle: 'italic' }}>
                         {t("journal.confirmNote")}
                     </Text>
@@ -240,14 +248,18 @@ export default function JournalScreen() {
                 />
             </View>
 
-            <TouchableOpacity
-                style={[styles.button, { backgroundColor: isSubmitting ? theme.textMuted : theme.secondary }]}
+            <Pressable
+                style={({ pressed }) => [
+                    styles.button,
+                    { backgroundColor: isSubmitting ? theme.textMuted : theme.secondary },
+                    pressed && !isSubmitting && { opacity: 0.85 },
+                ]}
                 onPress={handleSubmit}
                 disabled={isSubmitting}
             >
                 <MaterialCommunityIcons name="send" size={18} color={theme.secondary} style={{marginRight: 8}} />
                 <Text style={styles.buttonText}>{isSubmitting ? t("journal.submitting") : t("journal.submitMission")}</Text>
-            </TouchableOpacity>
+            </Pressable>
         </ScrollView>
     );
 }

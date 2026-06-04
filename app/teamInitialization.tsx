@@ -11,7 +11,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext, useEffect, useState } from "react";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { useTranslation } from "react-i18next";
-import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function TeamInitializationPage() {
@@ -174,15 +174,26 @@ export default function TeamInitializationPage() {
                         <Text style={styles.title}> {mode === "create" ? t("teamInitialization.createTitle"): t("teamInitialization.joinTitle")}
                         </Text>
                         <View style={styles.toggleContainer}>
-                            <TouchableOpacity
-                                style={[ styles.toggleButton, mode === "create" && styles.activeToggle ]}
+                            <Pressable
+                                style={({ pressed }) => [
+                                    styles.toggleButton,
+                                    mode === "create" && styles.activeToggle,
+                                    pressed && { opacity: 0.85 },
+                                ]}
                                 onPress={() => setMode("create")}
                             >
                                 <Text style={[styles.toggleText, mode === "create" && styles.activeToggleText]}>{t("buttons.createTeam")}</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={[styles.toggleButton, mode === "join" && styles.activeToggle]} onPress={() => setMode("join")}>
+                            </Pressable>
+                            <Pressable
+                                style={({ pressed }) => [
+                                    styles.toggleButton,
+                                    mode === "join" && styles.activeToggle,
+                                    pressed && { opacity: 0.85 },
+                                ]}
+                                onPress={() => setMode("join")}
+                            >
                                 <Text style={[ styles.toggleText, mode === "join" && styles.activeToggleText ]}>{t("buttons.joinTeam")}</Text>
-                            </TouchableOpacity>
+                            </Pressable>
                         </View>
 
                         {mode === "create" ? (
@@ -299,9 +310,11 @@ export default function TeamInitializationPage() {
                                 />
                             </>
                         )}
-                        <TouchableOpacity onPress={() => router.push("/(tabs)")}>
+                        <Pressable
+                            onPress={() => router.push("/(tabs)")}
+                            style={({ pressed }) => pressed && { opacity: 0.7 }}>
                             <Text style={styles.skipText}>{t("teamInitialization.skip")}</Text>
-                        </TouchableOpacity>
+                        </Pressable>
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>
