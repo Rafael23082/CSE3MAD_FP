@@ -20,11 +20,11 @@ export default function ActivityResultsRedirect() {
             };
             const route = routeMap[activityKey];
             if (route) {
-                setTimeout(() => router.replace(route as any), 0);
+                router.replace(route as any);
                 return;
             }
         }
-        setTimeout(() => router.replace("/(tabs)/activities" as any), 0);
+        router.replace("/(tabs)/activities" as any);
     }, [activityKey, router]);
 
     return (
