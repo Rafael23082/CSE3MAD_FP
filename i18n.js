@@ -495,6 +495,34 @@ const resources = {
         member: "Member",
         leader: "Leader",
         remove: "Remove"
+      },
+      privacyPolicy: {
+          dataCollection: "Data Collection",
+          dataCollectionContents: "This app collects motion sensor data (accelerometer) to analyze movement performance. No personal identity data is required.",
+          useOfData: "Use of Data",
+          useOfDataContents: "Data is used for activity tracking, performance analysis, and improving user experience.",
+          dataStorage: "Data Storage",
+          dataStorageContents: "Data may be stored locally or temporarily depending on application flow. It is not sold or shared with third parties.",
+          thirdPartyServices: "Third-Party Services",
+          thirdPartyServicesContents: "External services (e.g. APIs or analytics) may collect data according to their own privacy policies.",
+          security: "Security",
+          securityContents: "We apply reasonable security measures, but no system is fully secure.",
+          policyChanges: "Policy Updates",
+          policyChangesContents: "This privacy policy may be updated from time to time."
+      },
+      termsOfService: {
+          useOfApp: "Use of the App",
+          useOfAppContents: "This application is provided for educational and demonstration purposes. Users must use it lawfully.",
+          userResponsibilities: "User Responsibilities",
+          userResponsibilitiesContents: "Users must not attempt to disrupt, misuse, or reverse-engineer the application or its services.",
+          intellectualProperty: "Intellectual Property",
+          intellectualPropertyContents: "All content, design, and source code belong to the developer unless stated otherwise.",
+          noWarranty: "No Warranty",
+          noWarrantyContents: "This application is provided 'as is' without warranties of any kind.",
+          limitationOfLiability: "Limitation of Liability",
+          limitationOfLiabilityContents: "The developer is not responsible for any damages resulting from use of this application.",
+          changesToTerms: "Changes to Terms",
+          changesToTermsContents: "These terms may be updated at any time without prior notice."
       }
     }
   },
@@ -836,6 +864,34 @@ const resources = {
         newPasswordPlaceholder: "新しいパスワードを入力してください",
         confirmPassword: "パスワードを認証する",
         confirmPasswordPlaceholder: "新しいパスワードを確認します"
+      },
+      privacyPolicy: {
+        dataCollection: "データの収集",
+        dataCollectionContents: "当アプリは、動作分析のためにモーションセンサー（加速度計）データのみを収集します。個人を特定する情報は必要ありません。",
+        useOfData: "データの使用目的",
+        useOfDataContents: "収集したデータは、アクティビティの追跡、パフォーマンス分析、およびユーザーエクスペリエンスの向上のために使用されます。",
+        dataStorage: "データの保存",
+        dataStorageContents: "データはアプリケーションの動作に応じてローカルまたは一時的に保存されます。第三者への販売や共有は行われません。",
+        thirdPartyServices: "サードパーティサービス",
+        thirdPartyServicesContents: "外部サービス（APIや解析ツールなど）が、独自のプライバシーポリシーに基づいてデータを収集する場合があります。",
+        security: "セキュリティ",
+        securityContents: "合理的なセキュリティ対策を講じていますが、完全に安全なシステムは存在しません。",
+        policyChanges: "ポリシーの更新",
+        policyChangesContents: "本プライバシーポリシーは、随時更新される場合があります。"
+      },
+      termsOfService: {
+        useOfApp: "アプリの利用",
+        useOfAppContents: "本アプリケーションは、教育およびデモンストレーション目的で提供されています。ユーザーは適法に使用する必要があります。",
+        userResponsibilities: "ユーザーの責任",
+        userResponsibilitiesContents: "ユーザーは、本アプリケーションまたはそのサービスを混乱させたり、悪用したり、リバースエンジニアリングを試みたりしてはなりません。",
+        intellectualProperty: "知的財産権",
+        intellectualPropertyContents: "特に明記されていない限り、すべてのコンテンツ、デザイン、ソースコードは開発者に帰属します。",
+        noWarranty: "免責事項",
+        noWarrantyContents: "本アプリケーションは「現状有姿」で提供され、いかなる保証もいたしません。",
+        limitationOfLiability: "責任の制限",
+        limitationOfLiabilityContents: "開発者は、本アプリケーションの使用に起因するいかなる損害についても責任を負いません。",
+        changesToTerms: "利用規約の変更",
+        changesToTermsContents: "本規約は、予告なしにいつでも更新される場合があります。"
       }
     }
   },
@@ -1336,6 +1392,34 @@ const resources = {
         member: "Anggota",
         leader: "Ketua",
         remove: "Hapus"
+      },
+      privacyPolicy: {
+        dataCollection: "Pengumpulan Data",
+        dataCollectionContents: "Aplikasi ini mengumpulkan data sensor gerak (akselerometer) untuk menganalisis performa gerakan. Tidak diperlukan data identitas pribadi.",
+        useOfData: "Penggunaan Data",
+        useOfDataContents: "Data digunakan untuk pelacakan aktivitas, analisis performa, dan meningkatkan pengalaman pengguna.",
+        dataStorage: "Penyimpanan Data",
+        dataStorageContents: "Data mungkin disimpan secara lokal atau sementara tergantung pada alur aplikasi. Data tidak dijual atau dibagikan kepada pihak ketiga.",
+        thirdPartyServices: "Layanan Pihak Ketiga",
+        thirdPartyServicesContents: "Layanan eksternal (misalnya API atau analitik) dapat mengumpulkan data sesuai dengan kebijakan privasi mereka sendiri.",
+        security: "Keamanan",
+        securityContents: "Kami menerapkan langkah-langkah keamanan yang wajar, namun tidak ada sistem yang sepenuhnya aman.",
+        policyChanges: "Pembaruan Kebijakan",
+        policyChangesContents: "Kebijakan privasi ini dapat diperbarui dari waktu ke waktu."
+      },
+      termsOfService: {
+        useOfApp: "Penggunaan Aplikasi",
+        useOfAppContents: "Aplikasi ini disediakan untuk tujuan pendidikan dan demonstrasi. Pengguna wajib menggunakan aplikasi secara sah.",
+        userResponsibilities: "Tanggung Jawab Pengguna",
+        userResponsibilitiesContents: "Pengguna tidak boleh mencoba untuk mengganggu, menyalahgunakan, atau melakukan rekayasa balik (reverse-engineer) pada aplikasi atau layanannya.",
+        intellectualProperty: "Kekayaan Intelektual",
+        intellectualPropertyContents: "Semua konten, desain, dan kode sumber adalah milik pengembang kecuali dinyatakan lain.",
+        noWarranty: "Tanpa Jaminan",
+        noWarrantyContents: "Aplikasi ini disediakan 'apa adanya' tanpa jaminan dalam bentuk apa pun.",
+        limitationOfLiability: "Batasan Tanggung Jawab",
+        limitationOfLiabilityContents: "Pengembang tidak bertanggung jawab atas kerugian apa pun yang timbul dari penggunaan aplikasi ini.",
+        changesToTerms: "Perubahan Ketentuan",
+        changesToTermsContents: "Ketentuan ini dapat diperbarui kapan saja tanpa pemberitahuan sebelumnya."
       }
     }
   },
@@ -1826,6 +1910,34 @@ const resources = {
         member: "成员",
         leader: "队长",
         remove: "移除"
+      },
+      privacyPolicy: {
+        dataCollection: "数据收集",
+        dataCollectionContents: "本应用收集运动传感器（加速度计）数据以分析运动表现。无需个人身份数据。",
+        useOfData: "数据使用",
+        useOfDataContents: "数据用于活动跟踪、性能分析和改善用户体验。",
+        dataStorage: "数据存储",
+        dataStorageContents: "数据可能根据应用流程在本地或临时存储。不会出售或与第三方共享。",
+        thirdPartyServices: "第三方服务",
+        thirdPartyServicesContents: "外部服务（如API或分析工具）可能会根据其自身的隐私政策收集数据。",
+        security: "安全措施",
+        securityContents: "我们采取合理的安全措施，但不存在绝对安全的系统。",
+        policyChanges: "政策更新",
+        policyChangesContents: "本隐私政策可能会不时更新。"
+      },
+      termsOfService: {
+        useOfApp: "应用使用",
+        useOfAppContents: "本应用程序仅供教育和演示目的。用户必须合法使用。",
+        userResponsibilities: "用户责任",
+        userResponsibilitiesContents: "用户不得试图破坏、滥用或对应用程序及其服务进行反向工程。",
+        intellectualProperty: "知识产权",
+        intellectualPropertyContents: "除非另有说明，所有内容、设计和源代码均属于开发人员。",
+        noWarranty: "无保证条款",
+        noWarrantyContents: "本应用程序按“现状”提供，不提供任何形式的保证。",
+        limitationOfLiability: "责任限制",
+        limitationOfLiabilityContents: "开发人员对因使用本应用程序而导致的任何损害不承担责任。",
+        changesToTerms: "条款变更",
+        changesToTermsContents: "这些条款可能随时更新，恕不另行通知。"
       }
     }
   },

@@ -1,7 +1,5 @@
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
-import { useRouter } from "expo-router";
-import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View } from "react-native";
 
 type infoItemProps = {
@@ -13,8 +11,6 @@ type infoItemProps = {
 export function InfoItem({label, value, marginTop}: infoItemProps){
     const { theme } = useTheme();
     const styles = createStyles(theme);
-    const {t} = useTranslation();
-    const router = useRouter();
 
     return(
         <View style={{ marginTop: marginTop ? 16: 0 }}>

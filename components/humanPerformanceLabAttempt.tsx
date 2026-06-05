@@ -152,42 +152,6 @@ export default function HumanPerformanceLabAttemptScreen(){
         currentPhase = activity.phases[currentPhaseIndex]
     }
 
-    const _subscribe = useCallback(() => {
-        Accelerometer.setUpdateInterval(100);
-
-        setSubscription(
-            Accelerometer.addListener(({x, y, z}) => {
-                setData({x, y, z});
-
-                const magnitude = Math.sqrt(x*x + y*y + z*z);
-
-                const delta = Math.abs(magnitude - previousMagnitude.current);
-
-                previousMagnitude.current = magnitude;
-
-                movementValues.current.push(delta);
-
-                if (delta > 0.25){
-                    setVibrations((prev) => prev + 1);
-                }
-
-                setLargestMovement((prev) => Math.max(prev, delta));
-
-                setSmoothness((prev) => {
-                    const updated = prev - delta * 1.5;
-                    return Math.max(0, Math.min(100, updated));
-                });
-            })
-        );
-    }, []);
-
-    const _unsubscribe = useCallback(() => {
-        setSubscription(prev => {
-            prev?.remove();
-            return null;
-        });
-    }, []);
-
     const formatNumber = (s: number) => {
         const min = Math.floor(s / 60);
         const sec = s % 60;

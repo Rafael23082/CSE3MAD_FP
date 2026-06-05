@@ -49,12 +49,6 @@ const createStyles = (colors: ThemeColors) => {
       flexGrow: 1,
       backgroundColor: colors.backgroundColor,
     },
-    header: {
-      fontFamily: "PoppinsBold",
-      fontSize: 22,
-      color: colors.primary,
-      marginBottom: 24,
-    },
     infoSection: {
       marginBottom: 24,
     },
