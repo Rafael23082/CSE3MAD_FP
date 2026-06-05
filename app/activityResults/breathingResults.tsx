@@ -1,13 +1,13 @@
+import Button from "@/components/button";
 import { ActivityContext } from "@/context/ActivityContext";
 import { useTheme } from "@/hooks/useTheme";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import React, { useCallback, use, useState } from "react";
+import React, { use, useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Button from "@/components/button";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const RATING_KEY = '@stemm_rating_';
 
@@ -65,8 +65,8 @@ export default function BreathingResultsScreen() {
                 <View key={log.timestamp} style={styles.logItem}>
                   <Text style={styles.trialName}>{t("results.entryNumber", {number: i + 1})}</Text>
                   {d.bpm !== undefined && <Text style={styles.bpmValue}>{d.bpm} BPM</Text>}
+                  <Text style={styles.detail}>Preset: {d.presetName}</Text>
                   {d.breaths !== undefined && <Text style={styles.detail}>Breaths: {d.breaths}</Text>}
-                  {d.phase && <Text style={styles.detail}>Phase: {d.phase}</Text>}
                 </View>
               );
             })}

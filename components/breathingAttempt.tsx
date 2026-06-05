@@ -1,22 +1,28 @@
 import { ActivityContext } from "@/context/ActivityContext";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
-import { BreathingTrial } from "@/constants/types";
 import { useRouter } from "expo-router";
 import { Accelerometer } from 'expo-sensors';
 import { Subscription } from "expo-sensors/build/Pedometer";
 import { use, useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "./button";
 import Card from "./card";
 import { LineChart } from "./lineChart";
+import PresetSelector from "./presetSelector";
 
 export type bpmValue = {
     label: string,
     value: string
 }
+
+const DESIGN_PRESETS = [
+  { name: "Rest" },
+  { name: "Jogging One Minute" },
+  { name: "100 Star Jumps" },
+];
 
 export default function BreathingAttemptScreen(){
     const {theme} = useTheme();
@@ -27,7 +33,6 @@ export default function BreathingAttemptScreen(){
     const activityContext = use(ActivityContext);
 
     const [recordingState, setRecordingState] = useState<"idle" | "recording" | "completed">("idle");
-    const [currentPhaseIndex, setCurrentPhaseIndex] = useState(0);
     const [{ x, y, z }, setData] = useState({ x: 0, y: 0, z: 0 });
     const [subscription, setSubscription] = useState<Subscription | null>(null);
     const zValues = useRef<number[]>([]);
@@ -37,6 +42,16 @@ export default function BreathingAttemptScreen(){
     const bpmValues = useRef<bpmValue[]>([]);
     const [time, setTime] = useState(30)
     const [centered, setCentered] = useState<number[]>([]);
+    const [presetName, setPresetName] = useState("Rest");
+
+    interface breathingEntry {
+        id: number;
+        name: string;
+        breathsRecorded: number;
+        bpm: number;
+    }
+
+    const [designs, setDesigns] = useState<breathingEntry[]>([]);
 
     const _subscribe = useCallback(() => {
         Accelerometer.setUpdateInterval(100);
@@ -58,7 +73,6 @@ export default function BreathingAttemptScreen(){
 
         if (countdown <= 0) {
             setCountdown(null);
-
             zValues.current = [];
             setBreaths(0);
             setTime(30);
@@ -89,10 +103,6 @@ export default function BreathingAttemptScreen(){
                         setBreaths(breathCount);
                         const calculatedBpm = (breathCount / 30) * 60;
                         setBpm(Math.round(calculatedBpm));
-                        bpmValues.current.push({
-                            label: t("activities.breathingPaceTrainer.activityBPMCount", { index: currentPhaseIndex + 1 }),
-                            value: String(Math.round(calculatedBpm))
-                        });
                         setRecordingState("completed");
 
                         return 0;
@@ -113,11 +123,6 @@ export default function BreathingAttemptScreen(){
     if (!activityContext) return null;
     const { activity } = activityContext;
     if (!activity) return null;
-
-    let currentPhase;
-    if (activity.phases){
-        currentPhase = activity.phases[currentPhaseIndex]
-    }
 
     const formatNumber = (s: number) => {
         const min = Math.floor(s / 60);
@@ -176,6 +181,49 @@ export default function BreathingAttemptScreen(){
         return breaths;
     }
 
+    const logDesign = () => {
+        if (recordingState !== "completed"){
+            Alert.alert("Challenge Unfinished",
+                "Complete a challenge before logging this trial."
+            )
+            return;
+        }
+
+        setDesigns(prev => [...prev, {
+            id: Date.now() + Math.random(),
+            name: presetName,
+            breathsRecorded: breaths, 
+            bpm: bpm
+        }]);
+
+        if (activityContext) {
+            activityContext.addExperimentLog({
+                activityKey: "breathing-pace-trainer",
+                data: { presetName, breaths, bpm }
+            });
+        }
+        setCountdown(null);
+        setRecordingState("idle");
+        zValues.current = [];
+        setBreaths(0);
+        setTime(30);
+        setBpm(0);
+        bpmValues.current = [];
+        setCentered([]);
+        setPresetName("Rest");
+    };
+
+    const handleFinish = () => {
+        const results = designs.map(d => ({
+            label: `${d.name}`,
+            value: `Breaths Recorded: ${d.breathsRecorded} | BPM: ${d.bpm}}`
+        }));
+        router.push({
+            pathname: "/activityResults",
+            params: { results: JSON.stringify(results), activityKey: "breathing-pace-trainer" }
+        });
+    };
+
     return(
         <SafeAreaView style={styles.outerContainer} edges={["top"]}>
             <KeyboardAvoidingView style={{flex: 1}} behavior="height">
@@ -190,7 +238,6 @@ export default function BreathingAttemptScreen(){
                                 }]}>{formatNumber(time)}</Text>
                             </View>
                         </View>
-                        <Text style={styles.phaseText}>{t("activities.phase")} {currentPhaseIndex + 1} — {currentPhase}</Text>
                         <Text style={[styles.actionName, {marginTop: 24}]}>{t("activities.breathingPaceTrainer.recordBreathing")}</Text>
                         <View style={styles.cardContainer}>
                             <Card metric={t("activities.breathingPaceTrainer.breathsRecorded")} value={String(breaths)} maximumWidth={true} />
@@ -212,37 +259,60 @@ export default function BreathingAttemptScreen(){
                             )}
                         </View>
                     </View>
+
+                    {recordingState != "completed" && (
+                        <View style={styles.buttonContainer}>
+                            {recordingState === "idle" && (
+                                <Button text={t("buttons.startRecording")} action={() => {
+                                    setCountdown(3);
+                                }} />
+                            )}
+                            {recordingState === "recording" && (
+                                <Button text={t("buttons.recording")} action={() => {}} />
+                            )}
+                        </View>  
+                    )}
+
+                    <PresetSelector 
+                        designPresets={DESIGN_PRESETS}
+                        onSelect={(preset) => {
+                            setPresetName(preset.name);
+                        }}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        value={presetName}
+                        onChangeText={setPresetName}
+                        placeholder={"Enter Preset Name"}
+                        placeholderTextColor={theme.textMuted}
+                        editable={false}
+                    />
                     <View style={styles.buttonContainer}>
-                        {recordingState === "idle" && (
-                            <Button text={t("buttons.startRecording")} action={() => {
-                                setCountdown(3);
-                            }} />
-                        )}
-                        {recordingState === "recording" && (
-                            <Button text={t("buttons.recording")} action={() => {}} />
-                        )}
-                        {recordingState === "completed" && (
-                            <Button text={currentPhaseIndex == 2 ? t("buttons.finishActivity"): t("buttons.continue")} action={() => {
-                                if (activity.phases && currentPhaseIndex < activity.phases.length - 1) {
-                                    setCurrentPhaseIndex(currentPhaseIndex+1);
-                                    setRecordingState("idle");
-                                    setTime(30);
-                                    setBreaths(0);
-                                    setBpm(0);
-                                    setCentered([]);
-                                    zValues.current = [];
-                                } else {
-                                    router.push({
-                                        pathname: "/activityResults",
-                                        params: {
-                                            results: JSON.stringify(bpmValues.current),
-                                            activityKey: "breathing-pace-trainer"
-                                        }
-                                    });
-                                }
-                            }} />
-                        )}
+                        <Button 
+                            text={t("buttons.logTrial")}
+                            action={logDesign}
+                        />
                     </View>
+
+                    {designs.length > 0 && (
+                        <View>
+                            <Text style={styles.actionNameLarge}>Structural Iterations</Text>
+                            {designs.map((d) => (
+                                <View key={d.id} style={styles.designCard}>
+                                <View style={styles.designHeader}>
+                                    <Text style={styles.designName}>{d.name}</Text>
+                                </View>
+                                <Text style={styles.designConfig}>Breaths Recorded: {d.breathsRecorded}</Text>
+                                <Text style={styles.designResult}>
+                                    Bpm: {d.bpm}
+                                </Text>
+                                </View>
+                            ))}
+                            <View style={{ marginTop: 16 }}>
+                                <Button text={t("buttons.finishActivity")} action={handleFinish} />
+                            </View>
+                        </View>
+                    )}
                 </ScrollView>
             </KeyboardAvoidingView>
             {countdown !== null && (
@@ -284,11 +354,12 @@ const createStyles = (colors: ThemeColors) => {
             color: colors.secondary,
             marginVertical: 16
         },
-        phaseText: {
+        actionNameLarge: {
             fontFamily: "PoppinsRegular",
-            fontSize: 16,
+            fontSize: 18,
             color: colors.secondary,
-            marginTop: 12,
+            marginBottom: 16,
+            marginTop: 32
         },
         subContainer: {
             flexGrow: 1
@@ -349,8 +420,24 @@ const createStyles = (colors: ThemeColors) => {
             paddingHorizontal: 24
         },
         buttonContainer: {
-            marginTop: 32
-        }
+            marginTop: 16
+        },
+        input: { 
+            backgroundColor: colors.surfaceContainer,
+            color: colors.secondary, 
+            padding: 12, 
+            borderRadius: 8, 
+            borderWidth: 1, 
+            borderColor: colors.borderColor, 
+            fontSize: 16
+        },
+        sectionHeaderSmall: { fontFamily: "PoppinsRegular", fontSize: 18, color: colors.secondary, marginBottom: 12 },
+        designCard: { backgroundColor: colors.card, padding: 12, borderRadius: 10, marginBottom: 8, borderWidth: 1, borderColor: colors.borderColor },
+        designHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+        designName: { fontFamily: "PoppinsRegular", fontSize: 14, color: colors.secondary },
+        designAccel: { fontWeight: "bold", fontSize: 13 },
+        designConfig: { fontFamily: "InterRegular", fontSize: 11, color: colors.textMuted, marginTop: 2 },
+        designResult: { fontFamily: "InterRegular", fontSize: 11, color: colors.textMuted, marginTop: 2 },
     });
     return styles;
 }

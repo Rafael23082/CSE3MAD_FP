@@ -1,10 +1,11 @@
 import { getActivities } from "@/assets/activities";
 import ActivityGroup from "@/components/activityGroup";
+import Button from "@/components/button";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function ActivitiesScreen() {
@@ -31,12 +32,10 @@ export default function ActivitiesScreen() {
           Check camera, microphone, GPS, and accelerometer live on a physical
           Android device.
         </Text>
-        <Pressable
-          style={styles.debugButton}
-          onPress={() => router.push("/sensor-debug" as never)}
-        >
-          <Text style={styles.debugButtonText}>Open sensor debug screen</Text>
-        </Pressable>
+        <Button 
+          text={"Open Sensor Debug Screen"}
+          action={() => router.push("/sensor-debug" as never)}
+        />
       </View>
       {Object.entries(activities).map(([key, activity]) => (
         <ActivityGroup
@@ -74,8 +73,7 @@ const createStyles = (colors: ThemeColors) => {
       padding: 16,
       borderWidth: 1,
       borderColor: colors.borderColor,
-      marginBottom: 18,
-      gap: 10,
+      gap: 16,
     },
     debugTitle: {
       fontFamily: "PoppinsBold",

@@ -6,10 +6,11 @@ import { Accelerometer } from 'expo-sensors';
 import { Subscription } from "expo-sensors/build/Pedometer";
 import React, { use, useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "./button";
 import Card from "./card";
+import PresetSelector from "./presetSelector";
 
 const DESIGN_PRESETS = [
   { name: "4 folds + 4 pillars", folds: 4, pillars: 4 },
@@ -175,26 +176,14 @@ export default function EarthquakeAttemptScreen() {
           {/* PDF: Design Configuration */}
           <Text style={styles.sectionHeader}>New Trial</Text>
 
-          {/* Design Presets */}
-          <Pressable style={styles.presetsToggle} onPress={() => setShowPresets(!showPresets)}>
-            <Text style={styles.presetsToggleText}>
-              {showPresets ? "▼ " : "▶ "}Design Presets
-            </Text>
-          </Pressable>
-          {showPresets && (
-            <View style={styles.presetsList}>
-              {DESIGN_PRESETS.map((preset, i) => (
-                <Pressable
-                  key={i}
-                  style={styles.presetItem}
-                  onPress={() => { setFoldCount(String(preset.folds)); setPillarCount(String(preset.pillars)); setDesignName(preset.name); setShowPresets(false); }}
-                >
-                  <Text style={styles.presetName}>{preset.name}</Text>
-                  <Text style={styles.presetMeta}>{preset.folds} folds, {preset.pillars} pillars</Text>
-                </Pressable>
-              ))}
-            </View>
-          )}
+          <PresetSelector 
+              designPresets={DESIGN_PRESETS}
+              onSelect={(preset) => {
+                setFoldCount(String(preset.folds));
+                setPillarCount(String(preset.pillars));
+                setDesignName(preset.name);
+              }}
+          />
 
           <TextInput
             style={styles.input}

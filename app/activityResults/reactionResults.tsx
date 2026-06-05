@@ -1,13 +1,13 @@
+import Button from "@/components/button";
 import { ActivityContext } from "@/context/ActivityContext";
 import { useTheme } from "@/hooks/useTheme";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import React, { useCallback, use, useState } from "react";
+import React, { use, useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Button from "@/components/button";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const RATING_KEY = '@stemm_rating_';
 
@@ -64,9 +64,16 @@ export default function ReactionResultsScreen() {
               return (
                 <View key={log.timestamp} style={styles.logItem}>
                   <Text style={styles.trialName}>{t("results.entryNumber", {number: i + 1})}</Text>
-                  {d.reactionTime !== undefined && <Text style={styles.reactionValue}>{d.reactionTime} ms</Text>}
-                  {d.accuracy !== undefined && <Text style={styles.detail}>Accuracy: {d.accuracy}%</Text>}
-                  {d.phase && <Text style={styles.detail}>Phase: {d.phase}</Text>}
+                  {d.presetName === "Tracing Challenge" ? (
+                      <Text style={styles.mainValue}>
+                          Tracing Accuracy: {d.accuracy}%
+                      </Text>
+                  ) : (
+                      <Text style={styles.mainValue}>
+                          Reaction Time: {d.reactionTime} ms
+                      </Text>
+                  )}
+                  <Text style={styles.detail}>Preset: {d.presetName}</Text>
                 </View>
               );
             })}
@@ -102,7 +109,7 @@ const createStyles = (colors: any) => StyleSheet.create({
   emptyText: { color: colors.textMuted, fontSize: 16 },
   logItem: { backgroundColor: colors.surfaceContainer, padding: 12, borderRadius: 8, marginBottom: 8 },
   trialName: { fontSize: 13, fontFamily: "PoppinsRegular", color: colors.secondary, marginBottom: 4 },
-  reactionValue: { fontSize: 18, fontFamily: "InterBold", fontWeight: "bold", color: colors.secondary, marginBottom: 4 },
+  mainValue: { fontSize: 18, fontFamily: "InterBold", fontWeight: "bold", color: colors.primary, marginBottom: 4 },
   detail: { fontSize: 12, color: colors.textMuted },
   theoryText: { fontSize: 13, color: colors.textMuted, lineHeight: 20 },
   ratingHint: { textAlign: "center", fontSize: 11, color: colors.textMuted, marginTop: 8 },

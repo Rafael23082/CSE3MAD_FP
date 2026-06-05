@@ -6,16 +6,23 @@ import { Accelerometer } from 'expo-sensors';
 import { Subscription } from "expo-sensors/build/Pedometer";
 import { use, useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "./button";
 import Card from "./card";
 import { LineChart } from "./lineChart";
+import PresetSelector from "./presetSelector";
 
 export type movementValue = {
     label: string,
     value: string
 }
+
+const DESIGN_PRESETS = [
+  { name: "Clockwise Movement" },
+  { name: "Vertical Movement" },
+  { name: "Horizontal Movement" },
+];
 
 export default function HumanPerformanceLabAttemptScreen(){
     const {theme} = useTheme();
@@ -26,7 +33,6 @@ export default function HumanPerformanceLabAttemptScreen(){
     const activityContext = use(ActivityContext);
 
     const [recordingState, setRecordingState] = useState<"idle" | "recording" | "completed">("idle");
-    const [currentPhaseIndex, setCurrentPhaseIndex] = useState(0);
     const [{ x, y, z }, setData] = useState({ x: 0, y: 0, z: 0 });
     const [subscription, setSubscription] = useState<Subscription | null>(null);
     const movementValues = useRef<number[]>([]);
@@ -38,6 +44,16 @@ export default function HumanPerformanceLabAttemptScreen(){
     const [graphValues, setGraphValues] = useState<number[]>([]);
     const previousMagnitude = useRef(0);
     const [time, setTime] = useState(20);
+    const [presetName, setPresetName] = useState("Clockwise Movement")
+
+    interface humanPerformanceLabEntry {
+        id: number;
+        name: string;
+        smoothnessScore: number,
+        vibrations: number
+    }
+
+    const [designs, setDesigns] = useState<humanPerformanceLabEntry[]>([]);
 
     const _subscribe = useCallback(() => {
         Accelerometer.setUpdateInterval(100);
@@ -109,21 +125,8 @@ export default function HumanPerformanceLabAttemptScreen(){
                     if (isNaN(prev) || prev <= 1) {
 
                         const smoothed = smoothSignal(movementValues.current);
-
                         setGraphValues(smoothed);
-
-                        vibrationHistory.current.push({
-                            label: t("activities.stretchSpeedAndGracefulness.movementVibrations", {index: currentPhaseIndex + 1}),
-                            value: String(vibrations)
-                        });
-
-                        vibrationHistory.current.push({
-                            label: t("activities.stretchSpeedAndGracefulness.movementSmoothness", {index: currentPhaseIndex + 1}),
-                            value: `${Math.round(smoothness)}%`
-                        });
-
                         setRecordingState("completed");
-
                         return 0;
                     }
 
@@ -146,11 +149,6 @@ export default function HumanPerformanceLabAttemptScreen(){
 
     const { activity } = activityContext;
     if (!activity) return null;
-
-    let currentPhase;
-    if (activity.phases){
-        currentPhase = activity.phases[currentPhaseIndex]
-    }
 
     const formatNumber = (s: number) => {
         const min = Math.floor(s / 60);
@@ -176,6 +174,48 @@ export default function HumanPerformanceLabAttemptScreen(){
         return smoothed;
     }
 
+    const logDesign = () => {
+        if (recordingState != "completed"){
+            Alert.alert("Challenge Unfinished",
+                "Complete a challenge before logging this trial."
+            )
+            return;
+        }
+
+        setDesigns(prev => [...prev, {
+            id: Date.now() + Math.random(),
+            name: presetName,
+            smoothnessScore: smoothness, 
+            vibrations: vibrations
+        }]);
+
+        if (activityContext) {
+            activityContext.addExperimentLog({
+                activityKey: "stretch-speed-and-gracefulness",
+                data: { presetName, smoothness, vibrations }
+            });
+        }
+
+        setRecordingState("idle");
+        setTime(20);
+        setVibrations(0);
+        setSmoothness(100);
+        setLargestMovement(0);
+        setGraphValues([]);
+        movementValues.current = [];
+}
+
+    const handleFinish = () => {
+        const results = designs.map(d => ({
+            label: `${d.name}`,
+            value: `Smoothness Score: ${d.smoothnessScore} | Vibrations Detected: ${d.vibrations}}`
+        }));
+        router.push({
+            pathname: "/activityResults",
+            params: { results: JSON.stringify(results), activityKey: "stretch-speed-and-gracefulness" }
+        });
+    }
+
     return(
         <SafeAreaView style={styles.outerContainer} edges={["top"]}>
             <KeyboardAvoidingView style={{flex: 1}} behavior="height">
@@ -190,8 +230,6 @@ export default function HumanPerformanceLabAttemptScreen(){
                                 }]}>{formatNumber(time)}</Text>
                             </View>
                         </View>
-
-                        <Text style={styles.phaseText}>{t("activities.phase")} {currentPhaseIndex + 1} — {currentPhase}</Text>
 
                         <Text style={[styles.actionName, {marginTop: 24}]}>{t("activities.stretchSpeedAndGracefulness.recordMovement")}</Text>
 
@@ -226,45 +264,62 @@ export default function HumanPerformanceLabAttemptScreen(){
 
                     </View>
 
+                    {recordingState != "completed" && (
+                        <View style={styles.buttonContainer}>
+                            {recordingState === "idle" && (
+                                <Button text={t("buttons.startRecording")} action={() => {
+                                        setCountdown(3);
+                                    }}
+                                />
+                            )}
+
+                            {recordingState === "recording" && (
+                                <Button text={t("buttons.recording")} action={() => {}} />
+                            )}
+                        </View>
+                    )}
+
+                    <PresetSelector 
+                        designPresets={DESIGN_PRESETS}
+                        onSelect={(preset) => {
+                            setPresetName(preset.name);
+                        }}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        value={presetName}
+                        onChangeText={setPresetName}
+                        placeholder={"Enter Preset Name"}
+                        placeholderTextColor={theme.textMuted}
+                        editable={false}
+                    />
+
                     <View style={styles.buttonContainer}>
-
-                        {recordingState === "idle" && (
-                            <Button text={t("buttons.startRecording")} action={() => {
-                                    setCountdown(3);
-                                }}
-                            />
-                        )}
-
-                        {recordingState === "recording" && (
-                            <Button text={t("buttons.recording")} action={() => {}} />
-                        )}
-
-                        {recordingState === "completed" && (
-                            <Button text={currentPhaseIndex == 2 ? t("buttons.finishActivity"): t("buttons.continue")} action={() => {
-                                if (activity.phases && currentPhaseIndex < activity.phases.length - 1) {
-                                    setCurrentPhaseIndex(currentPhaseIndex + 1);
-                                    setRecordingState("idle");
-                                    setTime(20);
-                                    setVibrations(0);
-                                    setSmoothness(100);
-                                    setLargestMovement(0);
-                                    setGraphValues([]);
-                                    movementValues.current = [];
-                                } else {
-
-                                    router.push({
-                                        pathname: "/activityResults",
-                                        params: {
-                                            results: JSON.stringify(vibrationHistory.current),
-                                            activityKey: "stretch-speed-and-gracefulness"
-                                        }
-                                    });
-
-                                }
-                                }}
-                            />
-                        )}
+                        <Button 
+                            text={t("buttons.logTrial")}
+                            action={logDesign}
+                        />
                     </View>
+
+                    {designs.length > 0 && (
+                        <View>
+                            <Text style={styles.actionNameLarge}>Structural Iterations</Text>
+                            {designs.map((d) => (
+                                <View key={d.id} style={styles.designCard}>
+                                <View style={styles.designHeader}>
+                                    <Text style={styles.designName}>{d.name}</Text>
+                                </View>
+                                <Text style={styles.designConfig}>Smoothness Score: {Math.floor(d.smoothnessScore * 100) / 100}</Text>
+                                <Text style={styles.designResult}>
+                                    Vibrations Detected: {d.vibrations}
+                                </Text>
+                                </View>
+                            ))}
+                            <View style={{ marginTop: 16 }}>
+                                <Button text={t("buttons.finishActivity")} action={handleFinish} />
+                            </View>
+                        </View>
+                    )}
                 </ScrollView>
             </KeyboardAvoidingView>
 
@@ -314,13 +369,6 @@ const createStyles = (colors: ThemeColors) => {
             fontSize: 18,
             color: colors.secondary,
             marginVertical: 16
-        },
-
-        phaseText: {
-            fontFamily: "PoppinsRegular",
-            fontSize: 16,
-            color: colors.secondary,
-            marginTop: 12,
         },
 
         subContainer: {
@@ -392,8 +440,42 @@ const createStyles = (colors: ThemeColors) => {
 
         buttonContainer: {
             marginTop: 32
-        }
+        },
+
+        input: {
+            backgroundColor: colors.surfaceContainer,
+            color: colors.secondary, 
+            padding: 12, 
+            borderRadius: 8, 
+            borderWidth: 1, 
+            borderColor: colors.borderColor, 
+            fontSize: 16
+        },
+        actionNameLarge: {
+            fontFamily: "PoppinsRegular",
+            fontSize: 18,
+            color: colors.secondary,
+            marginBottom: 16,
+            marginTop: 32
+        },
+        sectionHeaderSmall: { fontFamily: "PoppinsRegular", fontSize: 18, color: colors.secondary, marginBottom: 12 },
+        designCard: { backgroundColor: colors.card, padding: 12, borderRadius: 10, marginBottom: 8, borderWidth: 1, borderColor: colors.borderColor },
+        designHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+        designName: { fontFamily: "PoppinsRegular", fontSize: 14, color: colors.secondary },
+        designAccel: { fontWeight: "bold", fontSize: 13 },
+        designConfig: { fontFamily: "InterRegular", fontSize: 11, color: colors.textMuted, marginTop: 2 },
+        designResult: { fontFamily: "InterRegular", fontSize: 11, color: colors.textMuted, marginTop: 2 },
     });
 
     return styles;
 }
+
+/**
+ *                                  setRecordingState("idle");
+                                    setTime(20);
+                                    setVibrations(0);
+                                    setSmoothness(100);
+                                    setLargestMovement(0);
+                                    setGraphValues([]);
+                                    movementValues.current = [];
+ */

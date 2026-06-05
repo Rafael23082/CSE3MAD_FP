@@ -1,20 +1,27 @@
 import { ActivityContext } from "@/context/ActivityContext";
-
-type ActivityResults = {
-    label: string,
-    value: string
-}
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { useRouter } from "expo-router";
 import { use, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Circle } from "react-native-svg";
 import Button from "./button";
 import Card from "./card";
+import PresetSelector from "./presetSelector";
+
+type ActivityResults = {
+    label: string,
+    value: string
+}
+
+const DESIGN_PRESETS = [
+  { name: "Dominant Hand Tap Reaction" },
+  { name: "Non-Dominant Hand Tap Reaction" },
+  { name: "Tracing Challenge" },
+];
 
 export default function ReactionBoardAttemptScreen(){
     const {theme} = useTheme();
@@ -24,7 +31,6 @@ export default function ReactionBoardAttemptScreen(){
 
     const activityContext = use(ActivityContext);
 
-    const [currentPhaseIndex, setCurrentPhaseIndex] = useState(0);
     const [challengeState, setChallengeState] = useState<"idle" | "waiting" | "ready" | "finished">("idle");
     const [reactionTime, setReactionTime] = useState<number | null>(null);
     const [startTime, setStartTime] = useState(0);
@@ -38,6 +44,15 @@ export default function ReactionBoardAttemptScreen(){
     const fingerPosition = useRef({ x: 0, y: 0 });
     const isTouching = useRef(false);
 
+    interface reactionEntry {
+        id: number;
+        name: string;
+        reactionTime?: number,
+        tracingAccuracy?: number
+    }
+    const [designs, setDesigns] = useState<reactionEntry[]>([]);
+
+
     const trackingSamples = useRef<{
         fingerX: number;
         fingerY: number;
@@ -47,11 +62,11 @@ export default function ReactionBoardAttemptScreen(){
     }[]>([]);
 
     const activityResults = useRef<ActivityResults[]>([]);
-
     const [circlePosition, setCirclePosition] = useState({ x: 50, y: 50 });
+    const [presetName, setPresetName] = useState("Dominant Hand Tap Reaction");
 
     useEffect(() => {
-        if (currentPhaseIndex !== 2) return;
+        if (presetName != "Tracing Challenge") return;
         if (containerSize.width === 0 || containerSize.height === 0) return;
         if (challengeState !== "ready") return;
 
@@ -87,10 +102,10 @@ export default function ReactionBoardAttemptScreen(){
         }, 16);
 
         return () => clearInterval(movementInterval);
-    }, [currentPhaseIndex, containerSize, challengeState]);
+    }, [presetName, containerSize, challengeState]);
 
     useEffect(() => {
-        if (currentPhaseIndex !== 2) return;
+        if (presetName != "Tracing Challenge") return;
         if (challengeState !== "ready") return;
 
         const interval = setInterval(() => {
@@ -104,30 +119,19 @@ export default function ReactionBoardAttemptScreen(){
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [challengeState, currentPhaseIndex]);
+    }, [challengeState, presetName]);
 
     useEffect(() => {
-        if (currentPhaseIndex !== 2 || time !== 0 || challengeState !== "ready") return;
-        if (!activityContext?.activity?.phases) return;
+        if (presetName !== "Tracing Challenge" || time !== 0 || challengeState !== "ready") return;
 
         const score = calculateAccuracy();
         setAccuracy(score);
         setChallengeState("finished");
-
-        activityResults.current.push({
-            label: activityContext.activity.phases[currentPhaseIndex],
-            value: `${score}%`
-        });
-    }, [currentPhaseIndex, time, challengeState, activityContext]);
+    }, [presetName, time, challengeState, activityContext]);
 
     if (!activityContext) return null;
     const { activity } = activityContext;
     if (!activity) return null;
-
-    let currentPhase;
-    if (activity.phases){
-        currentPhase = activity.phases[currentPhaseIndex]
-    }
 
     const startChallenge = () => {
         setChallengeState("waiting");
@@ -154,13 +158,6 @@ export default function ReactionBoardAttemptScreen(){
         
         setReactionTime(rounded);
         setChallengeState("finished");
-
-        if (activity.phases) {
-            activityResults.current.push({
-                label: activity.phases[currentPhaseIndex],
-                value: `${rounded} ms`
-            });
-        }
     };
 
     const calculateAccuracy = () => {
@@ -216,15 +213,57 @@ export default function ReactionBoardAttemptScreen(){
         return `${min}:${sec < 10 ? "0" : ""}${sec}`;
     };
 
+    const logDesign = () => {
+        if (challengeState !== "finished"){
+            Alert.alert("Challenge Unfinished",
+                "Complete a challenge before logging this trial."
+            )
+            return;
+        }
+
+        setDesigns(prev => [...prev, {
+            id: Date.now() + Math.random(),
+            name: presetName,
+            tracingAccuracy: accuracy ?? undefined,
+            reactionTime: reactionTime ?? undefined
+        }]);
+
+        if (activityContext) {
+            activityContext.addExperimentLog({
+                activityKey: "reaction-board-challenge",
+                data: { presetName, accuracy, reactionTime }
+            });
+        }
+
+        setStartTime(0);
+        setTime(10);
+        setAccuracy(0);
+        setChallengeState("idle");
+        setReactionTime(0);
+        setPresetName("Dominant Hand Tap Reaction");
+        trackingSamples.current = [];
+    }
+
+    const handleFinish = () => {
+        const results = designs.map(d => ({
+            label: `${d.name}`,
+            value: d.name == "Tracing Challenge" ? `Tracing Accuracy: ${d.tracingAccuracy} %`: `Reaction Time: ${d.reactionTime} ms`
+        }));
+        router.push({
+            pathname: "/activityResults",
+            params: { results: JSON.stringify(results), activityKey: "reaction-board-challenge" }
+        });
+    };
+
     return(
         <SafeAreaView style={styles.outerContainer} edges={["top"]}>
             <KeyboardAvoidingView style={{flex: 1}} behavior="height">
                 <ScrollView contentContainerStyle={styles.container}>
-                    <View style={styles.subContainer}>
+                    <View>
                         <Text style={styles.head}>{activity.name}</Text>
                         <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
                             <Text style={styles.sectionHeader}>{t("activities.attempt")}</Text>
-                            {currentPhaseIndex == 2 && (
+                            {presetName == "Tracing Challenge" && (
                                 <View style={styles.timerContainer}>
                                     <Text style={[styles.sectionHeader, {
                                         lineHeight: 20
@@ -232,17 +271,16 @@ export default function ReactionBoardAttemptScreen(){
                                 </View>
                             )}
                         </View>
-                        <Text style={styles.phaseText}>{t("activities.phase")} {currentPhaseIndex + 1} — {currentPhase}</Text>
-                        <Text style={[styles.actionName, {marginTop: 24}]}>{currentPhaseIndex == 2 ? t("activities.reactionBoardChallenge.measureTracingAccuracy"): t("activities.reactionBoardChallenge.recordReactionTime")}</Text>
+                        <Text style={[styles.actionName, {marginTop: 24}]}>{presetName == "Tracing Challenge" ? t("activities.reactionBoardChallenge.measureTracingAccuracy"): t("activities.reactionBoardChallenge.recordReactionTime")}</Text>
                         <View style={styles.cardContainer}>
-                            {currentPhaseIndex != 2 ? (
+                            {presetName !== "Tracing Challenge" ? (
                                 <Card metric="ms" value={reactionTime == null ? "0": String(reactionTime)} maximumWidth={true} />
                             ): (
                                 <Card metric={t("activities.reactionBoardChallenge.accuracyScore")} value={`${accuracy}%`} maximumWidth={true} />
                             )}
                         </View>
-                        <Text style={styles.actionName}>{currentPhaseIndex == 2 ? t("activities.reactionBoardChallenge.tracingZone"): t("activities.reactionBoardChallenge.reactionZone")}</Text>
-                        {currentPhaseIndex == 2 ? (
+                        <Text style={styles.actionName}>{presetName == "Tracing Challenge" ? t("activities.reactionBoardChallenge.tracingZone"): t("activities.reactionBoardChallenge.reactionZone")}</Text>
+                        {presetName == "Tracing Challenge" ? (
                             <GestureDetector gesture={panGesture}>
                                 <View 
                                     style={styles.reactionBoxContainer}
@@ -289,41 +327,63 @@ export default function ReactionBoardAttemptScreen(){
                             </View>
                         )}
                     </View>
+                    {challengeState != "finished" && (
+                        <View style={styles.buttonContainer}>
+                            {challengeState == "idle" && (
+                                <Button text={t("buttons.startChallenge")} action={() => {
+                                    if (presetName !== "Tracing Challenge"){
+                                        startChallenge()
+                                    }else{
+                                        trackingSamples.current = [];
+                                        setTime(10);
+                                        setAccuracy(0);
+                                        setChallengeState("ready");
+                                    }
+                                }} />
+                            )}
+                            {(challengeState == "waiting" || challengeState == "ready") && (
+                                <Button text={challengeState == "waiting" ? t("buttons.waitForSignal"): t("buttons.tapNow")} action={() => {}} />
+                            )}
+                        </View>
+                    )}
+                    <PresetSelector 
+                        designPresets={DESIGN_PRESETS}
+                        onSelect={(preset) => {
+                            setPresetName(preset.name);
+                        }}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        value={presetName}
+                        onChangeText={setPresetName}
+                        placeholder={"Enter Preset Name"}
+                        placeholderTextColor={theme.textMuted}
+                        editable={false}
+                    />
+
                     <View style={styles.buttonContainer}>
-                        {challengeState == "idle" && (
-                            <Button text={t("buttons.startChallenge")} action={() => {
-                                if (currentPhaseIndex != 2){
-                                    startChallenge()
-                                }else{
-                                    trackingSamples.current = [];
-                                    setTime(10);
-                                    setAccuracy(0);
-                                    setChallengeState("ready");
-                                }
-                            }} />
-                        )}
-                        {(challengeState == "waiting" || challengeState == "ready") && (
-                            <Button text={challengeState == "waiting" ? t("buttons.waitForSignal"): t("buttons.tapNow")} action={() => {}} />
-                        )}
-                        {challengeState == "finished" && (
-                            <Button text={currentPhaseIndex == 2 ? t("buttons.finishActivity"): t("buttons.continue")} action={() => {
-                                if (activity.phases && currentPhaseIndex < activity.phases.length - 1) {
-                                    setCurrentPhaseIndex(prev => prev + 1);
-                                    setChallengeState("idle");
-                                    setReactionTime(null);
-                                    setAccuracy(0);
-                                }else{
-                                    router.push({
-                                        pathname: "/activityResults",
-                                        params: {
-                                            results: JSON.stringify(activityResults.current),
-                                            activityKey: "reaction-board-challenge"
-                                        }
-                                    });
-                                }
-                            }} />
-                        )}
+                        <Button 
+                            text={t("buttons.logTrial")}
+                            action={logDesign}
+                        />
                     </View>
+
+                    {designs.length > 0 && (
+                        <View>
+                            <Text style={styles.actionNameLarge}>Structural Iterations</Text>
+                            {designs.map((d) => (
+                                <View key={d.id} style={styles.designCard}>
+                                <View style={styles.designHeader}>
+                                    <Text style={styles.designName}>{d.name}</Text>
+                                </View>
+                                <Text style={styles.designConfig}>{d.name == "Tracing Challenge" ? `Tracing Accuracy: ${d.tracingAccuracy}%`: `Reaction Time: ${d.reactionTime} ms`}</Text>
+                                </View>
+                            ))}
+                            <View style={{ marginTop: 16 }}>
+                                <Button text={t("buttons.finishActivity")} action={handleFinish} />
+                            </View>
+                        </View>
+                    )}
                 </ScrollView>
             </KeyboardAvoidingView>
         </SafeAreaView>
@@ -358,15 +418,6 @@ const createStyles = (colors: ThemeColors) => {
             fontSize: 18,
             color: colors.secondary,
             marginVertical: 16
-        },
-        phaseText: {
-            fontFamily: "PoppinsRegular",
-            fontSize: 16,
-            color: colors.secondary,
-            marginTop: 12,
-        },
-        subContainer: {
-            flexGrow: 1
         },
         cardContainer: {
             marginBottom: 16
@@ -416,7 +467,29 @@ const createStyles = (colors: ThemeColors) => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-        }
+        },
+        input: {
+            backgroundColor: colors.surfaceContainer,
+            color: colors.secondary, 
+            padding: 12, 
+            borderRadius: 8, 
+            borderWidth: 1, 
+            borderColor: colors.borderColor, 
+            fontSize: 16
+        },
+        actionNameLarge: {
+            fontFamily: "PoppinsRegular",
+            fontSize: 18,
+            color: colors.secondary,
+            marginBottom: 16,
+            marginTop: 32
+        },
+        designCard: { backgroundColor: colors.card, padding: 12, borderRadius: 10, marginBottom: 8, borderWidth: 1, borderColor: colors.borderColor },
+        designHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+        designName: { fontFamily: "PoppinsRegular", fontSize: 14, color: colors.secondary },
+        designAccel: { fontWeight: "bold", fontSize: 13 },
+        designConfig: { fontFamily: "InterRegular", fontSize: 11, color: colors.textMuted, marginTop: 2 },
+        designResult: { fontFamily: "InterRegular", fontSize: 11, color: colors.textMuted, marginTop: 2 },
     });
     return styles;
 }
