@@ -19,9 +19,9 @@ export type bpmValue = {
 }
 
 const DESIGN_PRESETS = [
-  { name: "Rest" },
-  { name: "Jogging One Minute" },
-  { name: "100 Star Jumps" },
+  { key: "activities.breathingPaceTrainer.rest" },
+  { key: "activities.breathingPaceTrainer.jogging" },
+  { key: "activities.breathingPaceTrainer.starJumps" },
 ];
 
 export default function BreathingAttemptScreen(){
@@ -42,11 +42,11 @@ export default function BreathingAttemptScreen(){
     const bpmValues = useRef<bpmValue[]>([]);
     const [time, setTime] = useState(30)
     const [centered, setCentered] = useState<number[]>([]);
-    const [presetName, setPresetName] = useState("Rest");
+    const [presetKey, setPresetKey] = useState("activities.breathingPaceTrainer.rest");
 
     interface breathingEntry {
         id: number;
-        name: string;
+        key: string;
         breathsRecorded: number;
         bpm: number;
     }
@@ -191,7 +191,7 @@ export default function BreathingAttemptScreen(){
 
         setDesigns(prev => [...prev, {
             id: Date.now() + Math.random(),
-            name: presetName,
+            key: presetKey,
             breathsRecorded: breaths, 
             bpm: bpm
         }]);
@@ -199,7 +199,7 @@ export default function BreathingAttemptScreen(){
         if (activityContext) {
             activityContext.addExperimentLog({
                 activityKey: "breathing-pace-trainer",
-                data: { presetName, breaths, bpm }
+                data: { presetKey, breaths, bpm }
             });
         }
         setCountdown(null);
@@ -210,12 +210,11 @@ export default function BreathingAttemptScreen(){
         setBpm(0);
         bpmValues.current = [];
         setCentered([]);
-        setPresetName("Rest");
     };
 
     const handleFinish = () => {
         const results = designs.map(d => ({
-            label: `${d.name}`,
+            label: `${d.key}`,
             value: `Breaths Recorded: ${d.breathsRecorded} | BPM: ${d.bpm}}`
         }));
         router.push({
@@ -276,13 +275,13 @@ export default function BreathingAttemptScreen(){
                     <PresetSelector 
                         designPresets={DESIGN_PRESETS}
                         onSelect={(preset) => {
-                            setPresetName(preset.name);
+                            setPresetKey(preset.key);
                         }}
                     />
                     <TextInput
                         style={styles.input}
-                        value={presetName}
-                        onChangeText={setPresetName}
+                        value={t(presetKey)}
+                        onChangeText={setPresetKey}
                         placeholder={"Enter Preset Name"}
                         placeholderTextColor={theme.textMuted}
                         editable={false}
@@ -296,13 +295,13 @@ export default function BreathingAttemptScreen(){
 
                     {designs.length > 0 && (
                         <View>
-                            <Text style={styles.actionNameLarge}>Structural Iterations</Text>
+                            <Text style={styles.actionNameLarge}>{t("attempt.structuralIterations")}</Text>
                             {designs.map((d) => (
                                 <View key={d.id} style={styles.designCard}>
                                 <View style={styles.designHeader}>
-                                    <Text style={styles.designName}>{d.name}</Text>
+                                    <Text style={styles.designName}>{t(d.key)}</Text>
                                 </View>
-                                <Text style={styles.designConfig}>Breaths Recorded: {d.breathsRecorded}</Text>
+                                <Text style={styles.designConfig}>{t("activities.breathingPaceTrainer.breathsRecorded")}: {d.breathsRecorded}</Text>
                                 <Text style={styles.designResult}>
                                     Bpm: {d.bpm}
                                 </Text>

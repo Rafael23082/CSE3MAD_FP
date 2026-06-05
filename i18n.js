@@ -290,11 +290,9 @@ const resources = {
           equipments: [
             { name: "Open space", description: "Provides a safe environment for students to perform full-range-of-motion exercises." }
           ],
-          phases: [
-            "Clockwise Movement",
-            "Vertical Movement",
-            "Horizontal Movement"
-          ],
+          clockwiseMovement: "Clockwise Movement",
+          verticalMovement: "Vertical Movement",
+          horizontalMovement: "Horizontal Movement",
           recordMovement: "Record Movement",
           vibrationsDetected: "Vibrations Detected",
           smoothnessScore: "Smoothness Score",
@@ -315,11 +313,9 @@ const resources = {
           equipments: [
             { name: "Variable Distractions", description: "Music, conversation, or physical tasks used to test how cognitive load affects response time." }
           ],
-          phases: [
-            "Dominant Hand Tap Reaction",
-            "Non-Dominant Hand Tap Reaction",
-            "Tracing Challenge"
-          ],
+          dominantHand: "Dominant Hand Tap Reaction",
+          nonDominantHand: "Non-Dominant Hand Tap Reaction",
+          tracingChallenge: "Tracing Challenge",
           recordReactionTime: "Record Reaction Time",
           measureTracingAccuracy: "Measure Tracing Accuracy",
           tracingZone: "Tracing Zone",
@@ -327,7 +323,9 @@ const resources = {
           reactionZone: "Reaction Zone",
           reactionZonePlaceholder: "Tap inside this area when the target appears",
           accuracyScore: "Accuracy Score",
-          tap: "TAP!"
+          tap: "TAP!",
+          tracingAccuracy: "Tracing Accuracy",
+          reactionTime: "Reaction Time"
         },
         
         breathingPaceTrainer: {
@@ -342,11 +340,9 @@ const resources = {
           equipments: [
             { name: "Flat surface", description: "Music, conversation, or physical tasks used to test how cognitive load affects response time." }
           ],
-          phases: [
-            "Rest",
-            "Jogging One Minute",
-            "100 Star Jumps"
-          ],
+          rest: "Rest",
+          jogging: "Jogging One Minute",
+          starJumps: "100 Star Jumps",
           recordBreathing: "Record Breathing",
           breathsRecorded: "Breaths Recorded",
           bpm: "BPM",
@@ -464,7 +460,8 @@ const resources = {
         earthquakeTheory: "How Earthquake-Resistant Structures Work\n\nWhen an earthquake strikes, buildings experience vibrations in multiple directions. Engineers design structures to absorb and dissipate this energy rather than resist it rigidly. Folds and pillars add structural stability by distributing forces more evenly. More pillars generally create a stronger base, while strategic folding adds cross-bracing that helps absorb lateral movement.\n\nKey concepts:\n• Base isolation: Separating the building from the ground\n• Cross-bracing: Diagonal supports add stability\n• Energy dissipation: Folds and flexible joints absorb vibrations\n• Center of mass: Lowering it improves stability",
         breathingTheory: "How Breathing Works\n\nBreathing rate changes with physical activity. At rest, a typical person breathes 12-20 times per minute. During exercise, the body needs more oxygen, so breathing rate increases. The accelerometer in your phone can detect the subtle chest movements of breathing to measure your respiration rate.\n\nKey concept:\n• BPM: Breaths per minute — your breathing rate\n• Rest: 12-20 BPM typical\n• Light exercise: 20-40 BPM\n• Vigorous exercise: 40-60 BPM",
         reactionTheory: "How Reaction Time Works\n\nReaction time is the interval between a stimulus and your response. It involves your senses detecting the stimulus, your brain processing the information, and your nerves signaling your muscles to act. The average human reaction time to a visual stimulus is about 200-250 milliseconds.\n\nKey factors:\n• Dominant hand: Typically 10-20ms faster than non-dominant\n• Age: Reaction time peaks in early 20s\n• Fatigue: Slows reaction time significantly\n• Practice: Can improve reaction time by 10-15%",
-        movementTheory: "How Movement Smoothness Works\n\nMovement smoothness is measured by sudden changes in acceleration. The phone's accelerometer detects vibrations and jolts. Smooth movements produce fewer and smaller acceleration changes. The smoothness score (0-100%) measures how gracefully you moved.\n\nKey concepts:\n• Vibrations: Sudden acceleration changes\n• Smoothness: Percentage of time without excessive vibration\n• Score: Starts at 100%, decreases with each jolt"
+        movementTheory: "How Movement Smoothness Works\n\nMovement smoothness is measured by sudden changes in acceleration. The phone's accelerometer detects vibrations and jolts. Smooth movements produce fewer and smaller acceleration changes. The smoothness score (0-100%) measures how gracefully you moved.\n\nKey concepts:\n• Vibrations: Sudden acceleration changes\n• Smoothness: Percentage of time without excessive vibration\n• Score: Starts at 100%, decreases with each jolt",
+        preset: "Preset"
       },
 
       leaderboard: {
@@ -527,6 +524,11 @@ const resources = {
       contactSupport: {
         customerService: "Our 24x7 Customer Service",
         writeUsAt: "Write us at"
+      },
+      attempt: {
+        newTrial: "New Trial",
+        designPresets: "Design Presets",
+        structuralIterations: "Structural Iterations"
       }
     }
   },
@@ -720,11 +722,9 @@ const resources = {
           equipments: [
             { name: "オープンスペース", description: "生徒が可動域をフルに活かした運動を行える、安全な環境を提供します。" }
           ],
-          phases: [
-            "時計回りの動き",
-            "垂直方向の動き",
-            "水平方向の動き"
-          ],
+          clockwiseMovement: "時計回りの動き",
+          verticalMovement: "垂直方向の動き",
+          horizontalMovement: "水平方向の動き",
           recordMovement: "記録の推移",
           vibrationsDetected: "振動が検出されました",
           smoothnessScore: "滑らかさスコア",
@@ -745,11 +745,9 @@ const resources = {
           equipments: [
             { name: "さまざまな気晴らし", description: "認知的負荷が反応時間にどのような影響を与えるかを調べるために用いられる、音楽、会話、または身体的な課題。" }
           ],
-          phases: [
-            "利き手のタップ反応",
-            "利き手ではない方の手のタップ反応",
-            "トレースチャレンジ"
-          ],
+          dominantHand: "利き手のタップ反応",
+          nonDominantHand: "非利き手のタップ反応",
+          tracingChallenge: "トレース（なぞり書き）チャレンジ",
           recordReactionTime: "反応時間を記録する",
           measureTracingAccuracy: "トレース精度の測定",
           tracingZone: "トレースゾーン",
@@ -757,7 +755,9 @@ const resources = {
           reactionZone: "リアクション・ゾーン",
           reactionZonePlaceholder: "ターゲットが表示されたら、このエリア内をタップしてください",
           accuracyScore: "精度スコア",
-          tap: "タップ！"
+          tap: "タップ！",
+          tracingAccuracy: "トレース精度",
+          reactionTime: "反応時間"
         },
         
         breathingPaceTrainer: {
@@ -772,11 +772,9 @@ const resources = {
           equipments: [
             { name: "平らな面", description: "認知的負荷が反応時間にどのような影響を与えるかを調べるために用いられる、音楽、会話、または身体的な課題。" }
           ],
-          phases: [
-            "休憩",
-            "1分間のジョギング",
-            "スタージャンプ100回"
-          ],
+          rest: "安静（休憩）",
+          jogging: "1分間のジョギング",
+          starJumps: "スタージャンプ100回",
           recordBreathing: "呼吸を記録する",
           breathsRecorded: "記録された呼吸",
           bpm: "BPM",
@@ -869,6 +867,60 @@ const resources = {
         confirmPassword: "パスワードを認証する",
         confirmPasswordPlaceholder: "新しいパスワードを確認します"
       },
+      results: {
+        attempts: "試行回数",
+        ranking: "ランキング",
+        theoryExplanation: "解説",
+        rating: "このアクティビティを評価する",
+        ratingPrompt: "アクティビティはいかがでしたか？",
+        accuracy: "精度",
+        noData: "記録がまだありません",
+        entryNumber: "#{{number}}",
+        ratingHint: "星をタップしてアクティビティを評価してください",
+        compare: "自分の結果をチームやリーダーボードと比較してみましょう！",
+        compareNoise: "チームの騒音マップをリーダーボードの他のマップと比較してみましょう！",
+        velocity: "速度",
+        gForce: "Gフォース",
+        time: "時間",
+        surfaceArea: "表面積",
+        backToActivities: "アクティビティに戻る",
+        parachuteTheory: "パラシュートの仕組み\n\nパラシュートをつけずにオモチャを落とすと、重力によって真下に引っ張られます。働く力は重力だけなので、地面にぶつかるまで9.8 m/s²で加速します。パラシュートは表面積を大きくすることで、空気抵抗（抗力）を生み出します。この抗力が重力に逆らって上向きに押し出すため、落下速度が遅くなります。\n\n主な公式：\n• 速度：v = d / t\n• 加速度：a = v / t\n• 重さ（重量）：W = m × 9.8\n• 合力：F = m × a\n• 抗力：F_抗力 = W - F_合力\n• Gフォース（跳ね返りなし）：(v / 接触時間) / 9.8\n• Gフォース（跳ね返りあり）：((v + v_跳ね返り) / 接触時間) / 9.8",
+        soundTheory: "騒音公害の仕組み\n\n音の大きさは、対数記号であるデシベル（dB）という単位で測定されます。10 dB上がるごとに、音の強さは10倍になります。通常の会話は約60 dBですが、ロックコンサートでは120 dBを超えることもあります。85 dB以上の音に長時間さらされると、聴覚障害を引き起こす恐れがあります。\n\n• デシベル（dB）：音の強さの単位\n• 安全：0-60 dB\n• 注意：60-85 dB\n• 危険：85 dB以上",
+        fanTheory: "うちわの仕組み\n\n的となる紙に向かってうちわで風を送ると、動く空気が力を生み出します。力の大きさは、風の速度、うちわの素材の硬さ、そして的までの距離によって決まります。硬い素材ほど、ひといきで多くの空気を押し出すことができるため、より強い力を生み出せます。\n\n主な公式：\n• 推定力：F ≈ k × θ\n• 素材係数：薄い紙（k=0.05）、画用紙（k=0.20）、薄い段ボール（k=0.50）、波構造の段ボール（k=2.50）",
+        earthquakeTheory: "耐震構造の仕組み\n\n地震が発生すると、建物はさまざまな方向から揺れ（振動）を受けます。エンジニアは、このエネルギーを吸収して逃がす（分散させる）ように構造を設計します。「折り」や「柱」を増やすことで、かかる力が均等に分散され、構造の安定性が高まります。\n\n• 免震：建物を地面から切り離す\n• 筋交い（ブレース）：斜めの補強材によって安定性を高める\n• エネルギー散逸：「折り」や柔軟な接合部が振動を吸収する",
+        breathingTheory: "呼吸の仕組み\n\n呼吸数は身体活動（運動）によって変化します。安静時、人の呼吸数は1分間に12〜20回です。運動中は体に多くの酸素が必要になるため、呼吸数が多くなります。\n\n• BPM：1分間あたりの呼吸数\n• 安静時：12-20 BPM\n• 軽い運動：20-40 BPM\n• 激しい運動：40-60 BPM",
+        reactionTheory: "反応時間の仕組み\n\n反応時間とは、刺激を受けてから体が反応するまでの時間のことです。感覚器官が刺激を察知し、脳がその情報を処理し、神経が筋肉に動くよう信号を送る、というプロセスを経て行われます。人間の視覚刺激に対する平均反応時間は、約200〜250ミリ秒（ms）です。\n\n• 利き手：通常、利き手ではない方よりも10〜20ms速い\n• 年齢：20代前半に反応時間のピークを迎える\n• 疲労：反応時間を著しく低下させる（遅らせる）",
+        movementTheory: "動きの滑らかさの仕組み\n\n動きの滑らかさは、加速度の急激な変化によって測定されます。スマートフォンの加速度センサーが、揺れや衝撃（ジャーク）を検知します。滑らかな動きほど、加速度の変化が少なく、その幅も小さくなります。\n\n• 揺れ：加速度の急激な変化\n• 滑らかさ：過度な揺れがない時間の割合（％）\n• スコア：100%からスタートし、衝撃が加わるたびに減点される",
+        preset: "プリセット"
+      },
+      leaderboard: {
+        title: "ランキング",
+        global: "グローバルランキング",
+        byActivity: "アクティビティ別",
+        rank: "順位",
+        team: "チーム",
+        score: "スコア",
+        members: "メンバー",
+        noData: "まだ送信されたデータがありません",
+        selectActivity: "アクティビティを選択"
+      },
+      teamSettings: {
+        title: "チーム設定",
+        teamName: "チーム名",
+        teamId: "チームID",
+        inviteCode: "招待コード",
+        gradeLevel: "学年",
+        members: "メンバー",
+        maxReached: "チームが満員です（最大4名）",
+        shareQR: "QRコードを共有",
+        qrInstructions: "他の生徒がこのQRコードをスキャンすると、あなたのチームに参加できます",
+        leaveTeam: "チームを脱退する",
+        leaveConfirm: "本当にチームを脱退しますか？",
+        noTeam: "チームに所属していません",
+        member: "メンバー",
+        leader: "リーダー",
+        remove: "削除"
+      },
       privacyPolicy: {
         dataCollection: "データの収集",
         dataCollectionContents: "当アプリは、動作分析のためにモーションセンサー（加速度計）データのみを収集します。個人を特定する情報は必要ありません。",
@@ -900,6 +952,11 @@ const resources = {
       contactSupport: {
         customerService: "24時間365日対応のカスタマーサービス",
         writeUsAt: "お問い合わせ先"
+      },
+      attempt: {
+        newTrial: "新しい試行",
+        designPresets: "デザインプリセット",
+        structuralIterations: "構造の反復試行"
       }
     }
   },
@@ -1198,11 +1255,9 @@ const resources = {
           equipments: [
             { name: "Ruangan Terbuka", description: "Menyediakan lingkungan yang aman bagi siswa untuk melakukan latihan rentang gerak penuh." }
           ],
-          phases: [
-            "Gerakan Searah Jarum Jam",
-            "Gerakan Vertikal",
-            "Gerakan Horizontal"
-          ],
+          clockwiseMovement: "Gerakan Searah Jarum Jam",
+          verticalMovement: "Gerakan Vertikal",
+          horizontalMovement: "Gerakan Horizontal",
           recordMovement: "Rekam Gerakan",
           vibrationsDetected: "Getaran Terdeteksi",
           smoothnessScore: "Skor Kehalusan",
@@ -1223,11 +1278,9 @@ const resources = {
           equipments: [
             { name: "Berbagai Gangguan", description: "Musik, percakapan, atau tugas fisik yang digunakan untuk menguji bagaimana beban kognitif mempengaruhi waktu respons." }
           ],
-          phases: [
-            "Reaksi Ketuk Tangan Dominan",
-            "Reaksi Ketuk Tangan Non-Dominan",
-            "Tantangan Menelusuri"
-          ],
+          dominantHand: "Reaksi Ketukan Tangan Dominan",
+          nonDominantHand: "Reaksi Ketukan Tangan Non-Dominan",
+          tracingChallenge: "Tantangan Menelusuri",
           recordReactionTime: "Rekam Waktu Reaksi",
           measureTracingAccuracy: "Ukur Akurasi Penelusuran",
           tracingZone: "Zona Penelusuran",
@@ -1235,7 +1288,9 @@ const resources = {
           reactionZone: "Zona Reaksi",
           reactionZonePlaceholder: "Ketuk di area ini saat target muncul",
           accuracyScore: "Skor Akurasi",
-          tap: "KETUK!"
+          tap: "KETUK!",
+          tracingAccuracy: "Akurasi Menelusuri",
+          reactionTime: "Waktu Reaksi"
         },
 
         breathingPaceTrainer: {
@@ -1250,11 +1305,9 @@ const resources = {
           equipments: [
             { name: "Permukaan Datar", description: "Musik, percakapan, atau tugas fisik yang digunakan untuk menguji bagaimana beban kognitif mempengaruhi waktu respons." }
           ],
-          phases: [
-            "Istirahat",
-            "Joging Satu Menit",
-            "100 Lompatan Bintang"
-          ],
+          rest: "Istirahat",
+          jogging: "Joging Satu Menit",
+          starJumps: "100 Star Jump",
           recordBreathing: "Rekam Pernapasan",
           breathsRecorded: "Napas Terekam",
           bpm: "BPM",
@@ -1371,7 +1424,8 @@ const resources = {
         earthquakeTheory: "Cara Kerja Struktur Tahan Gempa\n\nSaat gempa terjadi, bangunan mengalami getaran di berbagai arah. Insinyur merancang struktur untuk menyerap dan menghilangkan energi ini. Lipatan dan pilar menambah stabilitas struktural dengan mendistribusikan gaya lebih merata.\n\n• Isolasi dasar: Memisahkan bangunan dari tanah\n• Penyangga diagonal: Penyangga diagonal menambah stabilitas\n• Disipasi energi: Lipatan dan sambungan fleksibel menyerap getaran",
         breathingTheory: "Cara Kerja Pernapasan\n\nLaju pernapasan berubah dengan aktivitas fisik. Saat istirahat, seseorang bernapas 12-20 kali per menit. Selama olahraga, tubuh membutuhkan lebih banyak oksigen, sehingga laju pernapasan meningkat.\n\n• BPM: Napas per menit\n• Istirahat: 12-20 BPM\n• Olahraga ringan: 20-40 BPM\n• Olahraga berat: 40-60 BPM",
         reactionTheory: "Cara Kerja Waktu Reaksi\n\nWaktu reaksi adalah interval antara stimulus dan respons Anda. Ini melibatkan indra Anda mendeteksi stimulus, otak Anda memproses informasi, dan saraf Anda memberi sinyal otot untuk bertindak. Waktu reaksi rata-rata manusia terhadap stimulus visual sekitar 200-250 milidetik.\n\n• Tangan dominan: Biasanya 10-20ms lebih cepat\n• Usia: Waktu reaksi puncak di awal 20-an\n• Kelelahan: Memperlambat waktu reaksi secara signifikan",
-        movementTheory: "Cara Kerja Kehalusan Gerakan\n\nKehalusan gerakan diukur dari perubahan akselerasi mendadak. Akselerometer ponsel mendeteksi getaran dan sentakan. Gerakan halus menghasilkan perubahan akselerasi yang lebih sedikit dan lebih kecil.\n\n• Getaran: Perubahan akselerasi mendadak\n• Kehalusan: Persentase waktu tanpa getaran berlebihan\n• Skor: Mulai dari 100%, berkurang dengan setiap sentakan"
+        movementTheory: "Cara Kerja Kehalusan Gerakan\n\nKehalusan gerakan diukur dari perubahan akselerasi mendadak. Akselerometer ponsel mendeteksi getaran dan sentakan. Gerakan halus menghasilkan perubahan akselerasi yang lebih sedikit dan lebih kecil.\n\n• Getaran: Perubahan akselerasi mendadak\n• Kehalusan: Persentase waktu tanpa getaran berlebihan\n• Skor: Mulai dari 100%, berkurang dengan setiap sentakan",
+        preset: "Preset"      
       },
       leaderboard: {
         title: "Peringkat",
@@ -1432,6 +1486,11 @@ const resources = {
       contactSupport: {
         customerService: "Layanan Pelanggan 24/7 Kami",
         writeUsAt: "Hubungi kami di"
+      },
+      attempt: {
+        newTrial: "Uji Coba Baru",
+        designPresets: "Preset Desain",
+        structuralIterations: "Iterasi Struktural"
       }
     }
   },
@@ -1720,11 +1779,9 @@ const resources = {
           equipments: [
             { name: "开放空间", description: "为学生进行全范围运动练习提供安全环境。" }
           ],
-          phases: [
-            "顺时针运动",
-            "垂直运动",
-            "水平运动"
-          ],
+          clockwiseMovement: "顺时针运动",
+          verticalMovement: "垂直运动",
+          horizontalMovement: "水平运动",
           recordMovement: "记录运动",
           vibrationsDetected: "检测到振动",
           smoothnessScore: "流畅度评分",
@@ -1745,11 +1802,9 @@ const resources = {
           equipments: [
             { name: "各种干扰", description: "用于测试认知负荷如何影响反应时间的音乐、对话或体力任务。" }
           ],
-          phases: [
-            "惯用手点击反应",
-            "非惯用手点击反应",
-            "描摹挑战"
-          ],
+          dominantHand: "优势手点击反应",
+          nonDominantHand: "非优势手点击反应",
+          tracingChallenge: "描摹挑战",
           recordReactionTime: "记录反应时间",
           measureTracingAccuracy: "测量描摹准确度",
           tracingZone: "描摹区域",
@@ -1757,7 +1812,9 @@ const resources = {
           reactionZone: "反应区域",
           reactionZonePlaceholder: "目标出现时在此区域内点击",
           accuracyScore: "准确度评分",
-          tap: "点击！"
+          tap: "点击！",
+          tracingAccuracy: "描摹准确率",
+          reactionTime: "反应时间"
         },
 
         breathingPaceTrainer: {
@@ -1772,11 +1829,9 @@ const resources = {
           equipments: [
             { name: "平坦表面", description: "用于测试认知负荷如何影响反应时间的工具。" }
           ],
-          phases: [
-            "休息",
-            "慢跑一分钟",
-            "100次开合跳"
-          ],
+          rest: "静止休息",
+          jogging: "慢跑一分钟",
+          starJumps: "100次开合跳",
           recordBreathing: "记录呼吸",
           breathsRecorded: "记录呼吸次数",
           bpm: "次/分钟",
@@ -1893,7 +1948,8 @@ const resources = {
         earthquakeTheory: "抗震结构的工作原理\n\n地震发生时，建筑物经历多个方向的振动。工程师设计结构来吸收和消散这些能量，而不是刚性抵抗。折叠和支柱通过更均匀地分布力来增加结构稳定性。\n\n关键概念：\n• 基础隔离：将建筑与地面分离\n• 交叉支撑：对角支撑增加稳定性\n• 能量耗散：折叠和柔性接头吸收振动\n• 重心：降低重心提高稳定性",
         breathingTheory: "呼吸的工作原理\n\n呼吸频率随体力活动变化。静息时，人每分钟呼吸12-20次。运动中，身体需要更多氧气，呼吸频率增加。手机加速度计可以检测呼吸引起的细微胸部运动来测量呼吸频率。\n\n关键概念：\n• BPM：每分钟呼吸次数 — 您的呼吸频率\n• 静息：典型12-20 BPM\n• 轻度运动：20-40 BPM\n• 剧烈运动：40-60 BPM",
         reactionTheory: "反应时间的工作原理\n\n反应时间是刺激与您反应之间的间隔。它涉及您的感官检测刺激、大脑处理信息以及神经向肌肉发出信号。人类对视觉刺激的平均反应时间约为200-250毫秒。\n\n关键因素：\n• 惯用手：通常比非惯用手快10-20毫秒\n• 年龄：反应时间在20岁出头达到峰值\n• 疲劳：显著减慢反应时间\n• 练习：可提高反应时间10-15%",
-        movementTheory: "运动流畅度的工作原理\n\n运动流畅度通过加速度的突然变化来衡量。手机加速度计检测振动和颠簸。流畅的运动产生更少、更小的加速度变化。流畅度评分（0-100%）衡量您移动的优雅程度。\n\n关键概念：\n• 振动：突然的加速度变化\n• 流畅度：无过度振动的时间百分比\n• 评分：从100%开始，每次颠簸减少"
+        movementTheory: "运动流畅度的工作原理\n\n运动流畅度通过加速度的突然变化来衡量。手机加速度计检测振动和颠簸。流畅的运动产生更少、更小的加速度变化。流畅度评分（0-100%）衡量您移动的优雅程度。\n\n关键概念：\n• 振动：突然的加速度变化\n• 流畅度：无过度振动的时间百分比\n• 评分：从100%开始，每次颠簸减少",
+        preset: "预设"
       },
       leaderboard: {
         title: "排行榜",
@@ -1954,6 +2010,11 @@ const resources = {
       contactSupport: {
         customerService: "我们的 24×7 客户服务",
         writeUsAt: "发送邮件至"
+      },
+      attempt: {
+        newTrial: "新测试",
+        designPresets: "设计预设",
+        structuralIterations: "结构迭代"
       }
     }
   },

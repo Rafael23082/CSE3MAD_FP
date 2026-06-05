@@ -1,10 +1,11 @@
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 type DesignPreset = {
-    name: string;
+    key: string,
     folds?: number;
     pillars?: number
 };
@@ -18,12 +19,13 @@ export default function PresetSelector({designPresets, onSelect}: PresetSelector
     const {theme} = useTheme();
     const styles = createStyles(theme);
     const [showPresets, setShowPresets] = useState(false);
+    const {t} = useTranslation();
     return(
         <View>
-            <Text style={styles.actionNameLarge}>New Trial</Text>
+            <Text style={styles.actionNameLarge}>{t("attempt.newTrial")}</Text>
             <Pressable style={styles.presetsToggle} onPress={() => setShowPresets(!showPresets)}>
                 <Text style={styles.presetsToggleText}>
-                    {showPresets ? "▼ " : "▶ "}Design Presets
+                    {showPresets ? "▼ " : "▶ "}{t("attempt.designPresets")}
                 </Text>
             </Pressable>
             {showPresets && (
@@ -37,7 +39,7 @@ export default function PresetSelector({designPresets, onSelect}: PresetSelector
                                 setShowPresets(false);
                             }}
                         >
-                        <Text style={styles.presetName}>{preset.name}</Text>
+                        <Text style={styles.presetName}>{t(preset.key)}</Text>
                         </Pressable>
                     ))}
                 </View>

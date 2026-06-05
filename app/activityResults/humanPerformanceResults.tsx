@@ -64,8 +64,9 @@ export default function HumanPerformanceResultsScreen() {
               return (
                 <View key={log.timestamp} style={styles.logItem}>
                   <Text style={styles.trialName}>{t("results.entryNumber", {number: i + 1})}</Text>
-                  {d.smoothness !== undefined && <Text style={styles.smoothnessValue}>Smoothness Score: {Math.floor(d.smoothness * 100) / 100}%</Text>}
-                  {d.vibrations !== undefined && <Text style={styles.detail}>Vibrations Detected: {d.vibrations}</Text>}
+                  {d.smoothness !== undefined && <Text style={styles.smoothnessValue}>{t("activities.stretchSpeedAndGracefulness.smoothnessScore")}: {Math.floor(d.smoothness * 100) / 100}%</Text>}
+                  <Text style={styles.detail}>{t("results.preset")}: {t(d.presetKey)}</Text>
+                  {d.vibrations !== undefined && <Text style={styles.detail}>{t("activities.stretchSpeedAndGracefulness.vibrationsDetected")}: {d.vibrations}</Text>}
                 </View>
               );
             })}

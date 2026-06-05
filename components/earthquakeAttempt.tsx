@@ -4,13 +4,12 @@ import { ThemeColors } from "@/theme/colors";
 import { useRouter } from "expo-router";
 import { Accelerometer } from 'expo-sensors';
 import { Subscription } from "expo-sensors/build/Pedometer";
-import React, { use, useCallback, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "./button";
 import Card from "./card";
-import PresetSelector from "./presetSelector";
 
 const DESIGN_PRESETS = [
   { name: "4 folds + 4 pillars", folds: 4, pillars: 4 },
@@ -24,7 +23,8 @@ export default function EarthquakeAttemptScreen() {
   const router = useRouter();
   const { t } = useTranslation();
 
-  const activityContext = use(ActivityContext);
+  const activityContext = useContext(ActivityContext);
+  if (!activityContext || !activityContext.activity) return null;
 
   // PDF: Accelerometer-based tracking
   const [isShaking, setIsShaking] = useState(false);
@@ -43,7 +43,6 @@ export default function EarthquakeAttemptScreen() {
 
   // PDF: Write-up tracking
   interface EqEntry {
-    id: number;
     name: string;
     folds: string;
     pillars: string;
@@ -56,23 +55,6 @@ export default function EarthquakeAttemptScreen() {
 
   const [showPresets, setShowPresets] = useState(false);
 
-  const _unsubscribe = useCallback(() => {
-    setSubscription(prev => {
-      prev?.remove();
-      return null;
-    });
-  }, []);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      _unsubscribe();
-      if (shakeInterval.current) clearInterval(shakeInterval.current);
-    };
-  }, [_unsubscribe]);
-
-  if (!activityContext || !activityContext.activity) return null;
-
   // PDF: Accelerometer subscription
   const _subscribe = () => {
     Accelerometer.setUpdateInterval(100);
@@ -83,6 +65,19 @@ export default function EarthquakeAttemptScreen() {
       if (magnitude > peakAccel) setPeakAccel(magnitude);
     }));
   };
+
+  const _unsubscribe = () => {
+    subscription && subscription.remove();
+    setSubscription(null);
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      _unsubscribe();
+      if (shakeInterval.current) clearInterval(shakeInterval.current);
+    };
+  }, []);
 
   // PDF: Start/stop vibration + accelerometer tracking
   const triggerShake = () => {
@@ -116,7 +111,6 @@ export default function EarthquakeAttemptScreen() {
     const wasRight = pred > 0 ? (Math.abs(pred - sway) <= 2 ? "Yes" : "No") : "";
 
     setDesigns(prev => [...prev, {
-      id: Date.now() + Math.random(),
       name,
       folds: foldCount,
       pillars: pillarCount,
@@ -176,14 +170,26 @@ export default function EarthquakeAttemptScreen() {
           {/* PDF: Design Configuration */}
           <Text style={styles.sectionHeader}>New Trial</Text>
 
-          <PresetSelector 
-              designPresets={DESIGN_PRESETS}
-              onSelect={(preset) => {
-                setFoldCount(String(preset.folds));
-                setPillarCount(String(preset.pillars));
-                setDesignName(preset.name);
-              }}
-          />
+          {/* Design Presets */}
+          <Pressable style={styles.presetsToggle} onPress={() => setShowPresets(!showPresets)}>
+            <Text style={styles.presetsToggleText}>
+              {showPresets ? "▼ " : "▶ "}Design Presets
+            </Text>
+          </Pressable>
+          {showPresets && (
+            <View style={styles.presetsList}>
+              {DESIGN_PRESETS.map((preset, i) => (
+                <Pressable
+                  key={i}
+                  style={styles.presetItem}
+                  onPress={() => { setFoldCount(String(preset.folds)); setPillarCount(String(preset.pillars)); setDesignName(preset.name); setShowPresets(false); }}
+                >
+                  <Text style={styles.presetName}>{preset.name}</Text>
+                  <Text style={styles.presetMeta}>{preset.folds} folds, {preset.pillars} pillars</Text>
+                </Pressable>
+              ))}
+            </View>
+          )}
 
           <TextInput
             style={styles.input}
@@ -230,15 +236,15 @@ export default function EarthquakeAttemptScreen() {
           />
 
           <View style={styles.buttonContainer}>
-            <Button text={t("buttons.logDesign")} action={logDesign} />
+            <Button text="Log Design" action={logDesign} />
           </View>
 
           {/* PDF: Design History */}
           {designs.length > 0 && (
             <View style={styles.designsList}>
               <Text style={styles.sectionHeader}>Structural Iterations</Text>
-              {designs.map((d) => (
-                <View key={d.id} style={styles.designCard}>
+              {designs.map((d, i) => (
+                <View key={i} style={styles.designCard}>
                   <View style={styles.designHeader}>
                     <Text style={styles.designName}>{d.name}</Text>
                     <Text style={[styles.designAccel, { color: d.peakAccel > 3 ? theme.danger : theme.tertiary }]}>
@@ -267,7 +273,7 @@ const createStyles = (colors: ThemeColors) => {
   const styles = StyleSheet.create({
     outerContainer: { flex: 1, backgroundColor: colors.backgroundColor },
     container: { padding: 24, flexGrow: 1 },
-    head: { fontFamily: "PoppinsBold", fontSize: 22, color: colors.primary, marginBottom: 24 },
+    head: { fontFamily: "PoppinsBold", fontSize: 22, color: colors.danger, marginBottom: 24 },
     sectionHeader: { fontFamily: "PoppinsRegular", fontSize: 18, color: colors.secondary, marginVertical: 12 },
     cardRow: { flexDirection: "row", gap: 12, marginBottom: 8 },
     shakingHint: { fontFamily: "InterRegular", fontSize: 12, color: colors.primary, textAlign: "center", marginTop: 8, fontStyle: "italic" },

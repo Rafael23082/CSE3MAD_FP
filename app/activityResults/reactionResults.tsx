@@ -66,14 +66,14 @@ export default function ReactionResultsScreen() {
                   <Text style={styles.trialName}>{t("results.entryNumber", {number: i + 1})}</Text>
                   {d.presetName === "Tracing Challenge" ? (
                       <Text style={styles.mainValue}>
-                          Tracing Accuracy: {d.accuracy}%
+                          {t("activities.reactionBoardChallenge.measureTracingAccuracy")}: {d.accuracy}%
                       </Text>
                   ) : (
                       <Text style={styles.mainValue}>
-                          Reaction Time: {d.reactionTime} ms
+                          {t("activities.reactionBoardChallenge.reactionTime")}: {d.reactionTime} ms
                       </Text>
                   )}
-                  <Text style={styles.detail}>Preset: {d.presetName}</Text>
+                  <Text style={styles.detail}>{t("results.preset")}: {t(d.presetKey)}</Text>
                 </View>
               );
             })}

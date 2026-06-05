@@ -19,9 +19,9 @@ export type movementValue = {
 }
 
 const DESIGN_PRESETS = [
-  { name: "Clockwise Movement" },
-  { name: "Vertical Movement" },
-  { name: "Horizontal Movement" },
+  { key: "activities.stretchSpeedAndGracefulness.clockwiseMovement" },
+  { key: "activities.stretchSpeedAndGracefulness.verticalMovement" },
+  { key: "activities.stretchSpeedAndGracefulness.horizontalMovement" },
 ];
 
 export default function HumanPerformanceLabAttemptScreen(){
@@ -44,11 +44,11 @@ export default function HumanPerformanceLabAttemptScreen(){
     const [graphValues, setGraphValues] = useState<number[]>([]);
     const previousMagnitude = useRef(0);
     const [time, setTime] = useState(20);
-    const [presetName, setPresetName] = useState("Clockwise Movement")
+    const [presetKey, setPresetKey] = useState("activities.stretchSpeedAndGracefulness.clockwiseMovement");
 
     interface humanPerformanceLabEntry {
         id: number;
-        name: string;
+        key: string;
         smoothnessScore: number,
         vibrations: number
     }
@@ -184,7 +184,7 @@ export default function HumanPerformanceLabAttemptScreen(){
 
         setDesigns(prev => [...prev, {
             id: Date.now() + Math.random(),
-            name: presetName,
+            key: presetKey,
             smoothnessScore: smoothness, 
             vibrations: vibrations
         }]);
@@ -192,7 +192,7 @@ export default function HumanPerformanceLabAttemptScreen(){
         if (activityContext) {
             activityContext.addExperimentLog({
                 activityKey: "stretch-speed-and-gracefulness",
-                data: { presetName, smoothness, vibrations }
+                data: { presetKey, smoothness, vibrations }
             });
         }
 
@@ -207,7 +207,7 @@ export default function HumanPerformanceLabAttemptScreen(){
 
     const handleFinish = () => {
         const results = designs.map(d => ({
-            label: `${d.name}`,
+            label: `${d.key}`,
             value: `Smoothness Score: ${d.smoothnessScore} | Vibrations Detected: ${d.vibrations}}`
         }));
         router.push({
@@ -282,13 +282,13 @@ export default function HumanPerformanceLabAttemptScreen(){
                     <PresetSelector 
                         designPresets={DESIGN_PRESETS}
                         onSelect={(preset) => {
-                            setPresetName(preset.name);
+                            setPresetKey(preset.key);
                         }}
                     />
                     <TextInput
                         style={styles.input}
-                        value={presetName}
-                        onChangeText={setPresetName}
+                        value={t(presetKey)}
+                        onChangeText={setPresetKey}
                         placeholder={"Enter Preset Name"}
                         placeholderTextColor={theme.textMuted}
                         editable={false}
@@ -303,15 +303,15 @@ export default function HumanPerformanceLabAttemptScreen(){
 
                     {designs.length > 0 && (
                         <View>
-                            <Text style={styles.actionNameLarge}>Structural Iterations</Text>
+                            <Text style={styles.actionNameLarge}>{t("attempt.structuralIterations")}</Text>
                             {designs.map((d) => (
                                 <View key={d.id} style={styles.designCard}>
                                 <View style={styles.designHeader}>
-                                    <Text style={styles.designName}>{d.name}</Text>
+                                    <Text style={styles.designName}>{t(d.key)}</Text>
                                 </View>
-                                <Text style={styles.designConfig}>Smoothness Score: {Math.floor(d.smoothnessScore * 100) / 100}</Text>
+                                <Text style={styles.designConfig}>{t("activities.stretchSpeedAndGracefulness.smoothnessScore")}: {Math.floor(d.smoothnessScore * 100) / 100}</Text>
                                 <Text style={styles.designResult}>
-                                    Vibrations Detected: {d.vibrations}
+                                    {t("activities.stretchSpeedAndGracefulness.vibrationsDetected")}: {d.vibrations}
                                 </Text>
                                 </View>
                             ))}
@@ -469,13 +469,3 @@ const createStyles = (colors: ThemeColors) => {
 
     return styles;
 }
-
-/**
- *                                  setRecordingState("idle");
-                                    setTime(20);
-                                    setVibrations(0);
-                                    setSmoothness(100);
-                                    setLargestMovement(0);
-                                    setGraphValues([]);
-                                    movementValues.current = [];
- */

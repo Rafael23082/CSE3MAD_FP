@@ -65,8 +65,8 @@ export default function BreathingResultsScreen() {
                 <View key={log.timestamp} style={styles.logItem}>
                   <Text style={styles.trialName}>{t("results.entryNumber", {number: i + 1})}</Text>
                   {d.bpm !== undefined && <Text style={styles.bpmValue}>{d.bpm} BPM</Text>}
-                  <Text style={styles.detail}>Preset: {d.presetName}</Text>
-                  {d.breaths !== undefined && <Text style={styles.detail}>Breaths: {d.breaths}</Text>}
+                  <Text style={styles.detail}>{t("results.preset")}: {t(d.presetKey)}</Text>
+                  {d.breaths !== undefined && <Text style={styles.detail}>{t("activities.breathingPaceTrainer.breathsRecorded")}: {d.breaths}</Text>}
                 </View>
               );
             })}

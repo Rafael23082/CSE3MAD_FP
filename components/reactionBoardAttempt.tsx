@@ -18,9 +18,9 @@ type ActivityResults = {
 }
 
 const DESIGN_PRESETS = [
-  { name: "Dominant Hand Tap Reaction" },
-  { name: "Non-Dominant Hand Tap Reaction" },
-  { name: "Tracing Challenge" },
+  { key: "activities.reactionBoardChallenge.dominantHand" },
+  { key: "activities.reactionBoardChallenge.nonDominantHand" },
+  { key: "activities.reactionBoardChallenge.tracingChallenge" },
 ];
 
 export default function ReactionBoardAttemptScreen(){
@@ -46,12 +46,11 @@ export default function ReactionBoardAttemptScreen(){
 
     interface reactionEntry {
         id: number;
-        name: string;
+        key: string;
         reactionTime?: number,
         tracingAccuracy?: number
     }
     const [designs, setDesigns] = useState<reactionEntry[]>([]);
-
 
     const trackingSamples = useRef<{
         fingerX: number;
@@ -63,10 +62,10 @@ export default function ReactionBoardAttemptScreen(){
 
     const activityResults = useRef<ActivityResults[]>([]);
     const [circlePosition, setCirclePosition] = useState({ x: 50, y: 50 });
-    const [presetName, setPresetName] = useState("Dominant Hand Tap Reaction");
+    const [presetKey, setPresetKey] = useState("activities.reactionBoardChallenge.dominantHand");
 
     useEffect(() => {
-        if (presetName != "Tracing Challenge") return;
+        if (presetKey != "activities.reactionBoardChallenge.tracingChallenge") return;
         if (containerSize.width === 0 || containerSize.height === 0) return;
         if (challengeState !== "ready") return;
 
@@ -102,10 +101,10 @@ export default function ReactionBoardAttemptScreen(){
         }, 16);
 
         return () => clearInterval(movementInterval);
-    }, [presetName, containerSize, challengeState]);
+    }, [presetKey, containerSize, challengeState]);
 
     useEffect(() => {
-        if (presetName != "Tracing Challenge") return;
+        if (presetKey != "activities.reactionBoardChallenge.tracingChallenge") return;
         if (challengeState !== "ready") return;
 
         const interval = setInterval(() => {
@@ -119,15 +118,15 @@ export default function ReactionBoardAttemptScreen(){
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [challengeState, presetName]);
+    }, [challengeState, presetKey]);
 
     useEffect(() => {
-        if (presetName !== "Tracing Challenge" || time !== 0 || challengeState !== "ready") return;
+        if (presetKey !== "activities.reactionBoardChallenge.tracingChallenge" || time !== 0 || challengeState !== "ready") return;
 
         const score = calculateAccuracy();
         setAccuracy(score);
         setChallengeState("finished");
-    }, [presetName, time, challengeState, activityContext]);
+    }, [presetKey, time, challengeState, activityContext]);
 
     if (!activityContext) return null;
     const { activity } = activityContext;
@@ -223,7 +222,7 @@ export default function ReactionBoardAttemptScreen(){
 
         setDesigns(prev => [...prev, {
             id: Date.now() + Math.random(),
-            name: presetName,
+            key: presetKey,
             tracingAccuracy: accuracy ?? undefined,
             reactionTime: reactionTime ?? undefined
         }]);
@@ -231,7 +230,7 @@ export default function ReactionBoardAttemptScreen(){
         if (activityContext) {
             activityContext.addExperimentLog({
                 activityKey: "reaction-board-challenge",
-                data: { presetName, accuracy, reactionTime }
+                data: { presetKey, accuracy, reactionTime }
             });
         }
 
@@ -240,14 +239,13 @@ export default function ReactionBoardAttemptScreen(){
         setAccuracy(0);
         setChallengeState("idle");
         setReactionTime(0);
-        setPresetName("Dominant Hand Tap Reaction");
         trackingSamples.current = [];
     }
 
     const handleFinish = () => {
         const results = designs.map(d => ({
-            label: `${d.name}`,
-            value: d.name == "Tracing Challenge" ? `Tracing Accuracy: ${d.tracingAccuracy} %`: `Reaction Time: ${d.reactionTime} ms`
+            label: `${d.key}`,
+            value: d.key == "activities.reactionBoardChallenge.tracingChallenge" ? `Tracing Accuracy: ${d.tracingAccuracy} %`: `Reaction Time: ${d.reactionTime} ms`
         }));
         router.push({
             pathname: "/activityResults",
@@ -263,7 +261,7 @@ export default function ReactionBoardAttemptScreen(){
                         <Text style={styles.head}>{activity.name}</Text>
                         <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
                             <Text style={styles.sectionHeader}>{t("activities.attempt")}</Text>
-                            {presetName == "Tracing Challenge" && (
+                            {presetKey == "activities.reactionBoardChallenge.tracingChallenge" && (
                                 <View style={styles.timerContainer}>
                                     <Text style={[styles.sectionHeader, {
                                         lineHeight: 20
@@ -271,16 +269,16 @@ export default function ReactionBoardAttemptScreen(){
                                 </View>
                             )}
                         </View>
-                        <Text style={[styles.actionName, {marginTop: 24}]}>{presetName == "Tracing Challenge" ? t("activities.reactionBoardChallenge.measureTracingAccuracy"): t("activities.reactionBoardChallenge.recordReactionTime")}</Text>
+                        <Text style={[styles.actionName, {marginTop: 24}]}>{presetKey == "activities.reactionBoardChallenge.tracingChallenge" ? t("activities.reactionBoardChallenge.measureTracingAccuracy"): t("activities.reactionBoardChallenge.recordReactionTime")}</Text>
                         <View style={styles.cardContainer}>
-                            {presetName !== "Tracing Challenge" ? (
+                            {presetKey !== "activities.reactionBoardChallenge.tracingChallenge" ? (
                                 <Card metric="ms" value={reactionTime == null ? "0": String(reactionTime)} maximumWidth={true} />
                             ): (
                                 <Card metric={t("activities.reactionBoardChallenge.accuracyScore")} value={`${accuracy}%`} maximumWidth={true} />
                             )}
                         </View>
-                        <Text style={styles.actionName}>{presetName == "Tracing Challenge" ? t("activities.reactionBoardChallenge.tracingZone"): t("activities.reactionBoardChallenge.reactionZone")}</Text>
-                        {presetName == "Tracing Challenge" ? (
+                        <Text style={styles.actionName}>{presetKey == "activities.reactionBoardChallenge.tracingChallenge" ? t("activities.reactionBoardChallenge.tracingZone"): t("activities.reactionBoardChallenge.reactionZone")}</Text>
+                        {presetKey == "activities.reactionBoardChallenge.tracingChallenge" ? (
                             <GestureDetector gesture={panGesture}>
                                 <View 
                                     style={styles.reactionBoxContainer}
@@ -331,7 +329,7 @@ export default function ReactionBoardAttemptScreen(){
                         <View style={styles.buttonContainer}>
                             {challengeState == "idle" && (
                                 <Button text={t("buttons.startChallenge")} action={() => {
-                                    if (presetName !== "Tracing Challenge"){
+                                    if (presetKey !== "activities.reactionBoardChallenge.tracingChallenge"){
                                         startChallenge()
                                     }else{
                                         trackingSamples.current = [];
@@ -349,13 +347,13 @@ export default function ReactionBoardAttemptScreen(){
                     <PresetSelector 
                         designPresets={DESIGN_PRESETS}
                         onSelect={(preset) => {
-                            setPresetName(preset.name);
+                            setPresetKey(preset.key);
                         }}
                     />
                     <TextInput
                         style={styles.input}
-                        value={presetName}
-                        onChangeText={setPresetName}
+                        value={t(presetKey)}
+                        onChangeText={setPresetKey}
                         placeholder={"Enter Preset Name"}
                         placeholderTextColor={theme.textMuted}
                         editable={false}
@@ -370,13 +368,13 @@ export default function ReactionBoardAttemptScreen(){
 
                     {designs.length > 0 && (
                         <View>
-                            <Text style={styles.actionNameLarge}>Structural Iterations</Text>
+                            <Text style={styles.actionNameLarge}>{t("attempt.structuralIterations")}</Text>
                             {designs.map((d) => (
                                 <View key={d.id} style={styles.designCard}>
                                 <View style={styles.designHeader}>
-                                    <Text style={styles.designName}>{d.name}</Text>
+                                    <Text style={styles.designName}>{t(d.key)}</Text>
                                 </View>
-                                <Text style={styles.designConfig}>{d.name == "Tracing Challenge" ? `Tracing Accuracy: ${d.tracingAccuracy}%`: `Reaction Time: ${d.reactionTime} ms`}</Text>
+                                <Text style={styles.designConfig}>{d.key == "activities.reactionBoardChallenge.tracingChallenge" ? `${t("activities.reactionBoardChallenge.tracingAccuracy")}: ${d.tracingAccuracy}%`: `${t("activities.reactionBoardChallenge.reactionTime")}: ${d.reactionTime} ms`}</Text>
                                 </View>
                             ))}
                             <View style={{ marginTop: 16 }}>
