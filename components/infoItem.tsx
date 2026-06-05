@@ -11,7 +11,7 @@ type infoItemProps = {
 export function InfoItem({label, value, marginTop}: infoItemProps){
     const { theme } = useTheme();
     const styles = createStyles(theme);
-
+    
     return(
         <View style={{ marginTop: marginTop ? 16: 0 }}>
           <Text style={styles.label}>{label}</Text>

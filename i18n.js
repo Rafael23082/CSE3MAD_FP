@@ -523,6 +523,10 @@ const resources = {
           limitationOfLiabilityContents: "The developer is not responsible for any damages resulting from use of this application.",
           changesToTerms: "Changes to Terms",
           changesToTermsContents: "These terms may be updated at any time without prior notice."
+      },
+      contactSupport: {
+        customerService: "Our 24x7 Customer Service",
+        writeUsAt: "Write us at"
       }
     }
   },
@@ -892,6 +896,10 @@ const resources = {
         limitationOfLiabilityContents: "開発者は、本アプリケーションの使用に起因するいかなる損害についても責任を負いません。",
         changesToTerms: "利用規約の変更",
         changesToTermsContents: "本規約は、予告なしにいつでも更新される場合があります。"
+      },
+      contactSupport: {
+        customerService: "24時間365日対応のカスタマーサービス",
+        writeUsAt: "お問い合わせ先"
       }
     }
   },
@@ -1420,6 +1428,10 @@ const resources = {
         limitationOfLiabilityContents: "Pengembang tidak bertanggung jawab atas kerugian apa pun yang timbul dari penggunaan aplikasi ini.",
         changesToTerms: "Perubahan Ketentuan",
         changesToTermsContents: "Ketentuan ini dapat diperbarui kapan saja tanpa pemberitahuan sebelumnya."
+      },
+      contactSupport: {
+        customerService: "Layanan Pelanggan 24/7 Kami",
+        writeUsAt: "Hubungi kami di"
       }
     }
   },
@@ -1938,6 +1950,10 @@ const resources = {
         limitationOfLiabilityContents: "开发人员对因使用本应用程序而导致的任何损害不承担责任。",
         changesToTerms: "条款变更",
         changesToTermsContents: "这些条款可能随时更新，恕不另行通知。"
+      },
+      contactSupport: {
+        customerService: "我们的 24×7 客户服务",
+        writeUsAt: "发送邮件至"
       }
     }
   },

@@ -2,12 +2,14 @@ import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { StyleSheet, Text, View } from "react-native";
 
-type memberCardProps = {
-    member: any,
+type cardProps={
+    label: string
+    value: string
+    Icon: React.ReactNode
     marginTop: boolean
 }
 
-export default function MemberCard({member, marginTop}: memberCardProps){
+export default function ContactSupportCard({label, value, Icon, marginTop}: cardProps){
     const {theme} = useTheme();
     const styles = createStyles(theme);
     return(
@@ -15,10 +17,12 @@ export default function MemberCard({member, marginTop}: memberCardProps){
             marginTop: marginTop ? 16: 0
         }]}>
             <View style={styles.avatar}>
-                <Text style={styles.avatarText}>{member.firstName[0].toUpperCase()}</Text>
-        </View>
-
-        <Text style={styles.name}>{member.firstName}</Text>
+                {Icon}
+            </View>
+            <View style={styles.container}>
+                <Text style={styles.label}>{label}</Text>
+                <Text style={styles.value}>{value}</Text>
+            </View>
         </View>
     );
 }
@@ -41,16 +45,23 @@ const createStyles = (colors: ThemeColors) => {
             alignItems: "center",
             marginRight: 16,
         },
-        avatarText: {
-            fontSize: 16,
-            fontWeight: "600",
-            color: "#374151",
+        label: {
+            fontFamily: "InterRegular",
+            fontSize: 14,
+            opacity: 0.7,
+            color: colors.secondary,
+            marginBottom: 8,
         },
-        name: {
+        value: {
+            fontFamily: "InterRegular",
             fontSize: 16,
-            fontWeight: "500",
             color: colors.secondary,
         },
+        container: {
+            display: "flex",
+            flexDirection: "column",
+            flex: 1
+        }
     })
     return styles;
 }
