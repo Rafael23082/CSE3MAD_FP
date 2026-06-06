@@ -274,9 +274,13 @@ export default function BreathingAttemptScreen(){
                         editable={false}
                     />
 
-                    {designs.length > 0 && (
+                    <Text style={styles.actionNameLarge}>{t("attempt.structuralIterations")}</Text>
+                    {designs.length === 0 ? (
+                        <Text style={styles.emptyState}>
+                            {t("attempt.logTrialPlaceholder")}
+                        </Text>
+                    ): (
                         <View>
-                            <Text style={styles.actionNameLarge}>{t("attempt.structuralIterations")}</Text>
                             {designs.map((d) => (
                                 <View key={d.id} style={styles.designCard}>
                                 <View style={styles.designHeader}>
@@ -449,6 +453,17 @@ const createStyles = (colors: ThemeColors) => {
             fontFamily: "PoppinsRegular",
             textDecorationLine: "underline",
             fontSize: 16
+        },
+        emptyState: {
+            backgroundColor: colors.card,
+            borderWidth: 1,
+            borderColor: colors.borderColor,
+            borderRadius: 10,
+            padding: 16,
+            fontFamily: "InterRegular",
+            fontSize: 14,
+            color: colors.textMuted,
+            textAlign: "center",
         },
     });
     return styles;

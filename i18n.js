@@ -528,7 +528,8 @@ const resources = {
       attempt: {
         newTrial: "New Trial",
         designPresets: "Design Presets",
-        structuralIterations: "Structural Iterations"
+        structuralIterations: "Structural Iterations",
+        logTrialPlaceholder: "No trials logged yet. Complete a challenge and tap \"Log Trial\" to record your results."
       }
     }
   },
@@ -956,7 +957,8 @@ const resources = {
       attempt: {
         newTrial: "新しい試行",
         designPresets: "デザインプリセット",
-        structuralIterations: "構造の反復試行"
+        structuralIterations: "構造の反復試行",
+        logTrialPlaceholder: "まだ試行は記録されていません。チャレンジを完了し、「試行を記録」をタップして結果を保存してください。"
       }
     }
   },
@@ -1490,7 +1492,8 @@ const resources = {
       attempt: {
         newTrial: "Uji Coba Baru",
         designPresets: "Preset Desain",
-        structuralIterations: "Iterasi Struktural"
+        structuralIterations: "Iterasi Struktural",
+        logTrialPlaceholder: "Belum ada percobaan yang dicatat. Selesaikan tantangan lalu ketuk \"Catat Percobaan\" untuk menyimpan hasil Anda."
       }
     }
   },
@@ -2014,7 +2017,8 @@ const resources = {
       attempt: {
         newTrial: "新测试",
         designPresets: "设计预设",
-        structuralIterations: "结构迭代"
+        structuralIterations: "结构迭代",
+        logTrialPlaceholder: "尚未记录任何试验。请完成挑战，然后点击“记录试验”以保存您的结果。"
       }
     }
   },
