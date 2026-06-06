@@ -1,13 +1,13 @@
+import Button from "@/components/button";
 import { ActivityContext } from "@/context/ActivityContext";
 import { useTheme } from "@/hooks/useTheme";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import React, { useCallback, use, useState } from "react";
+import React, { use, useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Button from "@/components/button";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const RATING_KEY = '@stemm_rating_';
 
@@ -65,11 +65,11 @@ export default function EarthquakeResultsScreen() {
                 <View key={log.timestamp} style={styles.logItem}>
                   <Text style={styles.trialName}>{t("results.entryNumber", {number: i + 1})}</Text>
                   <View style={styles.grid}>
-                    {d.folds !== undefined && <Text style={styles.detail}>Folds: {d.folds}</Text>}
-                    {d.pillars !== undefined && <Text style={styles.detail}>Pillars: {d.pillars}</Text>}
-                    {d.observed !== undefined && <Text style={styles.detail}>Sway: {d.observed} cm</Text>}
-                    {d.peakAccel !== undefined && <Text style={styles.detail}>Peak: {d.peakAccel.toFixed(2)} g</Text>}
-                    {d.predictedMovement !== undefined && <Text style={styles.detail}>Predicted: {d.predictedMovement} cm</Text>}
+                    {d.folds !== undefined && <Text style={styles.detail}>{t("activities.earthquakeResistantStructure.folds")}: {d.folds}</Text>}
+                    {d.pillars !== undefined && <Text style={styles.detail}>{t("activities.earthquakeResistantStructure.pillars")}: {d.pillars}</Text>}
+                    {d.observed !== undefined && <Text style={styles.detail}>{t("activities.earthquakeResistantStructure.sway")}: {d.observed} cm</Text>}
+                    {d.peakAccel !== undefined && <Text style={styles.detail}>{t("activities.earthquakeResistantStructure.peak")}: {d.peakAccel.toFixed(2)} g</Text>}
+                    {d.predictedMovement !== undefined && <Text style={styles.detail}>{t("activities.earthquakeResistantStructure.predicted")}: {d.predictedMovement} cm</Text>}
                   </View>
                 </View>
               );

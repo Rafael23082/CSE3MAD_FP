@@ -55,7 +55,7 @@ const createStyles = (colors: ThemeColors) => {
             fontSize: 18,
             color: colors.secondary,
             marginBottom: 16,
-            marginTop: 32
+            marginTop: 24
         },
         presetsToggle: { 
             padding: 16,

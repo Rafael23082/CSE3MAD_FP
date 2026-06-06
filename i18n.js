@@ -274,7 +274,15 @@ const resources = {
             structuralEffectPlaceholder: "Your observation",
             realWorldLink: "How does this relate to real buildings?",
             realWorldLinkPlaceholder: "Your connection"
-          }
+          },
+          designPreset1: "4 folds + 4 pillars",
+          designPreset2: "10 folds + 4 pillars",
+          designPreset3: "3 folds + 6 pillars",
+          folds: "Folds",
+          pillars: "Pillars",
+          sway: "Sway",
+          peak: "Peak",
+          predicted: "Predicted"
         },
         
         stretchSpeedAndGracefulness: {
@@ -707,7 +715,15 @@ const resources = {
             { name: "紙および段ボール", description: "構造プラットフォームおよび防振層の構築に使用される主要材料。" },
             { name: "はさみ", description: "特定の扇形の形状やサイズに合わせて、素材を正確に切断することができます。" },
             { name: "粘着テープ", description: "対象物をテーブルに固定し、倒れることなく曲げられるようにします。" }
-          ]
+          ],
+          designPreset1: "4つ折り + 4つの柱",
+          designPreset2: "10つ折り + 4つの柱",
+          designPreset3: "3つ折り + 6つの柱",
+          folds: "折り目",
+          pillars: "支柱",
+          sway: "揺れ",
+          peak: "最大値",
+          predicted: "予測",
         },
         
         stretchSpeedAndGracefulness: {
@@ -1241,7 +1257,15 @@ const resources = {
             structuralEffectPlaceholder: "Pengamatan Anda",
             realWorldLink: "Bagaimana ini terkait dengan bangunan nyata?",
             realWorldLinkPlaceholder: "Hubungan Anda"
-          }
+          },
+          designPreset1: "4 lipatan + 4 pilar",
+          designPreset2: "10 lipatan + 4 pilar",
+          designPreset3: "3 lipatan + 6 pilar",
+          folds: "Lipatan",
+          pillars: "Pilar",
+          sway: "Goyangan",
+          peak: "Puncak",
+          predicted: "Prediksi",
         },
 
         stretchSpeedAndGracefulness: {
@@ -1766,7 +1790,15 @@ const resources = {
             structuralEffectPlaceholder: "您的观察",
             realWorldLink: "这与真实建筑有何关系？",
             realWorldLinkPlaceholder: "您的联系"
-          }
+          },
+          designPreset1: "4 折 + 4 柱",
+          designPreset2: "10 折 + 4 柱",
+          designPreset3: "3 折 + 6 柱",
+          folds: "折痕",
+          pillars: "支柱",
+          sway: "摆动",
+          peak: "峰值",
+          predicted: "预测",
         },
 
         stretchSpeedAndGracefulness: {

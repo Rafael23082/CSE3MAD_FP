@@ -1,5 +1,4 @@
 import { AuthContext } from "@/context/AuthContext";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { usePathname, useRouter } from "expo-router";
 import { use, useEffect } from "react";
 import { ActivityIndicator, View } from "react-native";
@@ -8,19 +7,6 @@ export default function Index() {
     const context = use(AuthContext);
     const router = useRouter();
     const pathname = usePathname();
-
-    useEffect(() => {
-        const clearAllData = async () => {
-        try {
-            await AsyncStorage.clear();
-            console.log("AsyncStorage successfully cleared completely.");
-        } catch (error) {
-            console.error("Failed to clear AsyncStorage:", error);
-        }
-        };
-
-        clearAllData();
-    }, [])
 
     useEffect(() => {
         if (!context || context.loading) return;

@@ -485,7 +485,7 @@ const createStyles = (colors: ThemeColors) => {
             fontSize: 18,
             color: colors.secondary,
             marginBottom: 16,
-            marginTop: 32
+            marginTop: 24
         },
         designCard: { backgroundColor: colors.card, padding: 12, borderRadius: 10, marginBottom: 8, borderWidth: 1, borderColor: colors.borderColor },
         designHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },

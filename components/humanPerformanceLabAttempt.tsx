@@ -460,7 +460,7 @@ const createStyles = (colors: ThemeColors) => {
             fontSize: 18,
             color: colors.secondary,
             marginBottom: 16,
-            marginTop: 32
+            marginTop: 24
         },
         sectionHeaderSmall: { fontFamily: "PoppinsRegular", fontSize: 18, color: colors.secondary, marginBottom: 12 },
         designCard: { backgroundColor: colors.card, padding: 12, borderRadius: 10, marginBottom: 8, borderWidth: 1, borderColor: colors.borderColor },

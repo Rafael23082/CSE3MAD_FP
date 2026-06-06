@@ -12,9 +12,9 @@ import Button from "./button";
 import Card from "./card";
 
 const DESIGN_PRESETS = [
-  { name: "4 folds + 4 pillars", folds: 4, pillars: 4 },
-  { name: "10 folds + 4 pillars", folds: 10, pillars: 4 },
-  { name: "3 folds + 6 pillars", folds: 3, pillars: 6 },
+  { key: "activities.earthquakeResistantStructure.designPreset1", folds: 4, pillars: 4 },
+  { key: "activities.earthquakeResistantStructure.designPreset2", folds: 10, pillars: 4 },
+  { key: "activities.earthquakeResistantStructure.designPreset3", folds: 3, pillars: 6 },
 ];
 
 export default function EarthquakeAttemptScreen() {
@@ -24,10 +24,13 @@ export default function EarthquakeAttemptScreen() {
   const { t } = useTranslation();
 
   const activityContext = useContext(ActivityContext);
-  if (!activityContext || !activityContext.activity) return null;
+  if (!activityContext || !activityContext.activity) {
+    console.log("Activity Context Null!");
+    return null;
+  }
 
   // PDF: Accelerometer-based tracking
-  const [isShaking, setIsShaking] = useState(false);
+  const [recordingState, setRecordingState] = useState<"idle" | "recording" | "completed">("idle");
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [peakAccel, setPeakAccel] = useState(0);
   const [liveAccel, setLiveAccel] = useState(0);
@@ -37,6 +40,7 @@ export default function EarthquakeAttemptScreen() {
   // PDF: Fold/Pillar configuration
   const [foldCount, setFoldCount] = useState("4");
   const [pillarCount, setPillarCount] = useState("4");
+  const [designKey, setDesignKey] = useState("");
   const [designName, setDesignName] = useState("");
   const [predictedMovement, setPredictedMovement] = useState("");
   const [observedCm, setObservedCm] = useState("");
@@ -52,8 +56,8 @@ export default function EarthquakeAttemptScreen() {
     wasRight: string;
   }
   const [designs, setDesigns] = useState<EqEntry[]>([]);
-
   const [showPresets, setShowPresets] = useState(false);
+  const [hasEditedName, setHasEditedName] = useState(false);
 
   // PDF: Accelerometer subscription
   const _subscribe = () => {
@@ -81,17 +85,22 @@ export default function EarthquakeAttemptScreen() {
 
   // PDF: Start/stop vibration + accelerometer tracking
   const triggerShake = () => {
-    if (isShaking) {
-      // Stop vibration simulation - tracking continues until user stops
-      setIsShaking(false);
+    if (recordingState === "recording") {
       _unsubscribe();
-      if (shakeInterval.current) clearInterval(shakeInterval.current);
-      shakeInterval.current = null;
+
+      if (shakeInterval.current) {
+        clearInterval(shakeInterval.current);
+        shakeInterval.current = null;
+      }
+
+      setRecordingState("completed");
     } else {
-      setIsShaking(true);
       setPeakAccel(0);
+      setLiveAccel(0);
       magnitudeHistory.current = [];
+
       _subscribe();
+      setRecordingState("recording");
     }
   };
 
@@ -106,24 +115,32 @@ export default function EarthquakeAttemptScreen() {
   const logDesign = () => {
     const obs = parseFloat(observedCm) || 0;
     const pred = parseFloat(predictedMovement) || 0;
-    const name = designName.trim() || `Design ${designs.length + 1}`;
     const sway = obs || estimateSway();
     const wasRight = pred > 0 ? (Math.abs(pred - sway) <= 2 ? "Yes" : "No") : "";
 
-    setDesigns(prev => [...prev, {
-      name,
+    let displayName = designName.trim();
+
+    if (!displayName) {
+      if (designKey && !hasEditedName) {
+        displayName = t(designKey);
+      }
+    }
+    const newEntry: EqEntry = {
+      name: displayName,
       folds: foldCount,
       pillars: pillarCount,
       predicted: predictedMovement,
       observed: String(sway),
       peakAccel,
       wasRight,
-    }]);
+    };
+
+    setDesigns(prev => [...prev, newEntry]);
 
     if (activityContext) {
       activityContext.addExperimentLog({
         activityKey: "earthquake-resistant-structure",
-        data: { name, folds: foldCount, pillars: pillarCount, predicted: pred, observed: sway, peakAccel }
+        data: { designName: displayName, folds: foldCount, pillars: pillarCount, predicted: pred, observed: sway, peakAccel }
       });
     }
     setDesignName("");
@@ -132,6 +149,7 @@ export default function EarthquakeAttemptScreen() {
     setFoldCount("4");
     setPillarCount("4");
     setPeakAccel(0);
+    setRecordingState("idle");
   };
 
   const handleFinish = () => {
@@ -150,25 +168,25 @@ export default function EarthquakeAttemptScreen() {
       <KeyboardAvoidingView style={{ flex: 1 }} behavior="height">
         <ScrollView contentContainerStyle={styles.container}>
           <Text style={styles.head}>{t("activities.earthquakeResistantStructure.name")}</Text>
-
+          <Text style={styles.sectionHeader}>{t("activities.attempt")}</Text>
           {/* PDF: Accelerometer Live Display */}
-          <Text style={styles.sectionHeader}>{t("activities.earthquakeResistantStructure.accelerometerData")}</Text>
+          <Text style={[styles.actionName, { marginTop: 24 }]}>{t("activities.earthquakeResistantStructure.accelerometerData")}</Text>
           <View style={styles.cardRow}>
-            <Card metric="Live" value={liveAccel.toFixed(2)} maximumWidth={false} />
-            <Card metric="Peak" value={peakAccel.toFixed(2)} maximumWidth={false} />
+            <Card metric="Live" value={liveAccel.toFixed(1)} maximumWidth={false} />
+            <Card metric="Peak" value={peakAccel.toFixed(1)} maximumWidth={false} />
           </View>
 
-          {/* PDF: Vibration control */}
-          <Button
-            text={isShaking ? t("activities.earthquakeResistantStructure.stopVibration") : t("activities.earthquakeResistantStructure.startVibration")}
-            action={triggerShake}
-          />
-          {isShaking && (
-            <Text style={styles.shakingHint}>Place phone on structure and shake the table</Text>
+          {recordingState === "recording" && (
+            <Text style={styles.shakingHint}>
+              {t("activities.earthquakeResistantStructure.recordingHint")}
+            </Text>
           )}
 
           {/* PDF: Design Configuration */}
-          <Text style={styles.sectionHeader}>New Trial</Text>
+          <Text style={[styles.sectionHeader, {
+            marginTop: 24,
+            paddingBottom: 16
+          }]}>New Trial</Text>
 
           {/* Design Presets */}
           <Pressable style={styles.presetsToggle} onPress={() => setShowPresets(!showPresets)}>
@@ -182,9 +200,9 @@ export default function EarthquakeAttemptScreen() {
                 <Pressable
                   key={i}
                   style={styles.presetItem}
-                  onPress={() => { setFoldCount(String(preset.folds)); setPillarCount(String(preset.pillars)); setDesignName(preset.name); setShowPresets(false); }}
+                  onPress={() => { setFoldCount(String(preset.folds)); setPillarCount(String(preset.pillars)); setDesignKey(preset.key); setShowPresets(false); setDesignName(t(preset.key)); setHasEditedName(false); }}
                 >
-                  <Text style={styles.presetName}>{preset.name}</Text>
+                  <Text style={styles.presetName}>{t(preset.key)}</Text>
                   <Text style={styles.presetMeta}>{preset.folds} folds, {preset.pillars} pillars</Text>
                 </Pressable>
               ))}
@@ -194,7 +212,10 @@ export default function EarthquakeAttemptScreen() {
           <TextInput
             style={styles.input}
             value={designName}
-            onChangeText={setDesignName}
+            onChangeText={(text) => {
+              setDesignName(text);
+              setHasEditedName(true);
+            }}
             placeholder={t("activities.earthquakeResistantStructure.designNamePlaceholder")}
             placeholderTextColor={theme.textMuted}
           />
@@ -227,7 +248,7 @@ export default function EarthquakeAttemptScreen() {
             placeholderTextColor={theme.textMuted}
           />
           <TextInput
-            style={styles.input}
+            style={[styles.input, {marginBottom: 0}]}
             value={observedCm}
             onChangeText={setObservedCm}
             keyboardType="numeric"
@@ -235,14 +256,15 @@ export default function EarthquakeAttemptScreen() {
             placeholderTextColor={theme.textMuted}
           />
 
-          <View style={styles.buttonContainer}>
-            <Button text="Log Design" action={logDesign} />
-          </View>
+          <Text style={[styles.sectionHeader, {marginTop: 24, marginBottom: 16}]}>{t("attempt.structuralIterations")}</Text>
 
           {/* PDF: Design History */}
-          {designs.length > 0 && (
-            <View style={styles.designsList}>
-              <Text style={styles.sectionHeader}>Structural Iterations</Text>
+          {designs.length === 0 ? (
+              <Text style={styles.emptyState}>
+                  {t("attempt.logTrialPlaceholder")}
+              </Text>
+          ): (
+            <View>
               {designs.map((d, i) => (
                 <View key={i} style={styles.designCard}>
                   <View style={styles.designHeader}>
@@ -251,48 +273,89 @@ export default function EarthquakeAttemptScreen() {
                       Peak: {d.peakAccel.toFixed(2)}g
                     </Text>
                   </View>
-                  <Text style={styles.designConfig}>{d.folds} folds, {d.pillars} pillars</Text>
+                  <Text style={styles.designConfig}>{d.folds} {t("activities.earthquakeResistantStructure.folds")}, {d.pillars} {t("activities.earthquakeResistantStructure.pillars")}</Text>
                   <Text style={styles.designResult}>
                     Pred: {d.predicted || "-"}cm | Obs: {d.observed}cm |
                     {d.wasRight ? (d.wasRight === "Yes" ? " ✓ Right" : " ✗ Wrong") : ""}
                   </Text>
                 </View>
               ))}
-              <View style={{ marginTop: 16 }}>
-                <Button text={t("buttons.finishActivity")} action={handleFinish} />
-              </View>
             </View>
           )}
+          <View style={styles.buttonContainer}>
+            {recordingState != "completed" && (
+              <Button
+                text={recordingState == "recording" ? t("activities.earthquakeResistantStructure.stopVibration") : t("activities.earthquakeResistantStructure.startVibration")}
+                action={triggerShake}
+              />
+           )}
+            {recordingState == "completed" && (
+              <Button text="Log Design" action={logDesign} />
+            )}
+        </View>
+        <Pressable
+            onPress={handleFinish}
+            style={({ pressed }) => pressed && { opacity: 0.7 }}>
+            <Text style={styles.skipText}>{t("buttons.finishActivity")}</Text>
+        </Pressable>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
-}
+};
 
-const createStyles = (colors: ThemeColors) => {
+function createStyles(colors: ThemeColors){
   const styles = StyleSheet.create({
     outerContainer: { flex: 1, backgroundColor: colors.backgroundColor },
     container: { padding: 24, flexGrow: 1 },
     head: { fontFamily: "PoppinsBold", fontSize: 22, color: colors.danger, marginBottom: 24 },
-    sectionHeader: { fontFamily: "PoppinsRegular", fontSize: 18, color: colors.secondary, marginVertical: 12 },
+    sectionHeader: {
+        fontFamily: "PoppinsRegular",
+        fontSize: 20,
+        color: colors.secondary,
+    },
     cardRow: { flexDirection: "row", gap: 12, marginBottom: 8 },
     shakingHint: { fontFamily: "InterRegular", fontSize: 12, color: colors.primary, textAlign: "center", marginTop: 8, fontStyle: "italic" },
-    presetsToggle: { padding: 10, backgroundColor: colors.card, borderRadius: 8, marginBottom: 8, borderWidth: 1, borderColor: colors.borderColor },
+    presetsToggle: { padding: 10, backgroundColor: colors.card, borderRadius: 8, marginBottom: 16, borderWidth: 1, borderColor: colors.borderColor },
     presetsToggleText: { color: colors.primary, fontWeight: "bold", fontSize: 14 },
-    presetsList: { backgroundColor: colors.card, borderRadius: 8, marginBottom: 10, borderWidth: 1, borderColor: colors.borderColor },
+    presetsList: { backgroundColor: colors.card, borderRadius: 8, marginBottom: 16, borderWidth: 1, borderColor: colors.borderColor },
     presetItem: { padding: 10, borderBottomWidth: 1, borderBottomColor: colors.borderColor },
     presetName: { color: colors.secondary, fontWeight: "bold", fontSize: 14 },
     presetMeta: { color: colors.textMuted, fontSize: 12, marginTop: 2 },
-    input: { backgroundColor: colors.surfaceContainer, color: colors.secondary, padding: 14, borderRadius: 8, marginBottom: 10, borderWidth: 1, borderColor: colors.borderColor, fontSize: 14 },
+    input: { backgroundColor: colors.surfaceContainer, color: colors.secondary, padding: 14, borderRadius: 8, marginBottom: 16, borderWidth: 1, borderColor: colors.borderColor, fontSize: 14 },
     configRow: { flexDirection: "row", gap: 12 },
-    buttonContainer: { marginTop: 12 },
-    designsList: { marginTop: 24 },
+    buttonContainer: { marginTop: 32 },
     designCard: { backgroundColor: colors.card, padding: 12, borderRadius: 10, marginBottom: 8, borderWidth: 1, borderColor: colors.borderColor },
     designHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
     designName: { fontFamily: "PoppinsRegular", fontSize: 14, color: colors.secondary },
     designAccel: { fontWeight: "bold", fontSize: 13 },
     designConfig: { fontFamily: "InterRegular", fontSize: 11, color: colors.textMuted, marginTop: 2 },
     designResult: { fontFamily: "InterRegular", fontSize: 11, color: colors.textMuted, marginTop: 2 },
+    emptyState: {
+        backgroundColor: colors.card,
+        borderWidth: 1,
+        borderColor: colors.borderColor,
+        borderRadius: 10,
+        padding: 16,
+        fontFamily: "InterRegular",
+        fontSize: 14,
+        color: colors.textMuted,
+        textAlign: "center",
+    },
+    actionName: {
+        fontFamily: "PoppinsRegular",
+        fontSize: 18,
+        color: colors.secondary,
+        marginVertical: 16
+    },
+    skipText: {
+        textAlign: "center",
+        marginTop: 16,
+        color: colors.secondary,
+        fontFamily: "PoppinsRegular",
+        textDecorationLine: "underline",
+        fontSize: 16
+    },
   });
   return styles;
 };
