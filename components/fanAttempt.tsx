@@ -1,6 +1,7 @@
 import { ActivityContext } from "@/context/ActivityContext";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
+import { calculateFanForce, degreesToRadians } from "@/utils/physics";
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter } from "expo-router";
 import React, { use, useState } from "react";
@@ -9,6 +10,7 @@ import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInpu
 import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "./button";
 import Card from "./card";
+import AdBanner from "./AdBanner";
 
 // PDF: Material stiffness coefficients from the document
 const MATERIALS = [
@@ -56,10 +58,11 @@ export default function FanAttemptScreen() {
 
   if (!activityContext || !activityContext.activity) return null;
 
-  // PDF: Force calculation F ≈ k × θ
+  // PDF: Force calculation F ≈ k × θ using physics.ts
   const kValue = selectedMaterial.k;
-  const theta = (parseFloat(angle) || 0) * (Math.PI / 180);
-  const force = kValue * theta;
+  const angleDeg = parseFloat(angle) || 0;
+  const theta = degreesToRadians(angleDeg);
+  const force = calculateFanForce(kValue, angleDeg);
 
   const logTrial = () => {
     const ang = parseFloat(angle) || 0;
@@ -212,6 +215,8 @@ export default function FanAttemptScreen() {
           <View style={styles.buttonContainer}>
             <Button text={t("buttons.logTrial")} action={logTrial} />
           </View>
+
+          <AdBanner />
 
           {/* PDF: Write-up logged trials */}
           {trials.length > 0 && (

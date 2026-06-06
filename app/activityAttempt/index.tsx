@@ -33,9 +33,10 @@ export default function ActivityAttemptMainScreen(){
                 return <FanAttemptScreen />;
             case "earthquake-resistant-structure":
                 return <EarthquakeAttemptScreen />;
-            default: 
-                return <Text>{t("common.notImplemented")}</Text>
-    }}
+            default:
+                return <Text>{t("common.notImplemented")}</Text>;
+        }
+    };
 
     return renderScreen();
 }

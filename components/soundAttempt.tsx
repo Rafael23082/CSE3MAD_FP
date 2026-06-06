@@ -1,13 +1,16 @@
 import { ActivityContext } from "@/context/ActivityContext";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
+import { getDecibelRisk } from "@/utils/physics";
 import { Audio } from 'expo-av';
+import * as Location from "expo-location";
 import { useRouter } from "expo-router";
 import React, { use, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "./button";
+import AdBanner from "./AdBanner";
 
 // PDF: Hearing damage risk table
 const HEARING_RISK_TABLE = [
@@ -39,6 +42,7 @@ export default function SoundAttemptScreen() {
   const [prediction, setPrediction] = useState<"Louder" | "Softer" | "">("");
   const [showActions, setShowActions] = useState(false);
   const [showRiskScale, setShowRiskScale] = useState(false);
+  const [isLogging, setIsLogging] = useState(false);
 
   useEffect(() => {
     return () => { if (recording) recording.stopAndUnloadAsync().catch(() => {}); };
@@ -76,34 +80,55 @@ export default function SoundAttemptScreen() {
     }
   };
 
-  // PDF: Determine risk level
-  const getRiskLevel = (db: number) => {
-    if (db <= 60) return "Safe";
-    if (db <= 85) return "Moderate";
-    if (db <= 100) return "Dangerous";
-    return "Critical";
-  };
 
-  const logReading = () => {
+  const logReading = async () => {
     if (!location.trim() || !selectedAction) return;
-    const entry = {
-      id: Date.now() + Math.random(),
-      action: selectedAction,
-      location: location.trim(),
-      db: liveDb,
-      prediction: prediction || "",
-      wasRight: prediction ? (prediction === "Louder" && liveDb > 70) || (prediction === "Softer" && liveDb <= 70) ? "✓" : "✗" : "",
-    };
-    setReadings(prev => [entry, ...prev]);
-    if (activityContext) {
-      activityContext.addExperimentLog({
-        activityKey: "sound-pollution-hunter",
-        data: { action: selectedAction, location: location.trim(), db: liveDb, risk: getRiskLevel(liveDb) }
-      });
+    setIsLogging(true);
+    try {
+      let gps: Location.LocationObject | null = null;
+      try {
+        const permission = await Location.requestForegroundPermissionsAsync();
+        if (permission.granted) {
+          gps = await Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.Balanced,
+          });
+        } else {
+          Alert.alert("Location unavailable", "Reading saved without GPS coordinates.");
+        }
+      } catch (error) {
+        console.warn("GPS capture failed:", error);
+        Alert.alert("Location unavailable", "Reading saved without GPS coordinates.");
+      }
+
+      const entry = {
+        id: Date.now() + Math.random(),
+        action: selectedAction,
+        location: location.trim(),
+        db: liveDb,
+        prediction: prediction || "",
+        wasRight: prediction ? (prediction === "Louder" && liveDb > 70) || (prediction === "Softer" && liveDb <= 70) ? "✓" : "✗" : "",
+      };
+      setReadings(prev => [entry, ...prev]);
+      if (activityContext) {
+        activityContext.addExperimentLog({
+          activityKey: "sound-pollution-hunter",
+          data: {
+            action: selectedAction,
+            location: location.trim(),
+            db: liveDb,
+            risk: getDecibelRisk(liveDb),
+            latitude: gps?.coords.latitude,
+            longitude: gps?.coords.longitude,
+            accuracy: gps?.coords.accuracy ?? null,
+          }
+        });
+      }
+      setLocation("");
+      setPrediction("");
+      setSelectedAction("");
+    } finally {
+      setIsLogging(false);
     }
-    setLocation("");
-    setPrediction("");
-    setSelectedAction("");
   };
 
   const handleFinish = () => {
@@ -136,7 +161,7 @@ export default function SoundAttemptScreen() {
               backgroundColor: liveDb > 85 ? theme.danger + "30" : theme.tertiary + "30",
               color: liveDb > 85 ? theme.danger : theme.tertiary
             }]}>
-              Risk: {getRiskLevel(liveDb)}
+              Risk: {getDecibelRisk(liveDb)}
             </Text>
           )}
 
@@ -194,8 +219,15 @@ export default function SoundAttemptScreen() {
           />
 
           <View style={styles.buttonContainer}>
-            <Button text={t("buttons.logReading")} action={logReading} />
+            <Button
+              text={t("buttons.logReading")}
+              action={logReading}
+              disabled={isLogging}
+              loading={isLogging}
+            />
           </View>
+
+          <AdBanner />
 
           {/* PDF: Hearing Risk Scale - toggle */}
           <Pressable style={styles.riskToggle} onPress={() => setShowRiskScale(!showRiskScale)}>

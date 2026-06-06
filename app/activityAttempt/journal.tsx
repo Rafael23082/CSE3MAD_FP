@@ -1,11 +1,16 @@
 import { ActivityContext } from '@/context/ActivityContext';
 import { AuthContext } from '@/context/AuthContext';
-import { db } from '@/firebase';
 import { useTheme } from '@/hooks/useTheme';
 import { ThemeColors } from '@/theme/colors';
+import {
+    ActivityLocation,
+    saveActivityResultLocally,
+    saveActivityResultToFirestore,
+    updateSyncStatus,
+    retryPendingSyncs,
+} from '@/utils/activityPersistence';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { addDoc, collection } from 'firebase/firestore';
-import React, { use, useMemo, useState } from 'react';
+import React, { use, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
@@ -25,6 +30,10 @@ export default function JournalScreen() {
         [activityContext?.experimentLogs, activityContext?.activity?.key]
     );
 
+    useEffect(() => {
+        retryPendingSyncs();
+    }, []);
+
     if (!activityContext || !activityContext.activity) return null;
 
     const { activity, experimentLogs, clearExperimentLogs } = activityContext;
@@ -40,14 +49,40 @@ export default function JournalScreen() {
         }
     };
 
-    const getMetricValue = (log: any) => {
+    interface LogWithData {
+        activityKey: string;
+        timestamp: number;
+        data?: Record<string, unknown>;
+    }
+
+    const toNumber = (value: unknown) => typeof value === 'number' ? value : 0;
+
+    const getMetricValue = (log: LogWithData) => {
         switch(activity.key) {
-            case 'parachute-drop-challenge': return log.data?.vFinal || 0;
-            case 'sound-pollution-hunter': return log.data?.db || 0;
-            case 'hand-fan-challenge': return log.data?.force || 0;
-            case 'earthquake-resistant-structure': return log.data?.observed || 0;
+            case 'parachute-drop-challenge': return toNumber(log.data?.vFinal);
+            case 'sound-pollution-hunter': return toNumber(log.data?.db);
+            case 'hand-fan-challenge': return toNumber(log.data?.force);
+            case 'earthquake-resistant-structure': return toNumber(log.data?.observed);
             default: return 0;
         }
+    };
+
+    const getSubmissionLocation = (logs: LogWithData[]): ActivityLocation | null => {
+        for (const log of logs) {
+            const latitude = log.data?.latitude;
+            const longitude = log.data?.longitude;
+            const accuracy = log.data?.accuracy;
+
+            if (typeof latitude === 'number' && typeof longitude === 'number') {
+                return {
+                    latitude,
+                    longitude,
+                    accuracy: typeof accuracy === 'number' || accuracy === null ? accuracy : null,
+                };
+            }
+        }
+
+        return null;
     };
 
     const handleDeleteTrial = (timestamp: number) => {
@@ -86,14 +121,26 @@ export default function JournalScreen() {
 
         setIsSubmitting(true);
         try {
-            await addDoc(collection(db, "submissions"), {
+            const payload = {
                 userId: auth?.user?.uid || "anonymous",
                 teamId: team?.teamId || "",
                 activityKey: activity.key,
+                logs: currentLogs.map((log) => ({
+                    activityKey: log.activityKey,
+                    timestamp: log.timestamp,
+                    data: { ...(log.data ?? {}) },
+                })),
                 reflection,
-                logs: currentLogs,
-                submittedAt: new Date()
-            });
+                location: getSubmissionLocation(currentLogs),
+            };
+
+            const localId = await saveActivityResultLocally(payload);
+            try {
+                await saveActivityResultToFirestore(payload);
+                await updateSyncStatus(localId, 'synced');
+            } catch (e) {
+                console.warn('Firestore save failed, queued for retry:', e);
+            }
             Alert.alert(t("journal.submitSuccess"));
             setReflection("");
             setTeamConfirmed(false);

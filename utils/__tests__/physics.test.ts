@@ -1,134 +1,214 @@
 import {
-  GRAVITY_MPS2,
-  amplitudeToDb,
-  calcAcceleration,
-  calcAverageDb,
-  calcDragForce,
-  calcFanForce,
-  calcFinalVelocity,
-  calcGForceBounce,
-  calcGForceNoBounce,
-  calcMeanReactionTime,
-  calcNetForce,
-  calcReactionImprovement,
-  calcReboundVelocity,
-  calcWeight,
-  calculateAcceleration,
-  calculateDragForce,
-  calculateFanForce,
-  calculateGForce,
-  calculateNetForce,
-  calculateReboundVelocity,
-  calculateVelocity,
-  calculateWeight,
-  degreesToRadians,
-  formatPhysicsValue,
-  getDecibelRisk,
-  getGForceRisk,
-  rateReactionTime,
+  calculateSafetyScore,
+  calculateNPI,
+  getNPILevel,
+  getFlexibilityLabel,
+  calculateStabilityScore,
+  calculateDampingRatio,
+  getDampingLabel,
 } from "../physics";
 
-describe("core physics helpers", () => {
-  it("calculates velocity", () => {
-    expect(calculateVelocity(10, 2)).toBeCloseTo(5, 4);
+describe("calculateSafetyScore", () => {
+  it("returns Excellent for zero values (perfect)", () => {
+    const result = calculateSafetyScore(0, 0, 0);
+    expect(result.percent).toBe(0);
+    expect(result.rating).toBe("Excellent");
   });
 
-  it("calculates acceleration", () => {
-    expect(calculateAcceleration(5, 2)).toBeCloseTo(2.5, 4);
+  it("returns Poor for max values", () => {
+    const result = calculateSafetyScore(100, 100, 100);
+    expect(result.percent).toBeGreaterThanOrEqual(80);
+    expect(result.rating).toBe("Poor");
   });
 
-  it("calculates weight", () => {
-    expect(calculateWeight(0.2)).toBeCloseTo(1.96, 4);
+  it("returns Fair for mid-range values", () => {
+    const result = calculateSafetyScore(2.5, 10, 0.5);
+    // velocityNorm=0.5, gNorm=0.5, accuracyNorm=0.5 → rawScore=0.5 → percent=50 → Fair
+    expect(result.rating).toBe("Fair");
   });
 
-  it("calculates net force", () => {
-    expect(calculateNetForce(0.2, 4)).toBeCloseTo(0.8, 4);
+  it("returns Poor around the Poor boundary", () => {
+    const result = calculateSafetyScore(3, 15, 0.6);
+    // velocityNorm=0.6, gNorm=0.75, accuracyNorm=0.6 → rawScore=0.63 → percent=63 → Poor
+    expect(result.rating).toBe("Poor");
   });
 
-  it("calculates drag force", () => {
-    expect(calculateDragForce(1.96, 0.8)).toBeCloseTo(1.16, 4);
+  it("returns Good for low (safe) values", () => {
+    // percent < 40 → Good
+    const result = calculateSafetyScore(1, 5, 0.2);
+    expect(result.rating).toBe("Good");
   });
 
-  it("calculates g-force", () => {
-    expect(calculateGForce(2, 0.05)).toBeCloseTo(4.0816, 4);
-  });
-
-  it("calculates rebound velocity", () => {
-    expect(calculateReboundVelocity(0.15)).toBeCloseTo(1.47, 2);
-  });
-
-  it("keeps the gravity constant stable", () => {
-    expect(GRAVITY_MPS2).toBe(9.8);
-  });
-});
-
-describe("compatibility aliases", () => {
-  it("keeps legacy velocity and force helpers working", () => {
-    expect(calcFinalVelocity(10, 2)).toBeCloseTo(5, 4);
-    expect(calcAcceleration(5, 2)).toBeCloseTo(2.5, 4);
-    expect(calcWeight(0.2)).toBeCloseTo(1.96, 4);
-    expect(calcNetForce(0.2, 4)).toBeCloseTo(0.8, 4);
-    expect(calcDragForce(1.96, 0.8)).toBeCloseTo(1.16, 4);
-    expect(calcGForceNoBounce(2, 0.05)).toBeCloseTo(4.0816, 4);
-    expect(calcGForceBounce(2, 1.47, 0.02)).toBeCloseTo(17.7, 1);
-    expect(calcReboundVelocity(0.15)).toBeCloseTo(1.47, 2);
-    expect(calcFanForce(0.05, 30)).toBeCloseTo(0.026, 2);
+  it("computes weighted components correctly", () => {
+    const result = calculateSafetyScore(5, 20, 1);
+    // velocityNorm = min(5/5, 1) = 1, gNorm = min(20/20, 1) = 1, accuracyNorm = min(1/1, 1) = 1
+    // rawScore = 0.4*1 + 0.4*1 + 0.2*1 = 1.0
+    // percent = 100
+    expect(result.rawScore).toBeCloseTo(1.0, 5);
+    expect(result.percent).toBeCloseTo(100, 5);
+    expect(result.rating).toBe("Poor");
   });
 });
 
-describe("risk and formatting helpers", () => {
-  it("classifies g-force risk", () => {
-    expect(getGForceRisk(3).level).toBe("Safe");
-    expect(getGForceRisk(7).level).toBe("Moderate");
-    expect(getGForceRisk(20).level).toBe("Serious");
-    expect(getGForceRisk(40).level).toBe("Severe");
-    expect(getGForceRisk(100).level).toBe("Critical");
+describe("calculateNPI", () => {
+  it("returns 0 for zero dB", () => {
+    expect(calculateNPI(0)).toBe(0);
   });
 
-  it("classifies sound levels", () => {
-    expect(getDecibelRisk(30)).toBe("Safe");
-    expect(getDecibelRisk(70)).toBe("Moderate");
-    expect(getDecibelRisk(90)).toBe("Dangerous");
-    expect(getDecibelRisk(110)).toBe("Critical");
+  it("returns 0 for negative dB", () => {
+    expect(calculateNPI(-10)).toBe(0);
   });
 
-  it("converts amplitude to db", () => {
-    expect(amplitudeToDb(1)).toBe(0);
-    expect(amplitudeToDb(0)).toBe(-Infinity);
+  it("returns ~0.588 for 50 dB", () => {
+    const npi = calculateNPI(50);
+    expect(npi).toBeCloseTo(0.588, 2);
   });
 
-  it("calculates average db", () => {
-    expect(calcAverageDb([0.1, 0.2, 0.15])).toBeLessThan(0);
-    expect(calcAverageDb([])).toBe(-Infinity);
+  it("returns 1.0 at 85 dB (threshold boundary)", () => {
+    expect(calculateNPI(85)).toBeCloseTo(1.0, 5);
   });
 
-  it("formats values", () => {
-    expect(formatPhysicsValue(3.14159)).toBe("3.14");
-    expect(formatPhysicsValue(3.14159, 3)).toBe("3.142");
+  it("returns > 1 for loud sounds", () => {
+    expect(calculateNPI(100)).toBeGreaterThan(1);
+    expect(calculateNPI(120)).toBeCloseTo(1.412, 2);
   });
 });
 
-describe("reaction helpers", () => {
-  it("calculates mean reaction time", () => {
-    expect(calcMeanReactionTime([100, 200, 300])).toBe(200);
+describe("getNPILevel", () => {
+  it("returns Safe for NPI < 0.5", () => {
+    expect(getNPILevel(0)).toBe("Safe");
+    expect(getNPILevel(0.49)).toBe("Safe");
   });
 
-  it("calculates reaction improvement", () => {
-    expect(calcReactionImprovement(300, 200)).toBeCloseTo(33.3333, 3);
+  it("returns Warning for NPI between 0.5 and 1.0", () => {
+    expect(getNPILevel(0.5)).toBe("Warning");
+    expect(getNPILevel(0.75)).toBe("Warning");
+    expect(getNPILevel(1.0)).toBe("Warning");
   });
 
-  it("rates reaction time", () => {
-    expect(rateReactionTime(150).level).toBe("Excellent");
-    expect(rateReactionTime(700).level).toBe("Needs Practice");
+  it("returns Unsafe for NPI > 1.0", () => {
+    expect(getNPILevel(1.01)).toBe("Unsafe");
+    expect(getNPILevel(2)).toBe("Unsafe");
   });
 });
 
-describe("angles", () => {
-  it("converts degrees to radians", () => {
-    expect(degreesToRadians(180)).toBeCloseTo(Math.PI, 5);
+describe("getFlexibilityLabel", () => {
+  it("returns High for k < 0.2", () => {
+    expect(getFlexibilityLabel(0)).toBe("High");
+    expect(getFlexibilityLabel(0.05)).toBe("High");
+    expect(getFlexibilityLabel(0.19)).toBe("High");
   });
 
-  it("aliases the fan force helper", () => {
-    expect(calculateFanForce(0.05, 30)).toBeCloseTo(calcFanForce(0.05, 30), 6);
+  it("returns Medium for 0.2 <= k < 1.0", () => {
+    expect(getFlexibilityLabel(0.2)).toBe("Medium");
+    expect(getFlexibilityLabel(0.5)).toBe("Medium");
+    expect(getFlexibilityLabel(0.99)).toBe("Medium");
+  });
+
+  it("returns Low for k >= 1.0", () => {
+    expect(getFlexibilityLabel(1.0)).toBe("Low");
+    expect(getFlexibilityLabel(2.5)).toBe("Low");
+    expect(getFlexibilityLabel(100)).toBe("Low");
+  });
+});
+
+describe("calculateStabilityScore", () => {
+  it("returns 100 for zero peak acceleration", () => {
+    const result = calculateStabilityScore(0);
+    expect(result.score).toBe(100);
+    expect(result.rating).toBe("Excellent");
+    expect(result.passed).toBe(true);
+  });
+
+  it("scores 60 at peakAccel = 2 (high but passing)", () => {
+    const result = calculateStabilityScore(2);
+    expect(result.score).toBe(60);
+    expect(result.rating).toBe("Fair");
+    expect(result.passed).toBe(false);
+  });
+
+  it("passes at boundary score 70 (peakAccel = 1.5)", () => {
+    const result = calculateStabilityScore(1.5);
+    expect(result.score).toBe(70);
+    expect(result.passed).toBe(true);
+  });
+
+  it("fails just below boundary (peakAccel = 1.51)", () => {
+    const result = calculateStabilityScore(1.51);
+    expect(result.score).toBe(69.8);
+    expect(result.passed).toBe(false);
+  });
+
+  it("clamps to 0 for very high acceleration", () => {
+    const result = calculateStabilityScore(100);
+    expect(result.score).toBe(0);
+    expect(result.rating).toBe("Poor");
+    expect(result.passed).toBe(false);
+  });
+
+  it("returns Good for peakAccel near 0.5", () => {
+    const result = calculateStabilityScore(0.5);
+    // score = 100 - 0.5*20 = 90
+    expect(result.score).toBe(90);
+    expect(result.rating).toBe("Excellent");
+    expect(result.passed).toBe(true);
+  });
+});
+
+describe("calculateDampingRatio", () => {
+  it("returns 1 for empty arrays", () => {
+    expect(calculateDampingRatio([], [])).toBe(1);
+  });
+
+  it("returns 1 for zero initial readings", () => {
+    expect(calculateDampingRatio([0, 0, 0], [5, 10])).toBe(1);
+    expect(calculateDampingRatio([0], [5])).toBe(1);
+  });
+
+  it("returns 1 when initial and final peaks are equal", () => {
+    expect(calculateDampingRatio([1, 2, 3], [1, 2, 3])).toBe(1);
+    expect(calculateDampingRatio([5, 10, 8], [3, 10, 7])).toBe(1);
+  });
+
+  it("returns < 1 when final peak is smaller (good damping)", () => {
+    const ratio = calculateDampingRatio([10, 8, 6], [2, 3, 1]);
+    expect(ratio).toBeCloseTo(0.3, 5);
+  });
+
+  it("returns > 1 when final peak is larger (amplification)", () => {
+    const ratio = calculateDampingRatio([2, 3, 1], [10, 8, 6]);
+    expect(ratio).toBeCloseTo(3.333, 3);
+  });
+
+  it("handles single-element arrays", () => {
+    expect(calculateDampingRatio([5], [2])).toBe(0.4);
+  });
+});
+
+describe("getDampingLabel", () => {
+  it("returns Excellent for ratio < 0.1", () => {
+    expect(getDampingLabel(0)).toBe("Excellent");
+    expect(getDampingLabel(0.09)).toBe("Excellent");
+  });
+
+  it("returns Good for ratio < 0.3", () => {
+    expect(getDampingLabel(0.1)).toBe("Good");
+    expect(getDampingLabel(0.29)).toBe("Good");
+  });
+
+  it("returns Moderate for ratio < 0.5", () => {
+    expect(getDampingLabel(0.3)).toBe("Moderate");
+    expect(getDampingLabel(0.49)).toBe("Moderate");
+  });
+
+  it("returns Poor for ratio < 0.8", () => {
+    expect(getDampingLabel(0.5)).toBe("Poor");
+    expect(getDampingLabel(0.79)).toBe("Poor");
+  });
+
+  it("returns None for ratio >= 0.8", () => {
+    expect(getDampingLabel(0.8)).toBe("None");
+    expect(getDampingLabel(1.0)).toBe("None");
+    expect(getDampingLabel(5)).toBe("None");
   });
 });

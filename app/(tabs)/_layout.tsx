@@ -6,10 +6,12 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TabLayout() {
   const { isDark } = useTheme();
   const {t} = useTranslation();
+  const insets = useSafeAreaInsets();
 
   return (
     <Tabs
@@ -21,6 +23,13 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: Colors[isDark ? 'dark' : 'light'].background,
           borderTopColor: Colors[isDark ? 'dark' : 'light'].background,
+          height: 60 + insets.bottom,
+          paddingBottom: insets.bottom,
+          paddingTop: 6,
+        },
+        tabBarLabelStyle: {
+          fontSize: 11,
+          marginTop: 2,
         },
       }}
     >

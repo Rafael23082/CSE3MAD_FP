@@ -46,3 +46,6 @@ firebase.js
 
 # test coverage
 coverage/
+
+# local env files
+.env

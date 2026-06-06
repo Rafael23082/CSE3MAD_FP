@@ -1,6 +1,7 @@
 import { ActivityContext } from "@/context/ActivityContext";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
+import { calculateVelocity, calculateAcceleration, calculateDragForce, getGForceRisk } from "@/utils/physics";
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter } from "expo-router";
 import React, { use, useEffect, useRef, useState } from "react";
@@ -9,8 +10,8 @@ import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInpu
 import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "./button";
 import Card from "./card";
+import AdBanner from "./AdBanner";
 
-// G-Force risk assessment from PDF
 const GFORCE_RISK = [
   { range: "1-5 g", examples: "Standing up quickly, elevators", risk: "No injury", colorClass: "tertiary" },
   { range: "5-10 g", examples: "Hard falls while running", risk: "Possible bruising", colorClass: "tertiary" },
@@ -35,14 +36,16 @@ export default function ParachuteAttemptScreen() {
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [trialCount, setTrialCount] = useState(0);
 
-  // PDF: New inputs for g-force and write-up
   const [contactTime, setContactTime] = useState("");
   const [didBounce, setDidBounce] = useState(false);
   const [surfaceArea, setSurfaceArea] = useState("");
   const [predictedTime, setPredictedTime] = useState("");
   const [easiestDesign, setEasiestDesign] = useState("");
 
-  // PDF: Write-up tracking
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordedVideoUri, setRecordedVideoUri] = useState<string | null>(null);
+  const cameraRef = useRef<any>(null);
+
   interface ParachuteWriteUpEntry {
     id: number;
     trialNumber: string;
@@ -86,45 +89,50 @@ export default function ParachuteAttemptScreen() {
   };
   const resetTimer = () => { setIsTimerRunning(false); setTimeValue(0); };
 
+  const startRecording = async () => {
+    if (!cameraRef.current) return;
+    try {
+      setIsRecording(true);
+      const result = await cameraRef.current.recordAsync({ maxDuration: 60 });
+      if (result?.uri) {
+        setRecordedVideoUri(result.uri);
+      }
+    } catch (err) {
+      console.warn("Recording failed:", err);
+    } finally {
+      setIsRecording(false);
+    }
+  };
+
+  const stopRecording = () => {
+    if (cameraRef.current && isRecording) {
+      cameraRef.current.stopRecording();
+      setIsRecording(false);
+    }
+  };
+
   const height = parseFloat(dropHeight) || 1.5;
   const mass = parseFloat(toyMass) || 0.15;
 
-  // Physics calculations from PDF
-  const vFinal = timeValue > 0 ? height / timeValue : 0;           // Step 3: Final velocity
-  const accel = timeValue > 0 ? vFinal / timeValue : 0;            // Step 4: Acceleration
-  const weight = mass * 9.8;                                        // Step 6: Weight (downward force)
-  const netForce = mass * accel;                                    // Net force (F = ma)
-  const dragForce = Math.max(0, weight - netForce);                 // Step 6: Drag force
+  const vFinal = calculateVelocity(height, timeValue);
+  const accel = calculateAcceleration(vFinal, timeValue);
+  const weight = mass * 9.8;
+  const netForce = mass * accel;
+  const dragForce = calculateDragForce(weight, netForce);
 
-  // PDF G-Force Calculation
   const ct = parseFloat(contactTime) || 0;
   let gForce = 0;
   if (vFinal > 0 && ct > 0) {
-    // PDF Formula: Case 1 - No bounce: Δv = v, g-force = (Δv / t) / 9.8
     if (!didBounce) {
-      const deltaV = vFinal;
-      gForce = (deltaV / ct) / 9.8;
+      gForce = (vFinal / ct) / 9.8;
     } else {
-      // PDF Formula: Case 2 - Bounce: Δv = v + v_rebound
-      // Use time to max height after bounce to find rebound velocity
-      // For simplicity, estimate rebound as 0.7 * impact speed
       const reboundVelocity = vFinal * 0.7;
-      const deltaV = vFinal + reboundVelocity;
-      gForce = (deltaV / ct) / 9.8;
+      gForce = ((vFinal + reboundVelocity) / ct) / 9.8;
     }
   }
 
-  // G-Force risk level
-  const getGForceRisk = () => {
-    if (gForce <= 5) return GFORCE_RISK[0];
-    if (gForce <= 10) return GFORCE_RISK[1];
-    if (gForce <= 30) return GFORCE_RISK[2];
-    if (gForce <= 50) return GFORCE_RISK[3];
-    return GFORCE_RISK[4];
-  };
-  const gForceRisk = getGForceRisk();
+  const gForceRisk = gForce > 0 ? getGForceRisk(gForce) : null;
 
-  // Trial name based on count (from PDF write-up table)
   const getTrialName = (count: number) => {
     if (count === 0) return t("activities.parachuteDropChallenge.baselineLabel");
     return `${t("activities.parachuteDropChallenge.prototype")} ${count}`;
@@ -133,13 +141,15 @@ export default function ParachuteAttemptScreen() {
   const logExperiment = () => {
     const newCount = trialCount + 1;
     setTrialCount(newCount);
+    const accuracyError = predictedTime ? Math.abs(parseFloat(predictedTime) - timeValue) : 0;
+    const wasRight = predictedTime ? (accuracyError < 0.2 ? "Yes" : "No") : "";
     const entry: ParachuteWriteUpEntry = {
       id: Date.now() + Math.random(),
       trialNumber: getTrialName(trialCount),
       surfaceArea: surfaceArea || "0",
       predictedTime: predictedTime || "0",
       recordedTime: timeValue.toFixed(2),
-      wasRight: predictedTime ? (Math.abs(parseFloat(predictedTime) - timeValue) < 0.2 ? "Yes" : "No") : "",
+      wasRight,
       contactTime: contactTime || "0",
       didBounce,
       gForce,
@@ -149,7 +159,7 @@ export default function ParachuteAttemptScreen() {
     if (activityContext) {
       activityContext.addExperimentLog({
         activityKey: "parachute-drop-challenge",
-        data: { vFinal, accel, weight, netForce, dragForce, gForce, time: timeValue, dropHeight: height, toyMass: mass, surfaceArea, contactTime, didBounce, trialName: getTrialName(trialCount) }
+        data: { vFinal, accel, weight, netForce, dragForce, gForce, time: timeValue, dropHeight: height, toyMass: mass, surfaceArea, contactTime, didBounce, trialName: getTrialName(trialCount), predictedTime: predictedTime || "0", accuracyError }
       });
     }
     resetTimer();
@@ -160,7 +170,6 @@ export default function ParachuteAttemptScreen() {
   };
 
   const handleFinish = () => {
-    // Include write-up entries in results
     const allResults = [
       ...writeUpEntries.map(e => ({ label: `${e.trialNumber} — Time`, value: `${e.recordedTime}s` })),
       ...writeUpEntries.filter(e => e.gForce > 0).map(e => ({ label: `${e.trialNumber} — G-Force`, value: `${e.gForce.toFixed(1)} g` })),
@@ -170,7 +179,11 @@ export default function ParachuteAttemptScreen() {
     }
     router.push({
       pathname: "/activityResults",
-      params: { results: JSON.stringify(allResults), activityKey: "parachute-drop-challenge" }
+      params: {
+        results: JSON.stringify(allResults),
+        activityKey: "parachute-drop-challenge",
+        videoUri: recordedVideoUri || "",
+      }
     });
   };
 
@@ -182,7 +195,6 @@ export default function ParachuteAttemptScreen() {
         <ScrollView contentContainerStyle={styles.container}>
           <Text style={styles.head}>{t("activities.parachuteDropChallenge.name")}</Text>
 
-          {/* Camera Toggle */}
           <Pressable style={styles.cameraToggle} onPress={() => setIsCameraActive(!isCameraActive)}>
             <Text style={styles.cameraToggleText}>
               {isCameraActive ? t("buttons.closeCamera") : t("buttons.openCamera")}
@@ -190,11 +202,25 @@ export default function ParachuteAttemptScreen() {
           </Pressable>
           {isCameraActive && (
             <View style={styles.cameraBox}>
-              <CameraView style={{ flex: 1 }} facing="back" />
+              <CameraView ref={cameraRef} style={{ flex: 1 }} facing="back" mode="video" />
+            </View>
+          )}
+          {isCameraActive && (
+            <View style={styles.recordRow}>
+              <Pressable
+                style={[styles.recordBtn, { backgroundColor: isRecording ? theme.danger : theme.primary }]}
+                onPress={isRecording ? stopRecording : startRecording}
+              >
+                <Text style={styles.recordBtnText}>
+                  {isRecording ? t("buttons.stop") : t("buttons.recordVideo")}
+                </Text>
+              </Pressable>
+              {recordedVideoUri && (
+                <Text style={styles.recordedText}>Video saved</Text>
+              )}
             </View>
           )}
 
-          {/* Timer Section */}
           <Text style={styles.sectionHeader}>{t("activities.attempt")}</Text>
           <View style={styles.cardRow}>
             <Card metric="Time" value={`${timeValue.toFixed(2)}s`} maximumWidth={false} />
@@ -210,13 +236,11 @@ export default function ParachuteAttemptScreen() {
             </Pressable>
           </View>
 
-          {/* PDF: Parameters */}
           <Text style={styles.sectionHeader}>{t("activities.parachuteDropChallenge.parameters")}</Text>
           <TextInput style={styles.input} value={dropHeight} onChangeText={setDropHeight} keyboardType="numeric" placeholder={t("activities.parachuteDropChallenge.dropHeightPlaceholder")} placeholderTextColor={theme.textMuted} />
           <TextInput style={styles.input} value={toyMass} onChangeText={setToyMass} keyboardType="numeric" placeholder={t("activities.parachuteDropChallenge.toyMassPlaceholder")} placeholderTextColor={theme.textMuted} />
           <TextInput style={styles.input} value={surfaceArea} onChangeText={setSurfaceArea} keyboardType="numeric" placeholder={t("activities.parachuteDropChallenge.surfaceAreaPlaceholder")} placeholderTextColor={theme.textMuted} />
 
-          {/* PDF: Physics Analytics */}
           <Text style={styles.sectionHeader}>{t("activities.parachuteDropChallenge.analytics")}</Text>
           <View style={styles.analyticsGrid}>
             <Card metric="Velocity" value={`${vFinal.toFixed(2)} m/s`} maximumWidth={false} />
@@ -225,7 +249,6 @@ export default function ParachuteAttemptScreen() {
             <Card metric="Drag" value={`${dragForce.toFixed(2)} N`} maximumWidth={false} />
           </View>
 
-          {/* PDF: G-Force Analysis Section */}
           <Text style={styles.sectionHeader}>{t("activities.parachuteDropChallenge.gForce")}</Text>
           <Text style={styles.gForceTip}>{t("activities.parachuteDropChallenge.gForceTip")}</Text>
 
@@ -250,11 +273,10 @@ export default function ParachuteAttemptScreen() {
           {ct > 0 && vFinal > 0 && (
             <View style={styles.gForceDisplay}>
               <Card metric={t("activities.parachuteDropChallenge.gForceResult")} value={`${gForce.toFixed(1)} g`} maximumWidth={true} />
-              <Card metric={t("activities.parachuteDropChallenge.gForceRisk")} value={gForceRisk.risk} maximumWidth={true} />
+              <Card metric={t("activities.parachuteDropChallenge.gForceRisk")} value={gForceRisk?.description || ""} maximumWidth={true} />
             </View>
           )}
 
-          {/* PDF: G-Force Risk Scale */}
           <Text style={styles.subSectionHeader}>{t("activities.parachuteDropChallenge.gForceRiskScale")}</Text>
           <View style={styles.riskScale}>
             {GFORCE_RISK.map((item, i) => (
@@ -265,7 +287,6 @@ export default function ParachuteAttemptScreen() {
             ))}
           </View>
 
-          {/* PDF: Write-up Prediction Section */}
           <Text style={styles.sectionHeader}>{t("activities.parachuteDropChallenge.writeUpPrediction")}</Text>
           <TextInput
             style={styles.input}
@@ -276,7 +297,6 @@ export default function ParachuteAttemptScreen() {
             placeholderTextColor={theme.textMuted}
           />
 
-          {/* Logged entries display - PDF write-up table */}
           {writeUpEntries.length > 0 && (
             <View style={styles.writeUpTable}>
               <Text style={styles.tableTitle}>{t("journal.recordedTrials")}</Text>
@@ -297,7 +317,6 @@ export default function ParachuteAttemptScreen() {
             </View>
           )}
 
-          {/* PDF: Write-up reflection */}
           <Text style={styles.subSectionHeader}>{t("activities.parachuteDropChallenge.writeUpPrediction")}</Text>
           <TextInput
             style={styles.input}
@@ -315,6 +334,8 @@ export default function ParachuteAttemptScreen() {
               </View>
             )}
           </View>
+
+          <AdBanner />
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -331,6 +352,10 @@ const createStyles = (colors: ThemeColors) => {
     cameraToggle: { backgroundColor: colors.surfaceContainer, padding: 12, borderRadius: 8, marginBottom: 12, alignItems: "center" },
     cameraToggleText: { color: colors.primary, fontWeight: "bold", fontSize: 14 },
     cameraBox: { height: 200, borderRadius: 10, overflow: "hidden", marginBottom: 12 },
+    recordRow: { flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 12 },
+    recordBtn: { flex: 1, padding: 12, borderRadius: 8, alignItems: "center" },
+    recordBtnText: { color: colors.buttonText, fontWeight: "bold", fontSize: 14 },
+    recordedText: { color: colors.tertiary, fontWeight: "bold", fontSize: 12 },
     cardRow: { flexDirection: "row", gap: 12, marginBottom: 8 },
     timerRow: { flexDirection: "row", gap: 12, marginBottom: 16 },
     timerBtn: { flex: 1, padding: 16, borderRadius: 8, alignItems: "center" },

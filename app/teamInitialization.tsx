@@ -11,7 +11,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { use, useState } from "react";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { useTranslation } from "react-i18next";
-import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function TeamInitializationPage() {
@@ -111,6 +111,19 @@ export default function TeamInitializationPage() {
 
             if (teamData.inviteCode != code){
                 setError("Invalid invite code");
+                return;
+            }
+
+            // Grade-level validation
+            const userDocRef = doc(db, "users", user!.uid);
+            const userDoc = await getDoc(userDocRef);
+            const userData = userDoc.data();
+            const userGrade = userData?.grade;
+            if (userGrade && String(userGrade) !== String(teamData.gradeLevel)) {
+                Alert.alert(
+                  "Grade Mismatch",
+                  `Your grade (${userGrade}) does not match this team's grade level (Grade ${teamData.gradeLevel}). You can only join teams within the same grade.`,
+                );
                 return;
             }
 
