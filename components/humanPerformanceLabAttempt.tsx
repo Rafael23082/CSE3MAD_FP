@@ -6,7 +6,7 @@ import { Accelerometer } from 'expo-sensors';
 import { Subscription } from "expo-sensors/build/Pedometer";
 import { use, useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Alert, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "./button";
 import Card from "./card";
@@ -264,21 +264,6 @@ export default function HumanPerformanceLabAttemptScreen(){
 
                     </View>
 
-                    {recordingState != "completed" && (
-                        <View style={styles.buttonContainer}>
-                            {recordingState === "idle" && (
-                                <Button text={t("buttons.startRecording")} action={() => {
-                                        setCountdown(3);
-                                    }}
-                                />
-                            )}
-
-                            {recordingState === "recording" && (
-                                <Button text={t("buttons.recording")} action={() => {}} />
-                            )}
-                        </View>
-                    )}
-
                     <PresetSelector 
                         designPresets={DESIGN_PRESETS}
                         onSelect={(preset) => {
@@ -294,13 +279,6 @@ export default function HumanPerformanceLabAttemptScreen(){
                         editable={false}
                     />
 
-                    <View style={styles.buttonContainer}>
-                        <Button 
-                            text={t("buttons.logTrial")}
-                            action={logDesign}
-                        />
-                    </View>
-
                     {designs.length > 0 && (
                         <View>
                             <Text style={styles.actionNameLarge}>{t("attempt.structuralIterations")}</Text>
@@ -315,11 +293,33 @@ export default function HumanPerformanceLabAttemptScreen(){
                                 </Text>
                                 </View>
                             ))}
-                            <View style={{ marginTop: 16 }}>
-                                <Button text={t("buttons.finishActivity")} action={handleFinish} />
-                            </View>
                         </View>
                     )}
+
+                    <View style={styles.buttonContainer}>
+                        {recordingState === "idle" && (
+                            <Button text={t("buttons.startRecording")} action={() => {
+                                    setCountdown(3);
+                                }}
+                            />
+                        )}
+
+                        {recordingState === "recording" && (
+                            <Button text={t("buttons.recording")} action={() => {}} />
+                        )}
+
+                        {recordingState === "completed" && (
+                            <Button 
+                                text={t("buttons.logTrial")}
+                                action={logDesign}
+                            />
+                        )}
+                    </View>
+                    <Pressable
+                        onPress={handleFinish}
+                        style={({ pressed }) => pressed && { opacity: 0.7 }}>
+                        <Text style={styles.skipText}>{t("buttons.finishActivity")}</Text>
+                    </Pressable>
                 </ScrollView>
             </KeyboardAvoidingView>
 
@@ -465,6 +465,14 @@ const createStyles = (colors: ThemeColors) => {
         designAccel: { fontWeight: "bold", fontSize: 13 },
         designConfig: { fontFamily: "InterRegular", fontSize: 11, color: colors.textMuted, marginTop: 2 },
         designResult: { fontFamily: "InterRegular", fontSize: 11, color: colors.textMuted, marginTop: 2 },
+        skipText: {
+            textAlign: "center",
+            marginTop: 16,
+            color: colors.secondary,
+            fontFamily: "PoppinsRegular",
+            textDecorationLine: "underline",
+            fontSize: 16
+        },
     });
 
     return styles;

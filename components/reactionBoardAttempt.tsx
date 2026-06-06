@@ -325,25 +325,6 @@ export default function ReactionBoardAttemptScreen(){
                             </View>
                         )}
                     </View>
-                    {challengeState != "finished" && (
-                        <View style={styles.buttonContainer}>
-                            {challengeState == "idle" && (
-                                <Button text={t("buttons.startChallenge")} action={() => {
-                                    if (presetKey !== "activities.reactionBoardChallenge.tracingChallenge"){
-                                        startChallenge()
-                                    }else{
-                                        trackingSamples.current = [];
-                                        setTime(10);
-                                        setAccuracy(0);
-                                        setChallengeState("ready");
-                                    }
-                                }} />
-                            )}
-                            {(challengeState == "waiting" || challengeState == "ready") && (
-                                <Button text={challengeState == "waiting" ? t("buttons.waitForSignal"): t("buttons.tapNow")} action={() => {}} />
-                            )}
-                        </View>
-                    )}
                     <PresetSelector 
                         designPresets={DESIGN_PRESETS}
                         onSelect={(preset) => {
@@ -359,13 +340,6 @@ export default function ReactionBoardAttemptScreen(){
                         editable={false}
                     />
 
-                    <View style={styles.buttonContainer}>
-                        <Button 
-                            text={t("buttons.logTrial")}
-                            action={logDesign}
-                        />
-                    </View>
-
                     {designs.length > 0 && (
                         <View>
                             <Text style={styles.actionNameLarge}>{t("attempt.structuralIterations")}</Text>
@@ -377,11 +351,37 @@ export default function ReactionBoardAttemptScreen(){
                                 <Text style={styles.designConfig}>{d.key == "activities.reactionBoardChallenge.tracingChallenge" ? `${t("activities.reactionBoardChallenge.tracingAccuracy")}: ${d.tracingAccuracy}%`: `${t("activities.reactionBoardChallenge.reactionTime")}: ${d.reactionTime} ms`}</Text>
                                 </View>
                             ))}
-                            <View style={{ marginTop: 16 }}>
-                                <Button text={t("buttons.finishActivity")} action={handleFinish} />
-                            </View>
                         </View>
                     )}
+
+                    <View style={styles.buttonContainer}>
+                        {challengeState == "idle" && (
+                            <Button text={t("buttons.startChallenge")} action={() => {
+                                if (presetKey !== "activities.reactionBoardChallenge.tracingChallenge"){
+                                    startChallenge()
+                                }else{
+                                    trackingSamples.current = [];
+                                    setTime(10);
+                                    setAccuracy(0);
+                                    setChallengeState("ready");
+                                }
+                            }} />
+                        )}
+                        {(challengeState == "waiting" || challengeState == "ready") && (
+                            <Button text={challengeState == "waiting" ? t("buttons.waitForSignal"): t("buttons.tapNow")} action={() => {}} />
+                        )}
+                        {challengeState == "finished" && (
+                            <Button 
+                                text={t("buttons.logTrial")}
+                                action={logDesign}
+                            />
+                        )}
+                    </View>
+                    <Pressable
+                        onPress={handleFinish}
+                        style={({ pressed }) => pressed && { opacity: 0.7 }}>
+                        <Text style={styles.skipText}>{t("buttons.finishActivity")}</Text>
+                    </Pressable>
                 </ScrollView>
             </KeyboardAvoidingView>
         </SafeAreaView>
@@ -488,6 +488,14 @@ const createStyles = (colors: ThemeColors) => {
         designAccel: { fontWeight: "bold", fontSize: 13 },
         designConfig: { fontFamily: "InterRegular", fontSize: 11, color: colors.textMuted, marginTop: 2 },
         designResult: { fontFamily: "InterRegular", fontSize: 11, color: colors.textMuted, marginTop: 2 },
+        skipText: {
+            textAlign: "center",
+            marginTop: 16,
+            color: colors.secondary,
+            fontFamily: "PoppinsRegular",
+            textDecorationLine: "underline",
+            fontSize: 16
+        },
     });
     return styles;
 }
