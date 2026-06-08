@@ -425,7 +425,7 @@ const createStyles = (colors: ThemeColors) =>
       backgroundColor: colors.card,
     },
     backButtonText: {
-      color: colors.textPrimary,
+      color: colors.secondary,
       fontWeight: "600",
     },
     panel: {
@@ -480,7 +480,7 @@ const createStyles = (colors: ThemeColors) =>
       letterSpacing: 0.8,
     },
     sensorLive: {
-      color: colors.textPrimary,
+      color: colors.secondary,
       fontSize: 14,
       lineHeight: 20,
     },
@@ -504,7 +504,7 @@ const createStyles = (colors: ThemeColors) =>
       gap: 8,
     },
     snapshotItem: {
-      color: colors.textPrimary,
+      color: colors.secondary,
       fontSize: 14,
     },
   });

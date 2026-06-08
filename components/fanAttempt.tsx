@@ -1,11 +1,13 @@
 import { ActivityContext } from "@/context/ActivityContext";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
+import { calculateFanForce, degreesToRadians } from "@/utils/physics";
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter } from "expo-router";
 import React, { use, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import AdBanner from "./AdBanner";
 import Button from "./button";
 import Card from "./card";
 
@@ -55,10 +57,11 @@ export default function FanAttemptScreen() {
 
   if (!activityContext || !activityContext.activity) return null;
 
-  // PDF: Force calculation F ≈ k × θ
+  // PDF: Force calculation F ≈ k × θ using physics.ts
   const kValue = selectedMaterial.k;
-  const theta = (parseFloat(angle) || 0) * (Math.PI / 180);
-  const force = kValue * theta;
+  const angleDeg = parseFloat(angle) || 0;
+  const theta = degreesToRadians(angleDeg);
+  const force = calculateFanForce(kValue, angleDeg);
 
   const logTrial = () => {
     const ang = parseFloat(angle) || 0;
@@ -210,6 +213,10 @@ export default function FanAttemptScreen() {
         <View style={styles.buttonContainer}>
           <Button text={t("buttons.logTrial")} action={logTrial} />
         </View>
+
+          <AdBanner />
+
+          <AdBanner />
 
         {/* PDF: Write-up logged trials */}
         {trials.length > 0 && (

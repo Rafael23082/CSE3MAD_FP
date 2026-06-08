@@ -52,7 +52,8 @@ const resources = {
         edit: "Edit",
         save: "Save",
         openCamera: "Open Camera",
-        closeCamera: "Close Camera"
+        closeCamera: "Close Camera",
+        recordVideo: "Record Video"
       },
       landing: {
         slogan: "Experiment. Measure. Improve."
@@ -102,7 +103,18 @@ const resources = {
           "Capture data using your phone's sensors and upload results",
           "Refine your design and climb the leaderboard"
         ],
-        seeActivityRequirement: "Complete an activity to see it here"
+        seeActivityRequirement: "Complete an activity to see it here",
+        progress: "Progress",
+        progressSummary: "You've completed {{count}} of 7 activities",
+        bestActivity: "Best Activity",
+        activityCompletion: "Activity Completion",
+        scoresOverview: "Scores Overview",
+        submissionHistory: "Submission History",
+        noSubmissionsYet: "No submissions yet",
+        noScoresYet: "Start completing activities to see your scores",
+        viewFullProgress: "View Full Progress",
+        completedActivities: "Completed Activities",
+        latestScore: "Latest Score"
       },
       activities: {
         selectActivity: "Select an Activity",
@@ -465,6 +477,9 @@ const resources = {
         gForce: "G-Force",
         time: "Time",
         surfaceArea: "Surface Area",
+        submitToLeaderboard: "Submit to Leaderboard",
+        submitted: "Submitted ✓",
+        leaderboard: "Leaderboard",
         backToActivities: "Back to Activities",
         parachuteTheory: "How Parachutes Work\n\nWhen you drop a toy without a parachute, gravity pulls it straight down. The only force acting on it is gravity, so it accelerates at 9.8 m/s² until it hits the ground. A parachute adds drag force by increasing surface area. The drag force pushes upward against gravity, slowing the fall. The larger the canopy, the more air resistance, and the slower the descent. The g-force experienced on landing depends on how quickly the object stops. A longer contact time (softer landing) reduces g-force, while a hard, sudden stop increases it dramatically.\n\nKey formulas:\n• Velocity: v = d / t\n• Acceleration: a = v / t\n• Weight: W = m × 9.8\n• Net Force: F = m × a\n• Drag Force: F_drag = W - F_net\n• G-force (no bounce): (v / contactTime) / 9.8\n• G-force (bounce): ((v + v_rebound) / contactTime) / 9.8",
         soundTheory: "How Sound Pollution Works\n\nSound is measured in decibels (dB), a logarithmic scale. Every 10 dB increase represents a tenfold increase in sound intensity. Normal conversation is about 60 dB, while a rock concert can exceed 120 dB. Prolonged exposure above 85 dB can cause hearing damage. The louder the sound and the longer the exposure, the greater the risk of permanent hearing loss.\n\nKey concepts:\n• Decibel (dB): Unit of sound intensity\n• Logarithmic scale: 20 dB is 10× more intense than 10 dB\n• Safe: 0-60 dB (whisper, quiet room)\n• Warning: 60-85 dB (busy traffic)\n• Dangerous: 85+ dB (machinery, concerts)",
@@ -474,7 +489,24 @@ const resources = {
         reactionTheory: "How Reaction Time Works\n\nReaction time is the interval between a stimulus and your response. It involves your senses detecting the stimulus, your brain processing the information, and your nerves signaling your muscles to act. The average human reaction time to a visual stimulus is about 200-250 milliseconds.\n\nKey factors:\n• Dominant hand: Typically 10-20ms faster than non-dominant\n• Age: Reaction time peaks in early 20s\n• Fatigue: Slows reaction time significantly\n• Practice: Can improve reaction time by 10-15%",
         movementTheory: "How Movement Smoothness Works\n\nMovement smoothness is measured by sudden changes in acceleration. The phone's accelerometer detects vibrations and jolts. Smooth movements produce fewer and smaller acceleration changes. The smoothness score (0-100%) measures how gracefully you moved.\n\nKey concepts:\n• Vibrations: Sudden acceleration changes\n• Smoothness: Percentage of time without excessive vibration\n• Score: Starts at 100%, decreases with each jolt",
         preset: "Preset",
-        score: "Score"
+        score: "Score",
+        viewSoundMap: "View Sound Map",
+        notSignedIn: "Not signed in",
+        notSignedInMessage: "Sign in to submit results to the leaderboard.",
+        submittedTitle: "Submitted!",
+        submittedMessage: "Your results are on the leaderboard.",
+        submitFailed: "Submit failed"
+      },
+
+      soundMap: {
+        title: "Sound Pollution Map",
+        readingsWithGps: "{{count}} readings with GPS",
+        noGpsReadings: "No GPS readings yet",
+        recordPlaceholder: "Record sound readings with location enabled to see them on the map",
+        mapPlaceholder: "Map Placeholder (Expo Go)",
+        legend: "Legend",
+        allReadings: "All Readings",
+        back: "Back"
       },
 
       leaderboard: {
@@ -484,6 +516,9 @@ const resources = {
         rank: "Rank",
         team: "Team",
         score: "Score",
+        scoreExplanation: "Score Explanation",
+        perActivity: "Per Activity",
+        points: "pts",
         members: "Members",
         noData: "No submissions yet",
         selectActivity: "Select Activity"
@@ -594,7 +629,8 @@ const resources = {
         edit: "編集",
         save: "保存",
         openCamera: "カメラを開く",
-        closeCamera: "クローズアップカメラ"
+        closeCamera: "クローズアップカメラ",
+        recordVideo: "ビデオを録画"
       },
       landing: {
         slogan: "試行。測定。改善。"
@@ -644,7 +680,18 @@ const resources = {
           "スマートフォンのセンサーを使ってデータを取得し、結果をアップロードする",
           "デザインを磨き、ランキングを駆け上がろう"
         ],
-        seeActivityRequirement: "アクティビティを完了すると、ここに表示されます。"
+        seeActivityRequirement: "アクティビティを完了すると、ここに表示されます。",
+        progress: "進捗",
+        progressSummary: "7つのアクティビティのうち{{count}}を完了しました",
+        bestActivity: "最高のアクティビティ",
+        activityCompletion: "アクティビティの完了状況",
+        scoresOverview: "スコア概要",
+        submissionHistory: "提出履歴",
+        noSubmissionsYet: "まだ提出はありません",
+        noScoresYet: "アクティビティを完了してスコアを確認しましょう",
+        viewFullProgress: "詳細な進捗を見る",
+        completedActivities: "完了したアクティビティ",
+        latestScore: "最新スコア"
       },
       activities: {
         selectActivity: "アクティビティを選択してください",
@@ -909,6 +956,9 @@ const resources = {
         gForce: "Gフォース",
         time: "時間",
         surfaceArea: "表面積",
+        submitToLeaderboard: "リーダーボードに送信",
+        submitted: "送信済み ✓",
+        leaderboard: "リーダーボード",
         backToActivities: "アクティビティに戻る",
         parachuteTheory: "パラシュートの仕組み\n\nパラシュートをつけずにオモチャを落とすと、重力によって真下に引っ張られます。働く力は重力だけなので、地面にぶつかるまで9.8 m/s²で加速します。パラシュートは表面積を大きくすることで、空気抵抗（抗力）を生み出します。この抗力が重力に逆らって上向きに押し出すため、落下速度が遅くなります。\n\n主な公式：\n• 速度：v = d / t\n• 加速度：a = v / t\n• 重さ（重量）：W = m × 9.8\n• 合力：F = m × a\n• 抗力：F_抗力 = W - F_合力\n• Gフォース（跳ね返りなし）：(v / 接触時間) / 9.8\n• Gフォース（跳ね返りあり）：((v + v_跳ね返り) / 接触時間) / 9.8",
         soundTheory: "騒音公害の仕組み\n\n音の大きさは、対数記号であるデシベル（dB）という単位で測定されます。10 dB上がるごとに、音の強さは10倍になります。通常の会話は約60 dBですが、ロックコンサートでは120 dBを超えることもあります。85 dB以上の音に長時間さらされると、聴覚障害を引き起こす恐れがあります。\n\n• デシベル（dB）：音の強さの単位\n• 安全：0-60 dB\n• 注意：60-85 dB\n• 危険：85 dB以上",
@@ -918,7 +968,23 @@ const resources = {
         reactionTheory: "反応時間の仕組み\n\n反応時間とは、刺激を受けてから体が反応するまでの時間のことです。感覚器官が刺激を察知し、脳がその情報を処理し、神経が筋肉に動くよう信号を送る、というプロセスを経て行われます。人間の視覚刺激に対する平均反応時間は、約200〜250ミリ秒（ms）です。\n\n• 利き手：通常、利き手ではない方よりも10〜20ms速い\n• 年齢：20代前半に反応時間のピークを迎える\n• 疲労：反応時間を著しく低下させる（遅らせる）",
         movementTheory: "動きの滑らかさの仕組み\n\n動きの滑らかさは、加速度の急激な変化によって測定されます。スマートフォンの加速度センサーが、揺れや衝撃（ジャーク）を検知します。滑らかな動きほど、加速度の変化が少なく、その幅も小さくなります。\n\n• 揺れ：加速度の急激な変化\n• 滑らかさ：過度な揺れがない時間の割合（％）\n• スコア：100%からスタートし、衝撃が加わるたびに減点される",
         preset: "プリセット",
-        score: "スコア"
+        score: "スコア",
+        viewSoundMap: "サウンドマップを見る",
+        notSignedIn: "サインインしていません",
+        notSignedInMessage: "リーダーボードに結果を送信するにはサインインしてください。",
+        submittedTitle: "送信完了！",
+        submittedMessage: "結果がリーダーボードに掲載されました。",
+        submitFailed: "送信に失敗しました"
+      },
+      soundMap: {
+        title: "騒音マップ",
+        readingsWithGps: "GPS付き{{count}}件の測定結果",
+        noGpsReadings: "GPSデータがまだありません",
+        recordPlaceholder: "場所を有効にして録音し、マップで確認しましょう",
+        mapPlaceholder: "マッププレースホルダー（Expo Go）",
+        legend: "凡例",
+        allReadings: "すべての測定結果",
+        back: "戻る"
       },
       leaderboard: {
         title: "ランキング",
@@ -927,6 +993,9 @@ const resources = {
         rank: "順位",
         team: "チーム",
         score: "スコア",
+        scoreExplanation: "スコアの説明",
+        perActivity: "アクティビティ別",
+        points: "ポイント",
         members: "メンバー",
         noData: "まだ送信されたデータがありません",
         selectActivity: "アクティビティを選択"
@@ -1095,7 +1164,18 @@ const resources = {
           "Ambil data menggunakan sensor ponsel dan unggah hasilnya",
           "Sempurnakan desain Anda dan naikkan peringkat"
         ],
-        seeActivityRequirement: "Selesaikan sebuah aktivitas untuk melihatnya di sini."
+        seeActivityRequirement: "Selesaikan sebuah aktivitas untuk melihatnya di sini.",
+        progress: "Kemajuan",
+        progressSummary: "Anda telah menyelesaikan {{count}} dari 7 aktivitas",
+        bestActivity: "Aktivitas Terbaik",
+        activityCompletion: "Penyelesaian Aktivitas",
+        scoresOverview: "Ikhtisar Skor",
+        submissionHistory: "Riwayat Pengiriman",
+        noSubmissionsYet: "Belum ada pengiriman",
+        noScoresYet: "Mulai selesaikan aktivitas untuk melihat skor Anda",
+        viewFullProgress: "Lihat Kemajuan Penuh",
+        completedActivities: "Aktivitas Selesai",
+        latestScore: "Skor Terbaru"
       },
       activities: {
         selectActivity: "Pilih Aktivitas",
@@ -1457,6 +1537,9 @@ const resources = {
         gForce: "G-Force",
         time: "Waktu",
         surfaceArea: "Luas Permukaan",
+        submitToLeaderboard: "Kirim ke Papan Peringkat",
+        submitted: "Terkirim ✓",
+        leaderboard: "Papan Peringkat",
         backToActivities: "Kembali ke Aktivitas",
         parachuteTheory: "Cara Kerja Parasut\n\nSaat Anda menjatuhkan mainan tanpa parasut, gravitasi menariknya langsung ke bawah. Satu-satunya gaya yang bekerja adalah gravitasi, sehingga ia berakselerasi pada 9,8 m/s² hingga menyentuh tanah. Parasut menambahkan gaya hambat dengan meningkatkan luas permukaan. Gaya hambat mendorong ke atas melawan gravitasi, memperlambat jatuh.\n\nRumus utama:\n• Kecepatan: v = d / t\n• Akselerasi: a = v / t\n• Berat: W = m × 9,8\n• Gaya Bersih: F = m × a\n• Gaya Hambat: F_hambat = W - F_bersih\n• G-force (tanpa pantul): (v / waktuKontak) / 9,8\n• G-force (dengan pantul): ((v + v_pantul) / waktuKontak) / 9,8",
         soundTheory: "Cara Kerja Polusi Suara\n\nSuara diukur dalam desibel (dB), skala logaritmik. Setiap kenaikan 10 dB mewakili peningkatan sepuluh kali lipat intensitas suara. Percakapan normal sekitar 60 dB, sementara konser rock bisa melebihi 120 dB. Paparan berkepanjangan di atas 85 dB dapat menyebabkan kerusakan pendengaran.\n\n• Desibel (dB): Satuan intensitas suara\n• Aman: 0-60 dB\n• Peringatan: 60-85 dB\n• Berbahaya: 85+ dB",
@@ -1475,6 +1558,9 @@ const resources = {
         rank: "Peringkat",
         team: "Tim",
         score: "Skor",
+        scoreExplanation: "Penjelasan Skor",
+        perActivity: "Per Aktivitas",
+        points: "poin",
         members: "Anggota",
         noData: "Belum ada pengiriman",
         selectActivity: "Pilih Aktivitas"
@@ -1633,7 +1719,18 @@ const resources = {
           "使用手机传感器捕获数据并上传结果",
           "优化设计并登上排行榜"
         ],
-        seeActivityRequirement: "完成活动即可在此处查看。"
+        seeActivityRequirement: "完成活动即可在此处查看。",
+        progress: "进度",
+        progressSummary: "您已完成{{count}}个活动（共7个）",
+        bestActivity: "最佳活动",
+        activityCompletion: "活动完成情况",
+        scoresOverview: "分数概览",
+        submissionHistory: "提交历史",
+        noSubmissionsYet: "暂无提交",
+        noScoresYet: "开始完成活动以查看您的分数",
+        viewFullProgress: "查看完整进度",
+        completedActivities: "已完成活动",
+        latestScore: "最新分数"
       },
       activities: {
         selectActivity: "选择活动",
@@ -1995,6 +2092,9 @@ const resources = {
         gForce: "G力",
         time: "时间",
         surfaceArea: "表面积",
+        submitToLeaderboard: "提交到排行榜",
+        submitted: "已提交 ✓",
+        leaderboard: "排行榜",
         backToActivities: "返回活动",
         parachuteTheory: "降落伞工作原理\n\n当您不带降落伞投掷玩具时，重力直接将其拉下。作用在它上面的唯一力是重力，因此它以9.8 m/s²加速直到撞击地面。降落伞通过增加表面积来增加阻力。阻力向上推，对抗重力，减缓下落。伞面越大，空气阻力越大，下降越慢。\n\n关键公式：\n• 速度：v = d / t\n• 加速度：a = v / t\n• 重量：W = m × 9.8\n• 净力：F = m × a\n• 阻力：F_drag = W - F_net\n• G力（无弹跳）：(v / 接触时间) / 9.8\n• G力（有弹跳）：((v + v_反弹) / 接触时间) / 9.8",
         soundTheory: "噪音污染的工作原理\n\n声音以分贝（dB）测量，为对数标度。每增加10 dB代表声音强度增加十倍。正常对话约为60 dB，而摇滚音乐会可能超过120 dB。长时间暴露在85 dB以上可能导致听力损伤。\n\n关键概念：\n• 分贝（dB）：声音强度单位\n• 对数标度：20 dB比10 dB强10倍\n• 安全：0-60 dB（耳语、安静房间）\n• 警告：60-85 dB（繁忙交通）\n• 危险：85+ dB（机械、音乐会）",
@@ -2013,6 +2113,9 @@ const resources = {
         rank: "排名",
         team: "团队",
         score: "分数",
+        scoreExplanation: "分数说明",
+        perActivity: "按活动",
+        points: "分",
         members: "成员",
         noData: "暂无提交",
         selectActivity: "选择活动"

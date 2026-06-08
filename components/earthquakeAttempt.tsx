@@ -32,8 +32,13 @@ export default function EarthquakeAttemptScreen() {
   const [recordingState, setRecordingState] = useState<"idle" | "recording" | "completed">("idle");
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [peakAccel, setPeakAccel] = useState(0);
+  const [peakX, setPeakX] = useState(0);
+  const [peakY, setPeakY] = useState(0);
+  const [peakZ, setPeakZ] = useState(0);
   const [liveAccel, setLiveAccel] = useState(0);
   const magnitudeHistory = useRef<number[]>([]);
+  const rawReadings = useRef<{ x: number; y: number; z: number; magnitude: number; ts: number }[]>([]);
+  const recordingStartRef = useRef(0);
   const shakeInterval = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // PDF: Fold/Pillar configuration
@@ -61,11 +66,17 @@ export default function EarthquakeAttemptScreen() {
   // PDF: Accelerometer subscription
   const _subscribe = () => {
     Accelerometer.setUpdateInterval(100);
+    recordingStartRef.current = Date.now();
+    rawReadings.current = [];
     setSubscription(Accelerometer.addListener(({ x, y, z }) => {
       const magnitude = Math.sqrt(x * x + y * y + z * z);
       setLiveAccel(magnitude);
       magnitudeHistory.current.push(magnitude);
+      rawReadings.current.push({ x, y, z, magnitude, ts: Date.now() - recordingStartRef.current });
       if (magnitude > peakAccel) setPeakAccel(magnitude);
+      if (Math.abs(x) > peakX) setPeakX(Math.abs(x));
+      if (Math.abs(y) > peakY) setPeakY(Math.abs(y));
+      if (Math.abs(z) > peakZ) setPeakZ(Math.abs(z));
     }));
   };
 
@@ -95,8 +106,12 @@ export default function EarthquakeAttemptScreen() {
       setRecordingState("completed");
     } else {
       setPeakAccel(0);
+      setPeakX(0);
+      setPeakY(0);
+      setPeakZ(0);
       setLiveAccel(0);
       magnitudeHistory.current = [];
+      rawReadings.current = [];
 
       _subscribe();
       setRecordingState("recording");
@@ -124,6 +139,22 @@ export default function EarthquakeAttemptScreen() {
         displayName = t(designKey);
       }
     }
+
+    // Compute damping buffers from raw readings
+    const readings = rawReadings.current;
+    const sampleRate = 100; // ms
+    const bufferSize = Math.floor(1000 / sampleRate); // 1s worth
+    let initialReadings: number[] = [];
+    let finalReadings: number[] = [];
+    if (readings.length > bufferSize * 2) {
+      initialReadings = readings.slice(0, bufferSize).map(r => r.magnitude);
+      finalReadings = readings.slice(-bufferSize).map(r => r.magnitude);
+    } else if (readings.length > 0) {
+      const half = Math.floor(readings.length / 2);
+      initialReadings = readings.slice(0, half).map(r => r.magnitude);
+      finalReadings = readings.slice(-half).map(r => r.magnitude);
+    }
+
     const newEntry: EqEntry = {
       name: displayName,
       folds: foldCount,
@@ -139,7 +170,19 @@ export default function EarthquakeAttemptScreen() {
     if (activityContext) {
       activityContext.addExperimentLog({
         activityKey: "earthquake-resistant-structure",
-        data: { designName: displayName, folds: foldCount, pillars: pillarCount, predicted: pred, observed: sway, peakAccel }
+        data: {
+          designName: displayName,
+          folds: foldCount,
+          pillars: pillarCount,
+          predicted: pred,
+          observed: sway,
+          peakAccel,
+          peakX,
+          peakY,
+          peakZ,
+          initialReadings,
+          finalReadings,
+        }
       });
     }
     setDesignName("");
@@ -148,6 +191,10 @@ export default function EarthquakeAttemptScreen() {
     setFoldCount("4");
     setPillarCount("4");
     setPeakAccel(0);
+    setPeakX(0);
+    setPeakY(0);
+    setPeakZ(0);
+    rawReadings.current = [];
     setRecordingState("idle");
   };
 
@@ -258,48 +305,48 @@ export default function EarthquakeAttemptScreen() {
 
         <Text style={[styles.sectionHeader, {marginTop: 24, marginBottom: 16}]}>{t("attempt.structuralIterations")}</Text>
 
-        {/* PDF: Design History */}
-        {designs.length === 0 ? (
-            <Text style={styles.emptyState}>
-                {t("attempt.logTrialPlaceholder")}
-            </Text>
-        ): (
-          <View>
-            {designs.map((d, i) => (
-              <View key={i} style={styles.designCard}>
-                <View style={styles.designHeader}>
-                  <Text style={styles.designName}>{d.name}</Text>
-                  <Text style={[styles.designAccel, { color: d.peakAccel > 3 ? theme.danger : theme.tertiary }]}>
-                    Peak: {d.peakAccel.toFixed(2)}g
+          {/* PDF: Design History */}
+          {designs.length === 0 ? (
+              <Text style={styles.emptyState}>
+                  {t("attempt.logTrialPlaceholder")}
+              </Text>
+          ): (
+            <View>
+              {designs.map((d, i) => (
+                <View key={i} style={styles.designCard}>
+                  <View style={styles.designHeader}>
+                    <Text style={styles.designName}>{d.name}</Text>
+                    <Text style={[styles.designAccel, { color: d.peakAccel > 3 ? theme.danger : theme.tertiary }]}>
+                      Peak: {d.peakAccel.toFixed(2)}g
+                    </Text>
+                  </View>
+                  <Text style={styles.designConfig}>{d.folds} {t("activities.earthquakeResistantStructure.folds")}, {d.pillars} {t("activities.earthquakeResistantStructure.pillars")}</Text>
+                  <Text style={styles.designResult}>
+                    Pred: {d.predicted || "-"}cm | Obs: {d.observed}cm |
+                    {d.wasRight ? (d.wasRight === "Yes" ? " ✓ Right" : " ✗ Wrong") : ""}
                   </Text>
                 </View>
-                <Text style={styles.designConfig}>{d.folds} {t("activities.earthquakeResistantStructure.folds")}, {d.pillars} {t("activities.earthquakeResistantStructure.pillars")}</Text>
-                <Text style={styles.designResult}>
-                  Pred: {d.predicted || "-"}cm | Obs: {d.observed}cm |
-                  {d.wasRight ? (d.wasRight === "Yes" ? " ✓ Right" : " ✗ Wrong") : ""}
-                </Text>
-              </View>
-            ))}
-          </View>
-        )}
-        <View style={styles.buttonContainer}>
-          {recordingState != "completed" && (
-            <Button
-              text={recordingState == "recording" ? t("activities.earthquakeResistantStructure.stopVibration") : t("activities.earthquakeResistantStructure.startVibration")}
-              action={triggerShake}
-            />
+              ))}
+            </View>
           )}
-          {recordingState == "completed" && (
-            <Button text="Log Design" action={logDesign} />
-          )}
-      </View>
-      <Pressable
-          onPress={handleFinish}
-          style={({ pressed }) => pressed && { opacity: 0.7 }}>
-          <Text style={styles.skipText}>{t("buttons.finishActivity")}</Text>
-      </Pressable>
-      </ScrollView>
-    </KeyboardAvoidingView>
+          <View style={styles.buttonContainer}>
+            {recordingState != "completed" && (
+              <Button
+                text={recordingState == "recording" ? t("activities.earthquakeResistantStructure.stopVibration") : t("activities.earthquakeResistantStructure.startVibration")}
+                action={triggerShake}
+              />
+           )}
+            {recordingState == "completed" && (
+              <Button text="Log Design" action={logDesign} />
+            )}
+        </View>
+        <Pressable
+            onPress={handleFinish}
+            style={({ pressed }) => pressed && { opacity: 0.7 }}>
+            <Text style={styles.skipText}>{t("buttons.finishActivity")}</Text>
+        </Pressable>
+        </ScrollView>
+      </KeyboardAvoidingView>
   );
 };
 

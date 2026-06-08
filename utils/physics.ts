@@ -155,6 +155,107 @@ export function rateReactionTime(ms: number): { level: string; emoji: string } {
 }
 
 // ==========================================
+// Parachute Safety Score
+// ==========================================
+
+export interface SafetyScoreResult {
+  rawScore: number;
+  percent: number;
+  rating: "Excellent" | "Good" | "Fair" | "Poor";
+}
+
+export function calculateSafetyScore(
+  velocity: number,
+  gForce: number,
+  accuracyError: number,
+): SafetyScoreResult {
+  const velocityNorm = Math.min(velocity / 5, 1);
+  const gNorm = Math.min(gForce / 20, 1);
+  const accuracyNorm = Math.min(accuracyError / 1, 1);
+  const rawScore = 0.4 * velocityNorm + 0.4 * gNorm + 0.2 * accuracyNorm;
+  const percent = rawScore * 100;
+  const rating = getParachuteRating(percent);
+  return { rawScore, percent, rating };
+}
+
+export function getParachuteRating(percent: number): SafetyScoreResult["rating"] {
+  if (percent < 20) return "Excellent";
+  if (percent < 40) return "Good";
+  if (percent < 60) return "Fair";
+  return "Poor";
+}
+
+// ==========================================
+// Sound NPI (Noise Pollution Index)
+// ==========================================
+
+export function calculateNPI(averageDb: number): number {
+  if (averageDb <= 0) return 0;
+  return averageDb / 85;
+}
+
+export function getNPILevel(npi: number): "Safe" | "Warning" | "Unsafe" {
+  if (npi < 0.5) return "Safe";
+  if (npi <= 1) return "Warning";
+  return "Unsafe";
+}
+
+// ==========================================
+// Hand Fan Flexibility
+// ==========================================
+
+export function getFlexibilityLabel(kValue: number): "High" | "Medium" | "Low" {
+  if (kValue < 0.2) return "High";
+  if (kValue < 1.0) return "Medium";
+  return "Low";
+}
+
+// ==========================================
+// Earthquake Stability & Damping
+// ==========================================
+
+export interface StabilityScoreResult {
+  score: number;
+  rating: "Excellent" | "Good" | "Fair" | "Poor";
+  passed: boolean;
+}
+
+export function calculateStabilityScore(peakAccel: number): StabilityScoreResult {
+  const score = Math.max(0, 100 - peakAccel * 20);
+  const rating = getStabilityRating(score);
+  const passed = score >= 70;
+  return { score, rating, passed };
+}
+
+export function getStabilityRating(score: number): StabilityScoreResult["rating"] {
+  if (score >= 90) return "Excellent";
+  if (score >= 70) return "Good";
+  if (score >= 50) return "Fair";
+  return "Poor";
+}
+
+export function calculateDampingRatio(
+  initialReadings: number[],
+  finalReadings: number[],
+): number {
+  if (initialReadings.length === 0 || finalReadings.length === 0) return 1;
+  const initialPeak = Math.max(...initialReadings);
+  const finalPeak = Math.max(...finalReadings);
+  if (initialPeak <= 0) return 1;
+  return finalPeak / initialPeak;
+}
+
+export function getDampingLabel(
+  ratio: number,
+): "Excellent" | "Good" | "Moderate" | "Poor" | "None" {
+  if (ratio < 0.1) return "Excellent";
+  if (ratio < 0.3) return "Good";
+  if (ratio < 0.5) return "Moderate";
+  if (ratio < 0.8) return "Poor";
+  return "None";
+}
+
+// ==========================================
 // Backwards-compatible aliases
 // ==========================================
 

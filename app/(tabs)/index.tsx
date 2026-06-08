@@ -8,8 +8,28 @@ import { useRouter } from "expo-router";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { useCallback, use, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ACTIVITIES } from "@/constants/data";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+function getBestActivity(subs: any[], activities: any): string {
+  const countMap: Record<string, number> = {};
+  for (const s of subs) {
+    if (s.activityKey) {
+      countMap[s.activityKey] = (countMap[s.activityKey] || 0) + 1;
+    }
+  }
+  let bestKey = '';
+  let bestCount = 0;
+  for (const [key, count] of Object.entries(countMap)) {
+    if (count > bestCount) {
+      bestCount = count;
+      bestKey = key;
+    }
+  }
+  if (!bestKey) return 'N/A';
+  return activities[bestKey]?.title || bestKey;
+}
 
 export default function HomeScreen() {
   const { theme } = useTheme();
@@ -89,6 +109,50 @@ export default function HomeScreen() {
           ) : (
             <View style={styles.teamCard}>
               <Text style={styles.welcomeMessage}>{t("home.welcome")}, {formattedName}!</Text>
+            </View>
+          )}
+
+          {/* Progress Section */}
+          {team && (
+            <View style={styles.teamCard}>
+              <View style={styles.progressHeader}>
+                <MaterialCommunityIcons name="chart-bar" size={18} color={theme.primary} />
+                <Text style={[styles.progressTitle, { color: theme.secondary }]}>{t("home.progress")}</Text>
+              </View>
+              <View style={styles.progressBarBg}>
+                <View
+                  style={[
+                    styles.progressBarFill,
+                    {
+                      width: `${Math.round((completedCount / 7) * 100)}%`,
+                      backgroundColor: theme.primary,
+                    },
+                  ]}
+                />
+              </View>
+              <Text style={styles.progressText}>
+                {t("home.progressSummary", { count: completedCount })}
+              </Text>
+              <View style={styles.bestActivityRow}>
+                <MaterialCommunityIcons name="trophy" size={14} color="#f59e0b" />
+                <Text style={styles.bestActivityLabel}>{t("home.bestActivity")}:</Text>
+                <Text style={styles.bestActivityValue}>
+                  {submissions.length > 0
+                    ? getBestActivity(submissions, ACTIVITIES)
+                    : t("home.noRecentActivity")}
+                </Text>
+              </View>
+              <View style={styles.viewProgressBtn}>
+                <Pressable
+                  style={[styles.viewProgressPressable, { backgroundColor: theme.primary + "20" }]}
+                  onPress={() => router.push("/progress")}
+                >
+                  <Text style={[styles.viewProgressText, { color: theme.primary }]}>
+                    {t("home.viewFullProgress")}
+                  </Text>
+                  <MaterialCommunityIcons name="arrow-right" size={14} color={theme.primary} />
+                </Pressable>
+              </View>
             </View>
           )}
 
@@ -239,6 +303,63 @@ const createStyles = (colors: ThemeColors) => {
       fontFamily: "InterRegular",
       fontSize: 11,
       color: colors.textMuted,
+    },
+    progressHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      marginBottom: 12,
+    },
+    progressTitle: {
+      fontFamily: 'PoppinsRegular',
+      fontSize: 16,
+    },
+    progressBarBg: {
+      height: 10,
+      backgroundColor: colors.borderColor,
+      borderRadius: 5,
+      overflow: 'hidden',
+      marginBottom: 8,
+    },
+    progressBarFill: {
+      height: '100%',
+      borderRadius: 5,
+    },
+    progressText: {
+      fontFamily: 'InterRegular',
+      fontSize: 12,
+      color: colors.textMuted,
+      marginBottom: 10,
+    },
+    bestActivityRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      marginBottom: 12,
+    },
+    bestActivityLabel: {
+      fontFamily: 'InterRegular',
+      fontSize: 12,
+      color: colors.textMuted,
+    },
+    bestActivityValue: {
+      fontFamily: 'PoppinsRegular',
+      fontSize: 12,
+      color: colors.secondary,
+      flex: 1,
+    },
+    viewProgressBtn: {},
+    viewProgressPressable: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 6,
+      paddingVertical: 10,
+      borderRadius: 8,
+    },
+    viewProgressText: {
+      fontFamily: 'InterRegular',
+      fontSize: 13,
     },
     startBtnContainer: {
       marginTop: 24,

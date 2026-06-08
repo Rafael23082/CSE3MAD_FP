@@ -1,3 +1,4 @@
+import { registerSyncOnForeground } from '@/utils/backgroundSync';
 import { ActivityProvider } from '@/context/ActivityContext';
 import { AuthProvider } from '@/context/AuthContext';
 import { ThemeProvider } from '@/context/ThemeContext';
@@ -24,6 +25,11 @@ export default function RootLayout() {
 
   useEffect(() => {
     initI18n();
+
+    const cleanupSync = registerSyncOnForeground();
+    return () => {
+      cleanupSync();
+    };
   }, [])
 
   const queryClient = new QueryClient();

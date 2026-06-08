@@ -10,6 +10,11 @@ export interface SubmissionData {
   reflection: string;
   submittedAt: Date;
   rating?: number;
+  media?: {
+    type: "video" | "image";
+    url: string;
+    path: string;
+  };
 }
 
 /**

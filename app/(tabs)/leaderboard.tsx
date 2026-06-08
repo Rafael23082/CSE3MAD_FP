@@ -8,8 +8,10 @@ import { useRouter } from "expo-router";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { useCallback, use, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+import { calculateOverallScore, getScoreExplanation, type ActivityScore } from "@/utils/scoring";
 
 type RankEntry = {
   rank: number;
@@ -17,6 +19,7 @@ type RankEntry = {
   teamName: string;
   score: number;
   membersCount: number;
+  perActivity: ActivityScore[];
 };
 
 const activities = [
@@ -32,6 +35,17 @@ const activities = [
 
 const MEDAL = ['🥇', '🥈', '🥉'];
 
+const activityLabels: Record<string, string> = {};
+for (const a of activities) {
+  if (a.key) activityLabels[a.key] = a.label;
+}
+
+function getScoreColor(score: number): string {
+  if (score >= 200) return '#22c55e';
+  if (score >= 100) return '#eab308';
+  return '#ef4444';
+}
+
 export default function LeaderboardScreen() {
   const { theme } = useTheme();
   const styles = createStyles(theme);
@@ -44,6 +58,7 @@ export default function LeaderboardScreen() {
   const [rankings, setRankings] = useState<RankEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [expandedTeamId, setExpandedTeamId] = useState<string | null>(null);
 
   const fetchLeaderboard = useCallback(async () => {
     setLoading(true);
@@ -52,14 +67,14 @@ export default function LeaderboardScreen() {
       const subs = subsSnap.docs.map(d => ({ id: d.id, ...d.data() } as any));
 
       // Group by team
-      const teamMap: Record<string, { count: number; teamName?: string }> = {};
+      const teamMap: Record<string, { submissions: any[]; teamName?: string }> = {};
 
       for (const sub of subs as any[]) {
         if (mode === 'activity' && selectedActivity && sub.activityKey !== selectedActivity) continue;
         const teamId = sub.teamId;
         if (!teamId) continue;
         if (!teamMap[teamId]) {
-          teamMap[teamId] = { count: 0 };
+          teamMap[teamId] = { submissions: [] };
           // Fetch team name
           try {
             const teamSnap = await getDoc(doc(db, 'teams', teamId));
@@ -70,17 +85,21 @@ export default function LeaderboardScreen() {
             teamMap[teamId].teamName = teamId;
           }
         }
-        teamMap[teamId].count++;
+        teamMap[teamId].submissions.push(sub);
       }
 
       const ranked: RankEntry[] = Object.entries(teamMap)
-        .map(([teamId, data]) => ({
-          rank: 0,
-          teamId,
-          teamName: data.teamName || teamId.substring(0, 8),
-          score: data.count,
-          membersCount: 0,
-        }))
+        .map(([teamId, data]) => {
+          const result = calculateOverallScore(data.submissions);
+          return {
+            rank: 0,
+            teamId,
+            teamName: data.teamName || teamId.substring(0, 8),
+            score: result.total,
+            membersCount: 0,
+            perActivity: result.perActivity,
+          };
+        })
         .sort((a, b) => b.score - a.score)
         .slice(0, 20)
         .map((entry, i) => ({ ...entry, rank: i + 1 }));
@@ -104,6 +123,13 @@ export default function LeaderboardScreen() {
   };
 
   const userTeamId = auth?.team?.teamId;
+
+  const showExplanation = (activityKey: string) => {
+    Alert.alert(
+      t("leaderboard.scoreExplanation"),
+      getScoreExplanation(activityKey),
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
@@ -164,26 +190,69 @@ export default function LeaderboardScreen() {
           <View style={styles.columnHeader}>
             <Text style={[styles.col, { width: 40 }]}>{t("leaderboard.rank")}</Text>
             <Text style={[styles.col, { flex: 1 }]}>{t("leaderboard.team")}</Text>
-            <Text style={[styles.col, { width: 60, textAlign: 'right' }]}>{t("leaderboard.score")}</Text>
+            <Pressable
+              style={{ width: 60, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 2 }}
+              onPress={() => showExplanation(mode === 'activity' && selectedActivity ? selectedActivity : '')}
+            >
+              <Text style={[styles.col, { textAlign: 'right' }]}>{t("leaderboard.score")}</Text>
+              <MaterialCommunityIcons name="information-outline" size={14} color={theme.textMuted} />
+            </Pressable>
           </View>
 
           {rankings.map((entry) => {
             const isUserTeam = entry.teamId === userTeamId;
+            const isExpanded = expandedTeamId === entry.teamId;
+            const scoreColor = getScoreColor(entry.score);
             return (
-              <View key={entry.teamId} style={[styles.rankRow, isUserTeam && styles.userRow]}>
-                <View style={{ width: 40, alignItems: 'center' }}>
-                  {entry.rank <= 3 ? (
-                    <Text style={styles.medal}>{MEDAL[entry.rank - 1]}</Text>
-                  ) : (
-                    <Text style={styles.rankNum}>#{entry.rank}</Text>
-                  )}
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={[styles.teamName, isUserTeam && styles.userTeamName]}>
-                    {entry.teamName}
+              <View key={entry.teamId}>
+                <Pressable
+                  style={[styles.rankRow, isUserTeam && styles.userRow]}
+                  onPress={() => setExpandedTeamId(isExpanded ? null : entry.teamId)}
+                >
+                  <View style={{ width: 40, alignItems: 'center' }}>
+                    {entry.rank <= 3 ? (
+                      <Text style={styles.medal}>{MEDAL[entry.rank - 1]}</Text>
+                    ) : (
+                      <Text style={styles.rankNum}>#{entry.rank}</Text>
+                    )}
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.teamName, isUserTeam && styles.userTeamName]}>
+                      {entry.teamName}
+                    </Text>
+                  </View>
+                  <Text style={[styles.score, { width: 60, textAlign: 'right', color: scoreColor }]}>
+                    {entry.score} {t("leaderboard.points")}
                   </Text>
-                </View>
-                <Text style={[styles.score, { width: 60, textAlign: 'right' }]}>{entry.score}</Text>
+                </Pressable>
+                {isExpanded && entry.perActivity.length > 0 && (
+                  <View style={styles.breakdownContainer}>
+                    <Text style={styles.breakdownTitle}>{t("leaderboard.perActivity")}</Text>
+                    {entry.perActivity.map((pa) => {
+                      const actLabel = activityLabels[pa.activityKey] || pa.activityKey;
+                      const paColor = getScoreColor(pa.score);
+                      return (
+                        <View key={pa.activityKey} style={styles.breakdownRow}>
+                          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                            <Text style={styles.breakdownLabel}>{actLabel}</Text>
+                            <Pressable onPress={() => showExplanation(pa.activityKey)}>
+                              <MaterialCommunityIcons name="information-outline" size={13} color={theme.textMuted} />
+                            </Pressable>
+                          </View>
+                          <Text style={[styles.breakdownScore, { color: paColor }]}>
+                            {pa.score} {t("leaderboard.points")}
+                          </Text>
+                        </View>
+                      );
+                    })}
+                    <View style={[styles.breakdownRow, styles.breakdownTotalRow]}>
+                      <Text style={styles.breakdownTotalLabel}>{t("leaderboard.score")}</Text>
+                      <Text style={[styles.breakdownScore, { color: scoreColor, fontFamily: 'PoppinsBold' }]}>
+                        {entry.score} {t("leaderboard.points")}
+                      </Text>
+                    </View>
+                  </View>
+                )}
               </View>
             );
           })}
@@ -215,8 +284,15 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   rankRow: { flexDirection: "row", alignItems: "center", paddingVertical: 12, paddingHorizontal: 8, borderRadius: 8, marginBottom: 4 },
   userRow: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.primary },
   medal: { fontSize: 20 },
-  rankNum: { fontFamily: "PoppinsBold", fontSize: 14, color: colors.textMuted },
+  rankNum: { fontFamily: "PoppinsBold", fontSize: 14, color: colors.secondary },
   teamName: { fontFamily: "PoppinsRegular", fontSize: 14, color: colors.secondary },
-  userTeamName: { color: colors.primary, fontWeight: "bold" },
-  score: { fontFamily: "PoppinsRegular", fontSize: 14, color: colors.secondary },
+  userTeamName: { color: colors.primary, fontWeight: "bold" as const },
+  score: { fontFamily: "PoppinsRegular", fontSize: 14 },
+  breakdownContainer: { backgroundColor: colors.card, borderRadius: 8, marginBottom: 4, marginLeft: 12, paddingVertical: 8, paddingHorizontal: 12 },
+  breakdownTitle: { fontFamily: "PoppinsBold", fontSize: 11, color: colors.textMuted, textTransform: "uppercase" as const, marginBottom: 6, letterSpacing: 0.5 },
+  breakdownRow: { flexDirection: "row", alignItems: "center", paddingVertical: 4 },
+  breakdownTotalRow: { borderTopWidth: 1, borderTopColor: colors.borderColor, marginTop: 4, paddingTop: 6 },
+  breakdownLabel: { fontFamily: "InterRegular", fontSize: 13, color: colors.secondary, flex: 1 },
+  breakdownScore: { fontFamily: "PoppinsRegular", fontSize: 13, textAlign: "right" },
+  breakdownTotalLabel: { fontFamily: "PoppinsBold", fontSize: 13, color: colors.secondary },
 });
