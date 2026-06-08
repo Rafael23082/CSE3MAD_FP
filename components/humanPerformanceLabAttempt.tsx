@@ -6,7 +6,7 @@ import { Accelerometer } from 'expo-sensors';
 import { Subscription } from "expo-sensors/build/Pedometer";
 import { use, useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Alert, KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "./button";
 import Card from "./card";
@@ -175,26 +175,24 @@ export default function HumanPerformanceLabAttemptScreen(){
     }
 
     const logDesign = () => {
-        if (recordingState != "completed"){
-            Alert.alert("Challenge Unfinished",
-                "Complete a challenge before logging this trial."
-            )
-            return;
-        }
+        setDesigns(prev => {
+            const index = prev.findIndex(d => d.key === presetKey);
 
-        setDesigns(prev => [...prev, {
-            id: Date.now() + Math.random(),
-            key: presetKey,
-            smoothnessScore: smoothness, 
-            vibrations: vibrations
-        }]);
+            const newDesign = {
+                id: Date.now() + Math.random(),
+                key: presetKey,
+                smoothnessScore: smoothness ?? undefined,
+                vibrations: vibrations ?? undefined,
+            };
 
-        if (activityContext) {
-            activityContext.addExperimentLog({
-                activityKey: "stretch-speed-and-gracefulness",
-                data: { presetKey, smoothness, vibrations }
-            });
-        }
+            if (index === -1) {
+                return [...prev, newDesign];
+            }
+
+            return prev.map((design, i) =>
+                i === index ? newDesign : design
+            );
+        });
 
         setRecordingState("idle");
         setTime(20);
@@ -206,10 +204,43 @@ export default function HumanPerformanceLabAttemptScreen(){
 }
 
     const handleFinish = () => {
+        if (designs.length < DESIGN_PRESETS.length){
+            Alert.alert(t("errorMessages.unfinishedChallenge"), t("errorMessages.unfinishedChallengeDescription"));
+            return;
+        }
+        
         const results = designs.map(d => ({
             label: `${d.key}`,
             value: `Smoothness Score: ${d.smoothnessScore} | Vibrations Detected: ${d.vibrations}}`
         }));
+
+        const clockwiseMovement = designs.find(
+            d => d.key === "activities.stretchSpeedAndGracefulness.clockwiseMovement"
+        );
+
+        const verticalMovement = designs.find(
+            d => d.key === "activities.stretchSpeedAndGracefulness.verticalMovement"
+        );
+
+        const horizontalMovement = designs.find(
+            d => d.key === "activities.stretchSpeedAndGracefulness.horizontalMovement"
+        );
+        
+        if (activityContext) {
+            activityContext.addExperimentLog({
+                activityKey: "stretch-speed-and-gracefulness",
+                data: { 
+                    presetKey,
+                    clockwiseMovementSmoothness: clockwiseMovement?.smoothnessScore,
+                    verticalMovementSmoothness: verticalMovement?.smoothnessScore,
+                    horizontalMovementSmoothness: horizontalMovement?.smoothnessScore,
+                    clockwiseMovementVibrations: clockwiseMovement?.vibrations,
+                    verticalMovementVibrations: verticalMovement?.vibrations,
+                    horizontalMovementVibrations: horizontalMovement?.vibrations
+                }
+            });
+        }
+
         router.push({
             pathname: "/activityResults",
             params: { results: JSON.stringify(results), activityKey: "stretch-speed-and-gracefulness" }
@@ -231,6 +262,21 @@ export default function HumanPerformanceLabAttemptScreen(){
                             </View>
                         </View>
 
+                        <PresetSelector 
+                            designPresets={DESIGN_PRESETS}
+                            onSelect={(preset) => {
+                                setPresetKey(preset.key);
+                            }}
+                        />
+                        <TextInput
+                            style={styles.input}
+                            value={t(presetKey)}
+                            onChangeText={setPresetKey}
+                            placeholder={"Enter Preset Name"}
+                            placeholderTextColor={theme.textMuted}
+                            editable={false}
+                        />
+
                         <Text style={[styles.actionName, {marginTop: 24}]}>{t("activities.stretchSpeedAndGracefulness.recordMovement")}</Text>
 
                         <View style={styles.cardContainer}>
@@ -239,6 +285,26 @@ export default function HumanPerformanceLabAttemptScreen(){
 
                         <View style={styles.cardContainer}>
                             <Card metric={t("activities.stretchSpeedAndGracefulness.smoothnessScore")} value={`${Math.round(smoothness)}%`} maximumWidth={true} />
+                        </View>
+
+                        <View>
+                            {recordingState === "idle" && (
+                                <Button text={t("buttons.startRecording")} action={() => {
+                                        setCountdown(3);
+                                    }}
+                                />
+                            )}
+
+                            {recordingState === "recording" && (
+                                <Button text={t("buttons.recording")} action={() => {}} />
+                            )}
+
+                            {recordingState === "completed" && (
+                                <Button 
+                                    text={t("buttons.logTrial")}
+                                    action={logDesign}
+                                />
+                            )}
                         </View>
 
                         <Text style={styles.actionName}>
@@ -264,66 +330,33 @@ export default function HumanPerformanceLabAttemptScreen(){
 
                     </View>
 
-                    <PresetSelector 
-                        designPresets={DESIGN_PRESETS}
-                        onSelect={(preset) => {
-                            setPresetKey(preset.key);
-                        }}
-                    />
-                    <TextInput
-                        style={styles.input}
-                        value={t(presetKey)}
-                        onChangeText={setPresetKey}
-                        placeholder={"Enter Preset Name"}
-                        placeholderTextColor={theme.textMuted}
-                        editable={false}
-                    />
-
                     <Text style={styles.actionNameLarge}>{t("attempt.structuralIterations")}</Text>
-                    {designs.length === 0 ? (
-                        <Text style={styles.emptyState}>
-                            {t("attempt.logTrialPlaceholder")}
-                        </Text>
-                    ): (
-                        <View>
-                            {designs.map((d) => (
-                                <View key={d.id} style={styles.designCard}>
+
+                    {DESIGN_PRESETS.map((design, index) => {
+                        const loggedDesign = designs.find((loggedDesign) => loggedDesign.key == design.key);
+                        return(
+                            <View key={index} style={styles.designCard}>
                                 <View style={styles.designHeader}>
-                                    <Text style={styles.designName}>{t(d.key)}</Text>
+                                    <Text style={styles.designName}>{t(design.key)}</Text>
                                 </View>
-                                <Text style={styles.designConfig}>{t("activities.stretchSpeedAndGracefulness.smoothnessScore")}: {Math.floor(d.smoothnessScore * 100) / 100}</Text>
-                                <Text style={styles.designResult}>
-                                    {t("activities.stretchSpeedAndGracefulness.vibrationsDetected")}: {d.vibrations}
-                                </Text>
-                                </View>
-                            ))}
-                        </View>
-                    )}
+                                {loggedDesign ? (
+                                    <View>
+                                        <Text style={styles.designConfig}>{t("activities.stretchSpeedAndGracefulness.smoothnessScore")}: {Math.floor(loggedDesign.smoothnessScore * 100) / 100}%</Text>
+                                        <Text style={styles.designConfig}>{t("activities.stretchSpeedAndGracefulness.vibrationsDetected")}: {loggedDesign.vibrations}</Text> 
+                                    </View>
+                                ): (
+                                    <Text style={styles.designConfig}>No Recorded Attempt Yet.</Text>
+                                )}  
+                            </View>
+                        );
+                    })}
 
                     <View style={styles.buttonContainer}>
-                        {recordingState === "idle" && (
-                            <Button text={t("buttons.startRecording")} action={() => {
-                                    setCountdown(3);
-                                }}
-                            />
-                        )}
-
-                        {recordingState === "recording" && (
-                            <Button text={t("buttons.recording")} action={() => {}} />
-                        )}
-
-                        {recordingState === "completed" && (
-                            <Button 
-                                text={t("buttons.logTrial")}
-                                action={logDesign}
-                            />
-                        )}
+                        <Button 
+                            text={t("buttons.finishActivity")}
+                            action={handleFinish}
+                        />
                     </View>
-                    <Pressable
-                        onPress={handleFinish}
-                        style={({ pressed }) => pressed && { opacity: 0.7 }}>
-                        <Text style={styles.skipText}>{t("buttons.finishActivity")}</Text>
-                    </Pressable>
                 </ScrollView>
             </KeyboardAvoidingView>
 
@@ -372,7 +405,8 @@ const createStyles = (colors: ThemeColors) => {
             fontFamily: "PoppinsRegular",
             fontSize: 18,
             color: colors.secondary,
-            marginVertical: 16
+            marginVertical: 16,
+            marginTop: 24
         },
 
         subContainer: {

@@ -64,9 +64,10 @@ export default function HumanPerformanceResultsScreen() {
               return (
                 <View key={log.timestamp} style={styles.logItem}>
                   <Text style={styles.trialName}>{t("results.entryNumber", {number: i + 1})}</Text>
-                  {d.smoothness !== undefined && <Text style={styles.smoothnessValue}>{t("activities.stretchSpeedAndGracefulness.smoothnessScore")}: {Math.floor(d.smoothness * 100) / 100}%</Text>}
-                  <Text style={styles.detail}>{t("results.preset")}: {t(d.presetKey)}</Text>
-                  {d.vibrations !== undefined && <Text style={styles.detail}>{t("activities.stretchSpeedAndGracefulness.vibrationsDetected")}: {d.vibrations}</Text>}
+                  <Text style={styles.smoothnessValue}>{t("results.score")}: -</Text>
+                  <Text style={styles.detail}>{t("activities.stretchSpeedAndGracefulness.clockwiseMovement")} {t("activities.stretchSpeedAndGracefulness.smoothnessScore")}: {d.clockwiseMovementSmoothness?.toFixed(2)}% ({d.clockwiseMovementVibrations} {t("activities.stretchSpeedAndGracefulness.vibrations")})</Text>
+                  <Text style={styles.detail}>{t("activities.stretchSpeedAndGracefulness.verticalMovement")} {t("activities.stretchSpeedAndGracefulness.smoothnessScore")}: {d.verticalMovementSmoothness?.toFixed(2)}% ({d.verticalMovementVibrations} {t("activities.stretchSpeedAndGracefulness.vibrations")})</Text>
+                  <Text style={styles.detail}>{t("activities.stretchSpeedAndGracefulness.horizontalMovement")} {t("activities.stretchSpeedAndGracefulness.smoothnessScore")}: {d.horizontalMovementSmoothness?.toFixed(2)}% ({d.horizontalMovementVibrations} {t("activities.stretchSpeedAndGracefulness.vibrations")})</Text>
                 </View>
               );
             })}

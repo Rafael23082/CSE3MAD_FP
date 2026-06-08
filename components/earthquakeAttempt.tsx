@@ -7,7 +7,6 @@ import { Subscription } from "expo-sensors/build/Pedometer";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "./button";
 import Card from "./card";
 
@@ -164,143 +163,143 @@ export default function EarthquakeAttemptScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.outerContainer} edges={["top"]}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior="height">
-        <ScrollView contentContainerStyle={styles.container}>
-          <Text style={styles.head}>{t("activities.earthquakeResistantStructure.name")}</Text>
-          <Text style={styles.sectionHeader}>{t("activities.attempt")}</Text>
-          {/* PDF: Accelerometer Live Display */}
-          <Text style={[styles.actionName, { marginTop: 24 }]}>{t("activities.earthquakeResistantStructure.accelerometerData")}</Text>
-          <View style={styles.cardRow}>
-            <Card metric="Live" value={liveAccel.toFixed(1)} maximumWidth={false} />
-            <Card metric="Peak" value={peakAccel.toFixed(1)} maximumWidth={false} />
+    <KeyboardAvoidingView style={styles.outerContainer} behavior="height">
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.head}>{t("activities.earthquakeResistantStructure.name")}</Text>
+        <Text style={styles.sectionHeader}>{t("activities.attempt")}</Text>
+        {/* PDF: Accelerometer Live Display */}
+
+        {/* PDF: Design Configuration */}
+        <Text style={[styles.sectionHeader, {
+          marginTop: 24,
+          paddingBottom: 16
+        }]}>New Trial</Text>
+
+        {/* Design Presets */}
+        <Pressable style={styles.presetsToggle} onPress={() => setShowPresets(!showPresets)}>
+          <Text style={styles.presetsToggleText}>
+            {showPresets ? "▼ " : "▶ "}Design Presets
+          </Text>
+        </Pressable>
+        {showPresets && (
+          <View style={styles.presetsList}>
+            {DESIGN_PRESETS.map((preset, i) => (
+              <Pressable
+                key={i}
+                style={styles.presetItem}
+                onPress={() => { setFoldCount(String(preset.folds)); setPillarCount(String(preset.pillars)); setDesignKey(preset.key); setShowPresets(false); setDesignName(t(preset.key)); setHasEditedName(false); }}
+              >
+                <Text style={styles.presetName}>{t(preset.key)}</Text>
+                <Text style={styles.presetMeta}>{preset.folds} folds, {preset.pillars} pillars</Text>
+              </Pressable>
+            ))}
           </View>
+        )}
 
-          {recordingState === "recording" && (
-            <Text style={styles.shakingHint}>
-              {t("activities.earthquakeResistantStructure.recordingHint")}
-            </Text>
-          )}
+        <TextInput
+          style={styles.input}
+          value={designName}
+          onChangeText={(text) => {
+            setDesignName(text);
+            setHasEditedName(true);
+          }}
+          placeholder={t("activities.earthquakeResistantStructure.designNamePlaceholder")}
+          placeholderTextColor={theme.textMuted}
+        />
 
-          {/* PDF: Design Configuration */}
-          <Text style={[styles.sectionHeader, {
-            marginTop: 24,
-            paddingBottom: 16
-          }]}>New Trial</Text>
+        <Text style={[styles.actionName, { marginTop: 24 }]}>{t("activities.earthquakeResistantStructure.accelerometerData")}</Text>
+        <View style={styles.cardRow}>
+          <Card metric="Live" value={liveAccel.toFixed(1)} maximumWidth={false} />
+          <Card metric="Peak" value={peakAccel.toFixed(1)} maximumWidth={false} />
+        </View>
 
-          {/* Design Presets */}
-          <Pressable style={styles.presetsToggle} onPress={() => setShowPresets(!showPresets)}>
-            <Text style={styles.presetsToggleText}>
-              {showPresets ? "▼ " : "▶ "}Design Presets
-            </Text>
-          </Pressable>
-          {showPresets && (
-            <View style={styles.presetsList}>
-              {DESIGN_PRESETS.map((preset, i) => (
-                <Pressable
-                  key={i}
-                  style={styles.presetItem}
-                  onPress={() => { setFoldCount(String(preset.folds)); setPillarCount(String(preset.pillars)); setDesignKey(preset.key); setShowPresets(false); setDesignName(t(preset.key)); setHasEditedName(false); }}
-                >
-                  <Text style={styles.presetName}>{t(preset.key)}</Text>
-                  <Text style={styles.presetMeta}>{preset.folds} folds, {preset.pillars} pillars</Text>
-                </Pressable>
-              ))}
-            </View>
-          )}
+        {recordingState === "recording" && (
+          <Text style={styles.shakingHint}>
+            {t("activities.earthquakeResistantStructure.recordingHint")}
+          </Text>
+        )}
 
+        <View style={styles.configRow}>
           <TextInput
-            style={styles.input}
-            value={designName}
-            onChangeText={(text) => {
-              setDesignName(text);
-              setHasEditedName(true);
-            }}
-            placeholder={t("activities.earthquakeResistantStructure.designNamePlaceholder")}
-            placeholderTextColor={theme.textMuted}
-          />
-          <View style={styles.configRow}>
-            <TextInput
-              style={[styles.input, { flex: 1 }]}
-              value={foldCount}
-              onChangeText={setFoldCount}
-              keyboardType="numeric"
-              placeholder={t("activities.earthquakeResistantStructure.foldCountPlaceholder")}
-              placeholderTextColor={theme.textMuted}
-            />
-            <TextInput
-              style={[styles.input, { flex: 1 }]}
-              value={pillarCount}
-              onChangeText={setPillarCount}
-              keyboardType="numeric"
-              placeholder={t("activities.earthquakeResistantStructure.pillarCountPlaceholder")}
-              placeholderTextColor={theme.textMuted}
-            />
-          </View>
-
-          {/* PDF: Predictions */}
-          <TextInput
-            style={styles.input}
-            value={predictedMovement}
-            onChangeText={setPredictedMovement}
+            style={[styles.input, { flex: 1 }]}
+            value={foldCount}
+            onChangeText={setFoldCount}
             keyboardType="numeric"
-            placeholder={t("activities.earthquakeResistantStructure.predictedMovementPlaceholder")}
+            placeholder={t("activities.earthquakeResistantStructure.foldCountPlaceholder")}
             placeholderTextColor={theme.textMuted}
           />
           <TextInput
-            style={[styles.input, {marginBottom: 0}]}
-            value={observedCm}
-            onChangeText={setObservedCm}
+            style={[styles.input, { flex: 1 }]}
+            value={pillarCount}
+            onChangeText={setPillarCount}
             keyboardType="numeric"
-            placeholder={t("activities.earthquakeResistantStructure.observedSwayPlaceholder")}
+            placeholder={t("activities.earthquakeResistantStructure.pillarCountPlaceholder")}
             placeholderTextColor={theme.textMuted}
           />
+        </View>
 
-          <Text style={[styles.sectionHeader, {marginTop: 24, marginBottom: 16}]}>{t("attempt.structuralIterations")}</Text>
+        {/* PDF: Predictions */}
+        <TextInput
+          style={styles.input}
+          value={predictedMovement}
+          onChangeText={setPredictedMovement}
+          keyboardType="numeric"
+          placeholder={t("activities.earthquakeResistantStructure.predictedMovementPlaceholder")}
+          placeholderTextColor={theme.textMuted}
+        />
+        <TextInput
+          style={[styles.input, {marginBottom: 0}]}
+          value={observedCm}
+          onChangeText={setObservedCm}
+          keyboardType="numeric"
+          placeholder={t("activities.earthquakeResistantStructure.observedSwayPlaceholder")}
+          placeholderTextColor={theme.textMuted}
+        />
 
-          {/* PDF: Design History */}
-          {designs.length === 0 ? (
-              <Text style={styles.emptyState}>
-                  {t("attempt.logTrialPlaceholder")}
-              </Text>
-          ): (
-            <View>
-              {designs.map((d, i) => (
-                <View key={i} style={styles.designCard}>
-                  <View style={styles.designHeader}>
-                    <Text style={styles.designName}>{d.name}</Text>
-                    <Text style={[styles.designAccel, { color: d.peakAccel > 3 ? theme.danger : theme.tertiary }]}>
-                      Peak: {d.peakAccel.toFixed(2)}g
-                    </Text>
-                  </View>
-                  <Text style={styles.designConfig}>{d.folds} {t("activities.earthquakeResistantStructure.folds")}, {d.pillars} {t("activities.earthquakeResistantStructure.pillars")}</Text>
-                  <Text style={styles.designResult}>
-                    Pred: {d.predicted || "-"}cm | Obs: {d.observed}cm |
-                    {d.wasRight ? (d.wasRight === "Yes" ? " ✓ Right" : " ✗ Wrong") : ""}
+        <Text style={[styles.sectionHeader, {marginTop: 24, marginBottom: 16}]}>{t("attempt.structuralIterations")}</Text>
+
+        {/* PDF: Design History */}
+        {designs.length === 0 ? (
+            <Text style={styles.emptyState}>
+                {t("attempt.logTrialPlaceholder")}
+            </Text>
+        ): (
+          <View>
+            {designs.map((d, i) => (
+              <View key={i} style={styles.designCard}>
+                <View style={styles.designHeader}>
+                  <Text style={styles.designName}>{d.name}</Text>
+                  <Text style={[styles.designAccel, { color: d.peakAccel > 3 ? theme.danger : theme.tertiary }]}>
+                    Peak: {d.peakAccel.toFixed(2)}g
                   </Text>
                 </View>
-              ))}
-            </View>
+                <Text style={styles.designConfig}>{d.folds} {t("activities.earthquakeResistantStructure.folds")}, {d.pillars} {t("activities.earthquakeResistantStructure.pillars")}</Text>
+                <Text style={styles.designResult}>
+                  Pred: {d.predicted || "-"}cm | Obs: {d.observed}cm |
+                  {d.wasRight ? (d.wasRight === "Yes" ? " ✓ Right" : " ✗ Wrong") : ""}
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
+        <View style={styles.buttonContainer}>
+          {recordingState != "completed" && (
+            <Button
+              text={recordingState == "recording" ? t("activities.earthquakeResistantStructure.stopVibration") : t("activities.earthquakeResistantStructure.startVibration")}
+              action={triggerShake}
+            />
           )}
-          <View style={styles.buttonContainer}>
-            {recordingState != "completed" && (
-              <Button
-                text={recordingState == "recording" ? t("activities.earthquakeResistantStructure.stopVibration") : t("activities.earthquakeResistantStructure.startVibration")}
-                action={triggerShake}
-              />
-           )}
-            {recordingState == "completed" && (
-              <Button text="Log Design" action={logDesign} />
-            )}
-        </View>
-        <Pressable
-            onPress={handleFinish}
-            style={({ pressed }) => pressed && { opacity: 0.7 }}>
-            <Text style={styles.skipText}>{t("buttons.finishActivity")}</Text>
-        </Pressable>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+          {recordingState == "completed" && (
+            <Button text="Log Design" action={logDesign} />
+          )}
+      </View>
+      <Pressable
+          onPress={handleFinish}
+          style={({ pressed }) => pressed && { opacity: 0.7 }}>
+          <Text style={styles.skipText}>{t("buttons.finishActivity")}</Text>
+      </Pressable>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

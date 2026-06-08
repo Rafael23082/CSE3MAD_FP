@@ -6,7 +6,6 @@ import { useRouter } from "expo-router";
 import React, { use, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "./button";
 
 // PDF: Hearing damage risk table
@@ -120,127 +119,125 @@ export default function SoundAttemptScreen() {
   const riskColor = (color: string) => color === "tertiary" ? theme.tertiary : theme.danger;
 
   return (
-    <SafeAreaView style={styles.outerContainer} edges={["top"]}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior="height">
-        <ScrollView contentContainerStyle={styles.container}>
-          <Text style={styles.head}>{t("activities.soundPollutionHunter.name")}</Text>
+    <KeyboardAvoidingView style={styles.outerContainer} behavior="height">
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.head}>{t("activities.soundPollutionHunter.name")}</Text>
 
-          {/* Decibel Meter */}
-          <Text style={styles.sectionHeader}>{t("activities.attempt")}</Text>
-          <View style={styles.dbMeter}>
-            <Text style={[styles.dbValue, { color: liveDb > 85 ? theme.danger : theme.primary }]}>{liveDb}</Text>
-            <Text style={styles.dbUnit}>dB</Text>
+        {/* Decibel Meter */}
+        <Text style={styles.sectionHeader}>{t("activities.attempt")}</Text>
+        <View style={styles.dbMeter}>
+          <Text style={[styles.dbValue, { color: liveDb > 85 ? theme.danger : theme.primary }]}>{liveDb}</Text>
+          <Text style={styles.dbUnit}>dB</Text>
+        </View>
+        {liveDb > 0 && (
+          <Text style={[styles.riskBadge, {
+            backgroundColor: liveDb > 85 ? theme.danger + "30" : theme.tertiary + "30",
+            color: liveDb > 85 ? theme.danger : theme.tertiary
+          }]}>
+            Risk: {getRiskLevel(liveDb)}
+          </Text>
+        )}
+
+        <Button
+          text={recording ? "Stop Measuring" : "Start Measuring"}
+          action={recording ? stopRecording : startRecording}
+        />
+
+        {/* PDF: Action selection */}
+        <Text style={styles.sectionHeader}>{t("activities.soundPollutionHunter.actionLabel")}</Text>
+        <Pressable style={styles.dropdown} onPress={() => setShowActions(!showActions)}>
+          <Text style={[styles.dropdownText, { color: selectedAction ? theme.secondary : theme.textMuted }]}>
+            {selectedAction || t("activities.soundPollutionHunter.actionPlaceholder")}
+          </Text>
+        </Pressable>
+        {showActions && (
+          <View style={styles.dropdownList}>
+            {ACTION_PRESETS.map((action, i) => (
+              <Pressable key={i} style={styles.dropdownItem} onPress={() => { setSelectedAction(action); setShowActions(false); }}>
+                <Text style={{ color: theme.secondary, padding: 8 }}>{action}</Text>
+              </Pressable>
+            ))}
           </View>
-          {liveDb > 0 && (
-            <Text style={[styles.riskBadge, {
-              backgroundColor: liveDb > 85 ? theme.danger + "30" : theme.tertiary + "30",
-              color: liveDb > 85 ? theme.danger : theme.tertiary
-            }]}>
-              Risk: {getRiskLevel(liveDb)}
-            </Text>
-          )}
+        )}
 
-          <Button
-            text={recording ? "Stop Measuring" : "Start Measuring"}
-            action={recording ? stopRecording : startRecording}
-          />
-
-          {/* PDF: Action selection */}
-          <Text style={styles.sectionHeader}>{t("activities.soundPollutionHunter.actionLabel")}</Text>
-          <Pressable style={styles.dropdown} onPress={() => setShowActions(!showActions)}>
-            <Text style={[styles.dropdownText, { color: selectedAction ? theme.secondary : theme.textMuted }]}>
-              {selectedAction || t("activities.soundPollutionHunter.actionPlaceholder")}
-            </Text>
-          </Pressable>
-          {showActions && (
-            <View style={styles.dropdownList}>
-              {ACTION_PRESETS.map((action, i) => (
-                <Pressable key={i} style={styles.dropdownItem} onPress={() => { setSelectedAction(action); setShowActions(false); }}>
-                  <Text style={{ color: theme.secondary, padding: 8 }}>{action}</Text>
-                </Pressable>
-              ))}
-            </View>
-          )}
-
-          {/* PDF: Prediction toggle */}
-          <Text style={styles.subSectionHeader}>{t("activities.soundPollutionHunter.predictionLabel")}</Text>
-          <View style={styles.predictionRow}>
-            <Pressable
-              style={[styles.predBtn, { backgroundColor: prediction === "Louder" ? theme.primary : theme.surfaceContainer }]}
-              onPress={() => setPrediction(prediction === "Louder" ? "" : "Louder")}
-            >
-              <Text style={[styles.predText, { color: prediction === "Louder" ? theme.buttonText : theme.textMuted }]}>
-                {t("activities.soundPollutionHunter.predictLouder")}
-              </Text>
-            </Pressable>
-            <Pressable
-              style={[styles.predBtn, { backgroundColor: prediction === "Softer" ? theme.primary : theme.surfaceContainer }]}
-              onPress={() => setPrediction(prediction === "Softer" ? "" : "Softer")}
-            >
-              <Text style={[styles.predText, { color: prediction === "Softer" ? theme.buttonText : theme.textMuted }]}>
-                {t("activities.soundPollutionHunter.predictSofter")}
-              </Text>
-            </Pressable>
-          </View>
-
-          {/* Location */}
-          <Text style={styles.subSectionHeader}>Location</Text>
-          <TextInput
-            style={styles.input}
-            value={location}
-            onChangeText={setLocation}
-            placeholder={t("activities.soundPollutionHunter.locationPlaceholder")}
-            placeholderTextColor={theme.textMuted}
-          />
-
-          <View style={styles.buttonContainer}>
-            <Button text={t("buttons.logReading")} action={logReading} />
-          </View>
-
-          {/* PDF: Hearing Risk Scale - toggle */}
-          <Pressable style={styles.riskToggle} onPress={() => setShowRiskScale(!showRiskScale)}>
-            <Text style={styles.riskToggleText}>
-              {showRiskScale ? "▼ " : "▶ "}{t("activities.soundPollutionHunter.hearingRiskTable")}
+        {/* PDF: Prediction toggle */}
+        <Text style={styles.subSectionHeader}>{t("activities.soundPollutionHunter.predictionLabel")}</Text>
+        <View style={styles.predictionRow}>
+          <Pressable
+            style={[styles.predBtn, { backgroundColor: prediction === "Louder" ? theme.primary : theme.surfaceContainer }]}
+            onPress={() => setPrediction(prediction === "Louder" ? "" : "Louder")}
+          >
+            <Text style={[styles.predText, { color: prediction === "Louder" ? theme.buttonText : theme.textMuted }]}>
+              {t("activities.soundPollutionHunter.predictLouder")}
             </Text>
           </Pressable>
-          {showRiskScale && (
-            <View style={styles.riskTable}>
-              {HEARING_RISK_TABLE.map((row, i) => (
-                <View key={i} style={[styles.riskRow, { borderLeftColor: riskColor(row.color) }]}>
-                  <Text style={[styles.riskRange, { color: theme.textMuted }]}>{row.range}</Text>
-                  <Text style={[styles.riskDesc, { color: theme.secondary }]}>{row.risk}</Text>
-                  <Text style={[styles.riskExamples, { color: theme.textMuted }]}>{row.examples}</Text>
-                </View>
-              ))}
-            </View>
-          )}
+          <Pressable
+            style={[styles.predBtn, { backgroundColor: prediction === "Softer" ? theme.primary : theme.surfaceContainer }]}
+            onPress={() => setPrediction(prediction === "Softer" ? "" : "Softer")}
+          >
+            <Text style={[styles.predText, { color: prediction === "Softer" ? theme.buttonText : theme.textMuted }]}>
+              {t("activities.soundPollutionHunter.predictSofter")}
+            </Text>
+          </Pressable>
+        </View>
 
-          {/* PDF: Write-up logged readings */}
-          {readings.length > 0 && (
-            <View style={styles.readingsList}>
-              <Text style={styles.subSectionHeader}>{t("activities.soundPollutionHunter.predictionCompare")}</Text>
-              {readings.map((r) => (
-                <View key={r.id} style={styles.readingCard}>
-                  <View style={styles.readingHeader}>
-                    <Text style={styles.readingAction}>{r.action}</Text>
-                    <Text style={[styles.readingDb, { color: r.db > 85 ? theme.danger : theme.tertiary }]}>{r.db} dB</Text>
-                  </View>
-                  <Text style={styles.readingLocation}>@{r.location}</Text>
-                  {r.prediction && (
-                    <Text style={styles.readingPred}>
-                      Predicted: {r.prediction} — {r.wasRight ? "✓ Right" : "?"}
-                    </Text>
-                  )}
-                </View>
-              ))}
-              <View style={{ marginTop: 12 }}>
-                <Button text={t("buttons.finishActivity")} action={handleFinish} />
+        {/* Location */}
+        <Text style={styles.subSectionHeader}>Location</Text>
+        <TextInput
+          style={styles.input}
+          value={location}
+          onChangeText={setLocation}
+          placeholder={t("activities.soundPollutionHunter.locationPlaceholder")}
+          placeholderTextColor={theme.textMuted}
+        />
+
+        <View style={styles.buttonContainer}>
+          <Button text={t("buttons.logReading")} action={logReading} />
+        </View>
+
+        {/* PDF: Hearing Risk Scale - toggle */}
+        <Pressable style={styles.riskToggle} onPress={() => setShowRiskScale(!showRiskScale)}>
+          <Text style={styles.riskToggleText}>
+            {showRiskScale ? "▼ " : "▶ "}{t("activities.soundPollutionHunter.hearingRiskTable")}
+          </Text>
+        </Pressable>
+        {showRiskScale && (
+          <View style={styles.riskTable}>
+            {HEARING_RISK_TABLE.map((row, i) => (
+              <View key={i} style={[styles.riskRow, { borderLeftColor: riskColor(row.color) }]}>
+                <Text style={[styles.riskRange, { color: theme.textMuted }]}>{row.range}</Text>
+                <Text style={[styles.riskDesc, { color: theme.secondary }]}>{row.risk}</Text>
+                <Text style={[styles.riskExamples, { color: theme.textMuted }]}>{row.examples}</Text>
               </View>
+            ))}
+          </View>
+        )}
+
+        {/* PDF: Write-up logged readings */}
+        {readings.length > 0 && (
+          <View style={styles.readingsList}>
+            <Text style={styles.subSectionHeader}>{t("activities.soundPollutionHunter.predictionCompare")}</Text>
+            {readings.map((r) => (
+              <View key={r.id} style={styles.readingCard}>
+                <View style={styles.readingHeader}>
+                  <Text style={styles.readingAction}>{r.action}</Text>
+                  <Text style={[styles.readingDb, { color: r.db > 85 ? theme.danger : theme.tertiary }]}>{r.db} dB</Text>
+                </View>
+                <Text style={styles.readingLocation}>@{r.location}</Text>
+                {r.prediction && (
+                  <Text style={styles.readingPred}>
+                    Predicted: {r.prediction} — {r.wasRight ? "✓ Right" : "?"}
+                  </Text>
+                )}
+              </View>
+            ))}
+            <View style={{ marginTop: 12 }}>
+              <Button text={t("buttons.finishActivity")} action={handleFinish} />
             </View>
-          )}
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+          </View>
+        )}
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 

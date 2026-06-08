@@ -6,7 +6,6 @@ import { useRouter } from "expo-router";
 import React, { use, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "./button";
 import Card from "./card";
 
@@ -102,143 +101,141 @@ export default function FanAttemptScreen() {
   if (!permission) return null;
 
   return (
-    <SafeAreaView style={styles.outerContainer} edges={["top"]}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior="height">
-        <ScrollView contentContainerStyle={styles.container}>
-          <Text style={styles.head}>{t("activities.handFanChallenge.name")}</Text>
+    <KeyboardAvoidingView style={styles.outerContainer} behavior="height">
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.head}>{t("activities.handFanChallenge.name")}</Text>
 
-          {/* Camera */}
-          <Pressable style={styles.cameraToggle} onPress={() => setIsCameraActive(!isCameraActive)}>
-            <Text style={styles.cameraToggleText}>{isCameraActive ? t("buttons.closeCamera") : t("buttons.openCamera")}</Text>
-          </Pressable>
-          {isCameraActive && (
-            <View style={styles.cameraBox}>
-              <CameraView style={{ flex: 1 }} facing="back" />
-            </View>
-          )}
-
-          <Text style={styles.sectionHeader}>{t("activities.attempt")}</Text>
-
-          {/* PDF: Fan Design Name */}
-          <TextInput
-            style={styles.input}
-            value={fanDesignName}
-            onChangeText={setFanDesignName}
-            placeholder={t("activities.handFanChallenge.fanDesignPlaceholder")}
-            placeholderTextColor={theme.textMuted}
-          />
-
-          {/* PDF: Target Material selector */}
-          <Text style={styles.subSectionHeader}>{t("activities.handFanChallenge.selectMaterial")} (k={kValue})</Text>
-          <Pressable style={styles.dropdown} onPress={() => setShowMaterials(!showMaterials)}>
-            <Text style={[styles.dropdownText, { color: theme.secondary }]}>{selectedMaterial.name}</Text>
-          </Pressable>
-          {showMaterials && (
-            <View style={styles.dropdownList}>
-              {MATERIALS.map((mat, i) => (
-                <Pressable key={i} style={styles.dropdownItem} onPress={() => { setSelectedMaterial(mat); setShowMaterials(false); }}>
-                  <Text style={{ color: theme.secondary, padding: 8 }}>{mat.name} (k={mat.k})</Text>
-                  <Text style={{ color: theme.textMuted, paddingHorizontal: 8, paddingBottom: 8, fontSize: 12 }}>Thickness: {mat.thickness}</Text>
-                </Pressable>
-              ))}
-            </View>
-          )}
-
-          {/* PDF: Target type toggle */}
-          <Text style={styles.subSectionHeader}>{t("activities.handFanChallenge.targetToggle")}</Text>
-          <View style={styles.targetRow}>
-            <Pressable
-              style={[styles.targetBtn, { backgroundColor: targetType === "paper" ? theme.primary : theme.surfaceContainer }]}
-              onPress={() => setTargetType("paper")}
-            >
-              <Text style={[styles.targetText, { color: targetType === "paper" ? theme.buttonText : theme.textMuted }]}>
-                {t("activities.handFanChallenge.paper")}
-              </Text>
-            </Pressable>
-            <Pressable
-              style={[styles.targetBtn, { backgroundColor: targetType === "cardboard" ? theme.primary : theme.surfaceContainer }]}
-              onPress={() => setTargetType("cardboard")}
-            >
-              <Text style={[styles.targetText, { color: targetType === "cardboard" ? theme.buttonText : theme.textMuted }]}>
-                {t("activities.handFanChallenge.cardboard")}
-              </Text>
-            </Pressable>
+        {/* Camera */}
+        <Pressable style={styles.cameraToggle} onPress={() => setIsCameraActive(!isCameraActive)}>
+          <Text style={styles.cameraToggleText}>{isCameraActive ? t("buttons.closeCamera") : t("buttons.openCamera")}</Text>
+        </Pressable>
+        {isCameraActive && (
+          <View style={styles.cameraBox}>
+            <CameraView style={{ flex: 1 }} facing="back" />
           </View>
+        )}
 
-          {/* PDF: Distance presets */}
-          <Text style={styles.subSectionHeader}>{t("activities.handFanChallenge.selectDistance")}</Text>
-          <View style={styles.distanceRow}>
-            {DISTANCES.map((d) => (
-              <Pressable
-                key={d}
-                style={[styles.distanceBtn, { backgroundColor: selectedDistance === d ? theme.primary : theme.surfaceContainer }]}
-                onPress={() => setSelectedDistance(d)}
-              >
-                <Text style={[styles.distanceText, { color: selectedDistance === d ? theme.buttonText : theme.textMuted }]}>
-                  {d} cm
-                </Text>
+        <Text style={styles.sectionHeader}>{t("activities.attempt")}</Text>
+
+        {/* PDF: Fan Design Name */}
+        <TextInput
+          style={styles.input}
+          value={fanDesignName}
+          onChangeText={setFanDesignName}
+          placeholder={t("activities.handFanChallenge.fanDesignPlaceholder")}
+          placeholderTextColor={theme.textMuted}
+        />
+
+        {/* PDF: Target Material selector */}
+        <Text style={styles.subSectionHeader}>{t("activities.handFanChallenge.selectMaterial")} (k={kValue})</Text>
+        <Pressable style={styles.dropdown} onPress={() => setShowMaterials(!showMaterials)}>
+          <Text style={[styles.dropdownText, { color: theme.secondary }]}>{selectedMaterial.name}</Text>
+        </Pressable>
+        {showMaterials && (
+          <View style={styles.dropdownList}>
+            {MATERIALS.map((mat, i) => (
+              <Pressable key={i} style={styles.dropdownItem} onPress={() => { setSelectedMaterial(mat); setShowMaterials(false); }}>
+                <Text style={{ color: theme.secondary, padding: 8 }}>{mat.name} (k={mat.k})</Text>
+                <Text style={{ color: theme.textMuted, paddingHorizontal: 8, paddingBottom: 8, fontSize: 12 }}>Thickness: {mat.thickness}</Text>
               </Pressable>
             ))}
           </View>
+        )}
 
-          {/* PDF: Prediction input */}
-          <Text style={styles.subSectionHeader}>{t("activities.handFanChallenge.predictionAngle")}</Text>
-          <TextInput
-            style={styles.input}
-            value={predictedAngle}
-            onChangeText={setPredictedAngle}
-            keyboardType="numeric"
-            placeholder={t("activities.handFanChallenge.predictionAnglePlaceholder")}
-            placeholderTextColor={theme.textMuted}
-          />
+        {/* PDF: Target type toggle */}
+        <Text style={styles.subSectionHeader}>{t("activities.handFanChallenge.targetToggle")}</Text>
+        <View style={styles.targetRow}>
+          <Pressable
+            style={[styles.targetBtn, { backgroundColor: targetType === "paper" ? theme.primary : theme.surfaceContainer }]}
+            onPress={() => setTargetType("paper")}
+          >
+            <Text style={[styles.targetText, { color: targetType === "paper" ? theme.buttonText : theme.textMuted }]}>
+              {t("activities.handFanChallenge.paper")}
+            </Text>
+          </Pressable>
+          <Pressable
+            style={[styles.targetBtn, { backgroundColor: targetType === "cardboard" ? theme.primary : theme.surfaceContainer }]}
+            onPress={() => setTargetType("cardboard")}
+          >
+            <Text style={[styles.targetText, { color: targetType === "cardboard" ? theme.buttonText : theme.textMuted }]}>
+              {t("activities.handFanChallenge.cardboard")}
+            </Text>
+          </Pressable>
+        </View>
 
-          {/* PDF: Observed angle */}
-          <TextInput
-            style={styles.input}
-            value={angle}
-            onChangeText={setAngle}
-            keyboardType="numeric"
-            placeholder={t("activities.handFanChallenge.anglePlaceholder")}
-            placeholderTextColor={theme.textMuted}
-          />
+        {/* PDF: Distance presets */}
+        <Text style={styles.subSectionHeader}>{t("activities.handFanChallenge.selectDistance")}</Text>
+        <View style={styles.distanceRow}>
+          {DISTANCES.map((d) => (
+            <Pressable
+              key={d}
+              style={[styles.distanceBtn, { backgroundColor: selectedDistance === d ? theme.primary : theme.surfaceContainer }]}
+              onPress={() => setSelectedDistance(d)}
+            >
+              <Text style={[styles.distanceText, { color: selectedDistance === d ? theme.buttonText : theme.textMuted }]}>
+                {d} cm
+              </Text>
+            </Pressable>
+          ))}
+        </View>
 
-          {/* Live calculation */}
-          <View style={styles.cardRow}>
-            <Card metric="Angle (rad)" value={theta.toFixed(3)} maximumWidth={false} />
-            <Card metric={t("activities.handFanChallenge.forceResult")} value={`${force.toFixed(3)} N`} maximumWidth={false} />
-          </View>
-          <Text style={styles.stiffnessNote}>{t("activities.handFanChallenge.stiffnessNote")}</Text>
+        {/* PDF: Prediction input */}
+        <Text style={styles.subSectionHeader}>{t("activities.handFanChallenge.predictionAngle")}</Text>
+        <TextInput
+          style={styles.input}
+          value={predictedAngle}
+          onChangeText={setPredictedAngle}
+          keyboardType="numeric"
+          placeholder={t("activities.handFanChallenge.predictionAnglePlaceholder")}
+          placeholderTextColor={theme.textMuted}
+        />
 
-          <View style={styles.buttonContainer}>
-            <Button text={t("buttons.logTrial")} action={logTrial} />
-          </View>
+        {/* PDF: Observed angle */}
+        <TextInput
+          style={styles.input}
+          value={angle}
+          onChangeText={setAngle}
+          keyboardType="numeric"
+          placeholder={t("activities.handFanChallenge.anglePlaceholder")}
+          placeholderTextColor={theme.textMuted}
+        />
 
-          {/* PDF: Write-up logged trials */}
-          {trials.length > 0 && (
-            <View style={styles.trialsList}>
-              <Text style={styles.sectionHeader}>{t("activities.parachuteDropChallenge.writeUpPrediction")}</Text>
-              {trials.map((t) => (
-                <View key={t.id} style={styles.trialCard}>
-                  <View style={styles.trialHeader}>
-                    <Text style={styles.trialName}>{t.name}</Text>
-                    <Text style={styles.trialForce}>{t.force.toFixed(3)}N</Text>
-                  </View>
-                  <Text style={styles.trialMeta}>{t.targetType} @ {t.distance}cm | {t.material}</Text>
-                  <Text style={styles.trialMeta}>
-                    Observed: {t.observedAngle}° |
-                    Pred: {t.predictedAngle || "-"}° |
-                    {t.wasRight ? (t.wasRight === "Yes" ? " ✓ Right" : " ✗ Wrong") : ""}
-                  </Text>
+        {/* Live calculation */}
+        <View style={styles.cardRow}>
+          <Card metric="Angle (rad)" value={theta.toFixed(3)} maximumWidth={false} />
+          <Card metric={t("activities.handFanChallenge.forceResult")} value={`${force.toFixed(3)} N`} maximumWidth={false} />
+        </View>
+        <Text style={styles.stiffnessNote}>{t("activities.handFanChallenge.stiffnessNote")}</Text>
+
+        <View style={styles.buttonContainer}>
+          <Button text={t("buttons.logTrial")} action={logTrial} />
+        </View>
+
+        {/* PDF: Write-up logged trials */}
+        {trials.length > 0 && (
+          <View style={styles.trialsList}>
+            <Text style={styles.sectionHeader}>{t("activities.parachuteDropChallenge.writeUpPrediction")}</Text>
+            {trials.map((t) => (
+              <View key={t.id} style={styles.trialCard}>
+                <View style={styles.trialHeader}>
+                  <Text style={styles.trialName}>{t.name}</Text>
+                  <Text style={styles.trialForce}>{t.force.toFixed(3)}N</Text>
                 </View>
-              ))}
-              <View style={{ marginTop: 16 }}>
-                <Button text={t("buttons.finishActivity")} action={handleFinish} />
+                <Text style={styles.trialMeta}>{t.targetType} @ {t.distance}cm | {t.material}</Text>
+                <Text style={styles.trialMeta}>
+                  Observed: {t.observedAngle}° |
+                  Pred: {t.predictedAngle || "-"}° |
+                  {t.wasRight ? (t.wasRight === "Yes" ? " ✓ Right" : " ✗ Wrong") : ""}
+                </Text>
               </View>
+            ))}
+            <View style={{ marginTop: 16 }}>
+              <Button text={t("buttons.finishActivity")} action={handleFinish} />
             </View>
-          )}
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+          </View>
+        )}
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 

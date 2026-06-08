@@ -6,8 +6,7 @@ import { Accelerometer } from 'expo-sensors';
 import { Subscription } from "expo-sensors/build/Pedometer";
 import { use, useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Alert, KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Alert, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import Button from "./button";
 import Card from "./card";
 import { LineChart } from "./lineChart";
@@ -182,26 +181,25 @@ export default function BreathingAttemptScreen(){
     }
 
     const logDesign = () => {
-        if (recordingState !== "completed"){
-            Alert.alert("Challenge Unfinished",
-                "Complete a challenge before logging this trial."
-            )
-            return;
-        }
+        setDesigns(prev => {
+            const index = prev.findIndex(d => d.key === presetKey);
 
-        setDesigns(prev => [...prev, {
-            id: Date.now() + Math.random(),
-            key: presetKey,
-            breathsRecorded: breaths, 
-            bpm: bpm
-        }]);
+            const newDesign = {
+                id: Date.now() + Math.random(),
+                key: presetKey,
+                breathsRecorded: breaths ?? undefined,
+                bpm: bpm ?? undefined,
+            };
 
-        if (activityContext) {
-            activityContext.addExperimentLog({
-                activityKey: "breathing-pace-trainer",
-                data: { presetKey, breaths, bpm }
-            });
-        }
+            if (index === -1) {
+                return [...prev, newDesign];
+            }
+
+            return prev.map((design, i) =>
+                i === index ? newDesign : design
+            );
+        });
+
         setCountdown(null);
         setRecordingState("idle");
         zValues.current = [];
@@ -213,10 +211,42 @@ export default function BreathingAttemptScreen(){
     };
 
     const handleFinish = () => {
+        if (designs.length < DESIGN_PRESETS.length){
+            Alert.alert(t("errorMessages.unfinishedChallenge"), t("errorMessages.unfinishedChallengeDescription"));
+            return;
+        }
+
         const results = designs.map(d => ({
             label: `${d.key}`,
             value: `Breaths Recorded: ${d.breathsRecorded} | BPM: ${d.bpm}}`
         }));
+
+        const rest = designs.find(
+            d => d.key === "activities.breathingPaceTrainer.rest"
+        );
+
+        const jogging = designs.find(
+            d => d.key === "activities.breathingPaceTrainer.jogging"
+        );
+
+        const starJumps = designs.find(
+            d => d.key === "activities.breathingPaceTrainer.starJumps"
+        );
+
+        if (activityContext) {
+            activityContext.addExperimentLog({
+                activityKey: "breathing-pace-trainer",
+                data: { 
+                    restBreaths: rest?.breathsRecorded,
+                    restBpm: rest?.bpm,
+                    joggingBreaths: jogging?.breathsRecorded,
+                    joggingBpm: jogging?.bpm,
+                    starJumpsBreaths: starJumps?.breathsRecorded,
+                    starJumpsBpm: starJumps?.bpm
+                 }
+            });
+        }
+
         router.push({
             pathname: "/activityResults",
             params: { results: JSON.stringify(results), activityKey: "breathing-pace-trainer" }
@@ -224,38 +254,16 @@ export default function BreathingAttemptScreen(){
     };
 
     return(
-        <SafeAreaView style={styles.outerContainer} edges={["top"]}>
-            <KeyboardAvoidingView style={{flex: 1}} behavior="height">
-                <ScrollView contentContainerStyle={styles.container}>
-                    <View style={styles.subContainer}>
-                        <Text style={styles.head}>{activity.name}</Text>
-                        <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
-                            <Text style={styles.sectionHeader}>{t("activities.attempt")}</Text>
-                            <View style={styles.timerContainer}>
-                                <Text style={[styles.sectionHeader, {
-                                    lineHeight: 20
-                                }]}>{formatNumber(time)}</Text>
-                            </View>
-                        </View>
-                        <Text style={[styles.actionName, {marginTop: 24}]}>{t("activities.breathingPaceTrainer.recordBreathing")}</Text>
-                        <View style={styles.cardContainer}>
-                            <Card metric={t("activities.breathingPaceTrainer.breathsRecorded")} value={String(breaths)} maximumWidth={true} />
-                        </View>
-                        <Card metric={t("activities.breathingPaceTrainer.bpm")} value={String(bpm)} maximumWidth={true} />
-                        <Text style={styles.actionName}>{t("activities.breathingPaceTrainer.breathingMonitor")}</Text>
-                        <View style={styles.chartContainer}>
-                            {centered.length != 0 ? (
-                                <LineChart
-                                    lineChartData={centered.map((value, index) => ({
-                                        time: index,
-                                        z: value
-                                    }))}
-                                /> 
-                            ): (
-                                <Text style={styles.placeholderText}>
-                                    {t("activities.breathingPaceTrainer.breathingMonitorPlaceholder")}
-                                </Text>
-                            )}
+        <KeyboardAvoidingView style={styles.outerContainer} behavior="height">
+            <ScrollView contentContainerStyle={styles.container}>
+                <View style={styles.subContainer}>
+                    <Text style={styles.head}>{activity.name}</Text>
+                    <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
+                        <Text style={styles.sectionHeader}>{t("activities.attempt")}</Text>
+                        <View style={styles.timerContainer}>
+                            <Text style={[styles.sectionHeader, {
+                                lineHeight: 20
+                            }]}>{formatNumber(time)}</Text>
                         </View>
                     </View>
 
@@ -274,31 +282,13 @@ export default function BreathingAttemptScreen(){
                         editable={false}
                     />
 
-                    <Text style={styles.actionNameLarge}>{t("attempt.structuralIterations")}</Text>
-                    {designs.length === 0 ? (
-                        <Text style={styles.emptyState}>
-                            {t("attempt.logTrialPlaceholder")}
-                        </Text>
-                    ): (
-                        <View>
-                            {designs.map((d) => (
-                                <View key={d.id} style={styles.designCard}>
-                                <View style={styles.designHeader}>
-                                    <Text style={styles.designName}>{t(d.key)}</Text>
-                                </View>
-                                <Text style={styles.designConfig}>{t("activities.breathingPaceTrainer.breathsRecorded")}: {d.breathsRecorded}</Text>
-                                <Text style={styles.designResult}>
-                                    Bpm: {d.bpm}
-                                </Text>
-                                </View>
-                            ))}
-                            <View style={{ marginTop: 16 }}>
-                                <Button text={t("buttons.finishActivity")} action={handleFinish} />
-                            </View>
-                        </View>
-                    )}
+                    <Text style={[styles.actionName, {marginTop: 24}]}>{t("activities.breathingPaceTrainer.recordBreathing")}</Text>
+                    <View style={styles.cardContainer}>
+                        <Card metric={t("activities.breathingPaceTrainer.breathsRecorded")} value={String(breaths)} maximumWidth={true} />
+                    </View>
+                    <Card metric={t("activities.breathingPaceTrainer.bpm")} value={String(bpm)} maximumWidth={true} />
 
-                    <View style={styles.buttonContainer}>
+                    <View style={{marginTop: 16}}>
                         {recordingState === "idle" && (
                             <Button text={t("buttons.startRecording")} action={() => {
                                 setCountdown(3);
@@ -313,23 +303,60 @@ export default function BreathingAttemptScreen(){
                                 action={logDesign}
                             />
                         )}
-                        
                     </View>
-                    <Pressable
-                        onPress={handleFinish}
-                        style={({ pressed }) => pressed && { opacity: 0.7 }}>
-                        <Text style={styles.skipText}>{t("buttons.finishActivity")}</Text>
-                    </Pressable>
 
-                </ScrollView>
-            </KeyboardAvoidingView>
+                    <Text style={styles.actionName}>{t("activities.breathingPaceTrainer.breathingMonitor")}</Text>
+                    <View style={styles.chartContainer}>
+                        {centered.length != 0 ? (
+                            <LineChart
+                                lineChartData={centered.map((value, index) => ({
+                                    time: index,
+                                    z: value
+                                }))}
+                            /> 
+                        ): (
+                            <Text style={styles.placeholderText}>
+                                {t("activities.breathingPaceTrainer.breathingMonitorPlaceholder")}
+                            </Text>
+                        )}
+                    </View>
+                </View>
+
+                <Text style={styles.actionNameLarge}>{t("attempt.structuralIterations")}</Text>
+                
+                {DESIGN_PRESETS.map((design, index) => {
+                    const loggedDesign = designs.find((loggedDesign) => loggedDesign.key == design.key);
+                    return(
+                        <View key={index} style={styles.designCard}>
+                            <View style={styles.designHeader}>
+                                <Text style={styles.designName}>{t(design.key)}</Text>
+                            </View>
+                            {loggedDesign ? (
+                                <View>
+                                    <Text style={styles.designConfig}>BPM: {loggedDesign.bpm}</Text>
+                                    <Text style={styles.designConfig}>{t("activities.breathingPaceTrainer.breathsRecorded")}: {loggedDesign.breathsRecorded}</Text> 
+                                </View>
+                            ): (
+                                <Text style={styles.designConfig}>No Recorded Attempt Yet.</Text>
+                            )}  
+                        </View>
+                    );
+                })}
+
+                <View style={styles.buttonContainer}>
+                    <Button 
+                        text={t("buttons.finishActivity")}
+                        action={handleFinish}
+                    />
+                </View>
+            </ScrollView>
             {countdown !== null && (
                 <View style={styles.overlay}>
                     <Text style={styles.readyText}>{t("countdown.getReady")}</Text>
                     <Text style={styles.countdownText}>{countdown}</Text>
                 </View>
             )}
-        </SafeAreaView>
+        </KeyboardAvoidingView>
     )
 } 
 
@@ -360,7 +387,8 @@ const createStyles = (colors: ThemeColors) => {
             fontFamily: "PoppinsRegular",
             fontSize: 18,
             color: colors.secondary,
-            marginVertical: 16
+            marginVertical: 16,
+            marginTop: 24
         },
         actionNameLarge: {
             fontFamily: "PoppinsRegular",

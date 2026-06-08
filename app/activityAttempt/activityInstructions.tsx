@@ -5,7 +5,6 @@ import { ThemeColors } from "@/theme/colors";
 import { use } from "react";
 import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, ScrollView, StyleSheet, Text } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ActivityAttemptInstructionsScreen(){
     const { theme } = useTheme();
@@ -19,8 +18,7 @@ export default function ActivityAttemptInstructionsScreen(){
     if (!activity) return null;
 
     return(
-        <SafeAreaView style={styles.outerContainer} edges={["top"]}>
-        <KeyboardAvoidingView style={{flex: 1}} behavior="height">
+        <KeyboardAvoidingView style={styles.outerContainer} behavior="height">
             <ScrollView contentContainerStyle={styles.container}>
                 <Text style={styles.head}>{activity.name}</Text>
                 <Text style={styles.sectionHeader}>{t("activities.instructions")}</Text>
@@ -34,7 +32,6 @@ export default function ActivityAttemptInstructionsScreen(){
                 ))}
             </ScrollView>
         </KeyboardAvoidingView>
-        </SafeAreaView>
     )
 } 
 

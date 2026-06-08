@@ -64,16 +64,12 @@ export default function ReactionResultsScreen() {
               return (
                 <View key={log.timestamp} style={styles.logItem}>
                   <Text style={styles.trialName}>{t("results.entryNumber", {number: i + 1})}</Text>
-                  {d.presetName === "Tracing Challenge" ? (
-                      <Text style={styles.mainValue}>
-                          {t("activities.reactionBoardChallenge.measureTracingAccuracy")}: {d.accuracy}%
-                      </Text>
-                  ) : (
-                      <Text style={styles.mainValue}>
-                          {t("activities.reactionBoardChallenge.reactionTime")}: {d.reactionTime} ms
-                      </Text>
-                  )}
-                  <Text style={styles.detail}>{t("results.preset")}: {t(d.presetKey)}</Text>
+                  <Text style={styles.mainValue}>
+                      {t("results.score")}: -
+                  </Text>
+                  <Text style={styles.detail}>{t("activities.reactionBoardChallenge.dominantHand")}: {d.reactionTime1} ms</Text>
+                  <Text style={styles.detail}>{t("activities.reactionBoardChallenge.nonDominantHand")}: {d.reactionTime2} ms</Text>
+                  <Text style={styles.detail}>{t("activities.reactionBoardChallenge.tracingAccuracy")}: {d.tracingAccuracy}%</Text>
                 </View>
               );
             })}

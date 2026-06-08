@@ -64,9 +64,12 @@ export default function BreathingResultsScreen() {
               return (
                 <View key={log.timestamp} style={styles.logItem}>
                   <Text style={styles.trialName}>{t("results.entryNumber", {number: i + 1})}</Text>
-                  {d.bpm !== undefined && <Text style={styles.bpmValue}>{d.bpm} BPM</Text>}
-                  <Text style={styles.detail}>{t("results.preset")}: {t(d.presetKey)}</Text>
-                  {d.breaths !== undefined && <Text style={styles.detail}>{t("activities.breathingPaceTrainer.breathsRecorded")}: {d.breaths}</Text>}
+                  <Text style={styles.mainValue}>
+                      {t("results.score")}: -
+                  </Text>
+                  <Text style={styles.detail}>{t("activities.breathingPaceTrainer.rest")} {t("activities.breathingPaceTrainer.bpm")}: {d.restBpm} ({d.restBreaths} {t("activities.breathingPaceTrainer.breathsRecorded")})</Text>
+                  <Text style={styles.detail}>{t("activities.breathingPaceTrainer.jogging")} {t("activities.breathingPaceTrainer.bpm")}: {d.joggingBpm} ({d.joggingBreaths} {t("activities.breathingPaceTrainer.breathsRecorded")})</Text>
+                  <Text style={styles.detail}>{t("activities.breathingPaceTrainer.starJumps")} {t("activities.breathingPaceTrainer.bpm")}: {d.starJumpsBpm} ({d.starJumpsBreaths} {t("activities.breathingPaceTrainer.breathsRecorded")})</Text>
                 </View>
               );
             })}
@@ -106,4 +109,5 @@ const createStyles = (colors: any) => StyleSheet.create({
   detail: { fontSize: 12, color: colors.textMuted },
   theoryText: { fontSize: 13, color: colors.textMuted, lineHeight: 20 },
   ratingHint: { textAlign: "center", fontSize: 11, color: colors.textMuted, marginTop: 8 },
+  mainValue: { fontSize: 18, fontFamily: "InterBold", fontWeight: "bold", color: colors.primary, marginBottom: 4 },
 });

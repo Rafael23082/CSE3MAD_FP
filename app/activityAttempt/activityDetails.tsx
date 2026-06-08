@@ -4,7 +4,6 @@ import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { use } from "react";
 import { KeyboardAvoidingView, ScrollView, StyleSheet } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ActivityAttemptDetailsScreen(){
     const { theme } = useTheme();
@@ -16,13 +15,11 @@ export default function ActivityAttemptDetailsScreen(){
     if (!activity) return null;
 
     return(
-        <SafeAreaView style={styles.outerContainer} edges={["top"]}>
-        <KeyboardAvoidingView style={{flex: 1}} behavior="height">
-            <ScrollView contentContainerStyle={styles.container}>
-                <ActivityDetailsContents activity={activity} />
-            </ScrollView>
-        </KeyboardAvoidingView>
-        </SafeAreaView>
+    <KeyboardAvoidingView style={styles.outerContainer} behavior="height">
+        <ScrollView contentContainerStyle={styles.container}>
+            <ActivityDetailsContents activity={activity} />
+        </ScrollView>
+    </KeyboardAvoidingView>
     )
 } 
 

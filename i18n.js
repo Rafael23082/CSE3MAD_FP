@@ -307,7 +307,8 @@ const resources = {
           movementMonitor: "Movement Monitor",
           movementMonitorPlaceholder: "Start recording to visualize movement smoothness",
           movementVibrations: "Movement {{index}} Vibrations",
-          movementSmoothness: "Movement {{index}} Smoothness"
+          movementSmoothness: "Movement {{index}} Smoothness",
+          vibrations: "Vibrations"
         },
         
         reactionBoardChallenge: {
@@ -406,7 +407,9 @@ const resources = {
         emailAlreadyInUse: "This email is already registered",
         failedPasswordUpdate: "Password update failed",
         passwordsDoNotMatch: "Passwords do not match",
-        emptyFirstName: "First name cannot be empty"
+        emptyFirstName: "First name cannot be empty",
+        unfinishedChallenge: "Challenge Unfinished",
+        unfinishedChallengeDescription: "Complete and log all challenges before this attempt can be saved."
       },
       countdown: {
         getReady: "Get Ready"
@@ -428,7 +431,8 @@ const resources = {
       },
       appearance: {
         lightMode: "Light Mode",
-        darkMode: "Dark Mode"
+        darkMode: "Dark Mode",
+        system: "System"
       },
       team: {
         teamInformation: "Team Information",
@@ -469,7 +473,8 @@ const resources = {
         breathingTheory: "How Breathing Works\n\nBreathing rate changes with physical activity. At rest, a typical person breathes 12-20 times per minute. During exercise, the body needs more oxygen, so breathing rate increases. The accelerometer in your phone can detect the subtle chest movements of breathing to measure your respiration rate.\n\nKey concept:\n• BPM: Breaths per minute — your breathing rate\n• Rest: 12-20 BPM typical\n• Light exercise: 20-40 BPM\n• Vigorous exercise: 40-60 BPM",
         reactionTheory: "How Reaction Time Works\n\nReaction time is the interval between a stimulus and your response. It involves your senses detecting the stimulus, your brain processing the information, and your nerves signaling your muscles to act. The average human reaction time to a visual stimulus is about 200-250 milliseconds.\n\nKey factors:\n• Dominant hand: Typically 10-20ms faster than non-dominant\n• Age: Reaction time peaks in early 20s\n• Fatigue: Slows reaction time significantly\n• Practice: Can improve reaction time by 10-15%",
         movementTheory: "How Movement Smoothness Works\n\nMovement smoothness is measured by sudden changes in acceleration. The phone's accelerometer detects vibrations and jolts. Smooth movements produce fewer and smaller acceleration changes. The smoothness score (0-100%) measures how gracefully you moved.\n\nKey concepts:\n• Vibrations: Sudden acceleration changes\n• Smoothness: Percentage of time without excessive vibration\n• Score: Starts at 100%, decreases with each jolt",
-        preset: "Preset"
+        preset: "Preset",
+        score: "Score"
       },
 
       leaderboard: {
@@ -748,7 +753,8 @@ const resources = {
           movementMonitor: "動作モニター",
           movementMonitorPlaceholder: "録画を開始して、動きの滑らかさを確認しましょう",
           movementVibrations: "運動 {{index}} 振動",
-          movementSmoothness: "動き {{index}} の滑らかさ"
+          movementSmoothness: "動き {{index}} の滑らかさ",
+          vibrations: "振動回数"
         },
         
         reactionBoardChallenge: {
@@ -846,7 +852,9 @@ const resources = {
         weakPassword: "パスワードは6文字以上にしてください",
         emailAlreadyInUse: "このメールアドレスはすでに登録されています",
         failedPasswordUpdate: "パスワードの更新に失敗しました",
-        emptyFirstName: "名字は空欄にできません"
+        emptyFirstName: "名字は空欄にできません",
+        unfinishedChallenge: "チャレンジ未完了",
+        unfinishedChallengeDescription: "この試行を保存する前に、すべてのチャレンジを完了して記録してください。"
       },
       countdown: {
         getReady: "準備をしよう"
@@ -868,7 +876,8 @@ const resources = {
       },
       appearance: {
         lightMode: "ライトモード",
-        darkMode: "ダークモード"
+        darkMode: "ダークモード",
+        system: "システム"
       },
       team: {
         teamInformation: "チーム情報",
@@ -908,7 +917,8 @@ const resources = {
         breathingTheory: "呼吸の仕組み\n\n呼吸数は身体活動（運動）によって変化します。安静時、人の呼吸数は1分間に12〜20回です。運動中は体に多くの酸素が必要になるため、呼吸数が多くなります。\n\n• BPM：1分間あたりの呼吸数\n• 安静時：12-20 BPM\n• 軽い運動：20-40 BPM\n• 激しい運動：40-60 BPM",
         reactionTheory: "反応時間の仕組み\n\n反応時間とは、刺激を受けてから体が反応するまでの時間のことです。感覚器官が刺激を察知し、脳がその情報を処理し、神経が筋肉に動くよう信号を送る、というプロセスを経て行われます。人間の視覚刺激に対する平均反応時間は、約200〜250ミリ秒（ms）です。\n\n• 利き手：通常、利き手ではない方よりも10〜20ms速い\n• 年齢：20代前半に反応時間のピークを迎える\n• 疲労：反応時間を著しく低下させる（遅らせる）",
         movementTheory: "動きの滑らかさの仕組み\n\n動きの滑らかさは、加速度の急激な変化によって測定されます。スマートフォンの加速度センサーが、揺れや衝撃（ジャーク）を検知します。滑らかな動きほど、加速度の変化が少なく、その幅も小さくなります。\n\n• 揺れ：加速度の急激な変化\n• 滑らかさ：過度な揺れがない時間の割合（％）\n• スコア：100%からスタートし、衝撃が加わるたびに減点される",
-        preset: "プリセット"
+        preset: "プリセット",
+        score: "スコア"
       },
       leaderboard: {
         title: "ランキング",
@@ -1290,7 +1300,8 @@ const resources = {
           movementMonitor: "Monitor Gerakan",
           movementMonitorPlaceholder: "Mulai merekam untuk memvisualisasikan kehalusan gerakan",
           movementVibrations: "Gerakan {{index}} Getaran",
-          movementSmoothness: "Gerakan {{index}} Kehalusan"
+          movementSmoothness: "Gerakan {{index}} Kehalusan",
+          vibrations: "Getaran"
         },
 
         reactionBoardChallenge: {
@@ -1389,7 +1400,9 @@ const resources = {
         emailAlreadyInUse: "Email ini sudah terdaftar",
         failedPasswordUpdate: "Pembaruan kata sandi gagal",
         passwordsDoNotMatch: "Kata sandi tidak cocok",
-        emptyFirstName: "Nama depan tidak boleh kosong"
+        emptyFirstName: "Nama depan tidak boleh kosong",
+        unfinishedChallenge: "Tantangan Belum Selesai",
+        unfinishedChallengeDescription: "Selesaikan dan simpan semua tantangan sebelum percobaan ini dapat disimpan."
       },
       countdown: {
         getReady: "Bersiaplah"
@@ -1411,7 +1424,8 @@ const resources = {
       },
       appearance: {
         lightMode: "Mode Terang",
-        darkMode: "Mode Gelap"
+        darkMode: "Mode Gelap",
+        system: "Sistem"
       },
       team: {
         teamInformation: "Informasi Tim",
@@ -1451,7 +1465,8 @@ const resources = {
         breathingTheory: "Cara Kerja Pernapasan\n\nLaju pernapasan berubah dengan aktivitas fisik. Saat istirahat, seseorang bernapas 12-20 kali per menit. Selama olahraga, tubuh membutuhkan lebih banyak oksigen, sehingga laju pernapasan meningkat.\n\n• BPM: Napas per menit\n• Istirahat: 12-20 BPM\n• Olahraga ringan: 20-40 BPM\n• Olahraga berat: 40-60 BPM",
         reactionTheory: "Cara Kerja Waktu Reaksi\n\nWaktu reaksi adalah interval antara stimulus dan respons Anda. Ini melibatkan indra Anda mendeteksi stimulus, otak Anda memproses informasi, dan saraf Anda memberi sinyal otot untuk bertindak. Waktu reaksi rata-rata manusia terhadap stimulus visual sekitar 200-250 milidetik.\n\n• Tangan dominan: Biasanya 10-20ms lebih cepat\n• Usia: Waktu reaksi puncak di awal 20-an\n• Kelelahan: Memperlambat waktu reaksi secara signifikan",
         movementTheory: "Cara Kerja Kehalusan Gerakan\n\nKehalusan gerakan diukur dari perubahan akselerasi mendadak. Akselerometer ponsel mendeteksi getaran dan sentakan. Gerakan halus menghasilkan perubahan akselerasi yang lebih sedikit dan lebih kecil.\n\n• Getaran: Perubahan akselerasi mendadak\n• Kehalusan: Persentase waktu tanpa getaran berlebihan\n• Skor: Mulai dari 100%, berkurang dengan setiap sentakan",
-        preset: "Preset"      
+        preset: "Preset",
+        score: "Skor"
       },
       leaderboard: {
         title: "Peringkat",
@@ -1823,7 +1838,8 @@ const resources = {
           movementMonitor: "运动监视器",
           movementMonitorPlaceholder: "开始录制以可视化运动流畅度",
           movementVibrations: "运动 {{index}} 振动",
-          movementSmoothness: "运动 {{index}} 流畅度"
+          movementSmoothness: "运动 {{index}} 流畅度",
+          vibrations: "振动次数"
         },
 
         reactionBoardChallenge: {
@@ -1922,7 +1938,9 @@ const resources = {
         emailAlreadyInUse: "此邮箱已注册",
         failedPasswordUpdate: "密码更新失败",
         passwordsDoNotMatch: "密码不匹配",
-        emptyFirstName: "名字不能为空"
+        emptyFirstName: "名字不能为空",
+        unfinishedChallenge: "挑战未完成",
+        unfinishedChallengeDescription: "请先完成并记录所有挑战，然后才能保存本次尝试。"
       },
       countdown: {
         getReady: "准备"
@@ -1944,7 +1962,8 @@ const resources = {
       },
       appearance: {
         lightMode: "浅色模式",
-        darkMode: "深色模式"
+        darkMode: "深色模式",
+        system: "系统"
       },
       team: {
         teamInformation: "团队信息",
@@ -1984,7 +2003,8 @@ const resources = {
         breathingTheory: "呼吸的工作原理\n\n呼吸频率随体力活动变化。静息时，人每分钟呼吸12-20次。运动中，身体需要更多氧气，呼吸频率增加。手机加速度计可以检测呼吸引起的细微胸部运动来测量呼吸频率。\n\n关键概念：\n• BPM：每分钟呼吸次数 — 您的呼吸频率\n• 静息：典型12-20 BPM\n• 轻度运动：20-40 BPM\n• 剧烈运动：40-60 BPM",
         reactionTheory: "反应时间的工作原理\n\n反应时间是刺激与您反应之间的间隔。它涉及您的感官检测刺激、大脑处理信息以及神经向肌肉发出信号。人类对视觉刺激的平均反应时间约为200-250毫秒。\n\n关键因素：\n• 惯用手：通常比非惯用手快10-20毫秒\n• 年龄：反应时间在20岁出头达到峰值\n• 疲劳：显著减慢反应时间\n• 练习：可提高反应时间10-15%",
         movementTheory: "运动流畅度的工作原理\n\n运动流畅度通过加速度的突然变化来衡量。手机加速度计检测振动和颠簸。流畅的运动产生更少、更小的加速度变化。流畅度评分（0-100%）衡量您移动的优雅程度。\n\n关键概念：\n• 振动：突然的加速度变化\n• 流畅度：无过度振动的时间百分比\n• 评分：从100%开始，每次颠簸减少",
-        preset: "预设"
+        preset: "预设",
+        score: "得分"
       },
       leaderboard: {
         title: "排行榜",

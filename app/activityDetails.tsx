@@ -8,37 +8,38 @@ import { useRouter } from "expo-router";
 import { use } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ActivityDetailsScreen(){
     const { theme } = useTheme();
     const styles = createStyles(theme);
     const router = useRouter();
     const {t} = useTranslation();
-    const insets = useSafeAreaInsets();
     const activityContext = use(ActivityContext);
     if (!activityContext) return null;
     const { activity } = activityContext;
     if (!activity) return null;
 
     return(
-        <ScrollView
-            style={styles.outerContainer}
-            contentContainerStyle={[styles.container, { paddingTop: insets.top + 24 }]}
-            contentInsetAdjustmentBehavior="automatic"
-        >
-            <View style={styles.header}>
-                <Pressable onPress={() => router.back()}>
-                    <MaterialCommunityIcons size={24} name="arrow-left" color={theme.secondary} />
-                </Pressable>
-                <Text style={styles.headerTitle}>{t("activities.activityDetails")}</Text>
-            </View>
-            <ActivityDetailsContents activity={activity} />
-            <Button
-                text={t("buttons.begin")}
-                action={()=>{router.push("/activityAttempt")}}
-            />
-        </ScrollView>
+        <SafeAreaView style={{flex: 1, backgroundColor: theme.backgroundColor}}>
+            <ScrollView
+                style={styles.outerContainer}
+                contentContainerStyle={[styles.container]}
+                contentInsetAdjustmentBehavior="automatic"
+            >
+                <View style={styles.header}>
+                    <Pressable onPress={() => router.back()}>
+                        <MaterialCommunityIcons size={24} name="arrow-left" color={theme.secondary} />
+                    </Pressable>
+                    <Text style={styles.headerTitle}>{t("activities.activityDetails")}</Text>
+                </View>
+                <ActivityDetailsContents activity={activity} />
+                <Button
+                    text={t("buttons.begin")}
+                    action={()=>{router.push("/activityAttempt")}}
+                />
+            </ScrollView>
+        </SafeAreaView>
     )
 }
 

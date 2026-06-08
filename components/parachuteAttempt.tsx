@@ -6,7 +6,6 @@ import { useRouter } from "expo-router";
 import React, { use, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "./button";
 import Card from "./card";
 
@@ -177,147 +176,145 @@ export default function ParachuteAttemptScreen() {
   if (!permission) return null;
 
   return (
-    <SafeAreaView style={styles.outerContainer} edges={["top"]}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior="height">
-        <ScrollView contentContainerStyle={styles.container}>
-          <Text style={styles.head}>{t("activities.parachuteDropChallenge.name")}</Text>
+    <KeyboardAvoidingView style={styles.outerContainer} behavior="height">
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.head}>{t("activities.parachuteDropChallenge.name")}</Text>
 
-          {/* Camera Toggle */}
-          <Pressable style={styles.cameraToggle} onPress={() => setIsCameraActive(!isCameraActive)}>
-            <Text style={styles.cameraToggleText}>
-              {isCameraActive ? t("buttons.closeCamera") : t("buttons.openCamera")}
-            </Text>
+        {/* Camera Toggle */}
+        <Pressable style={styles.cameraToggle} onPress={() => setIsCameraActive(!isCameraActive)}>
+          <Text style={styles.cameraToggleText}>
+            {isCameraActive ? t("buttons.closeCamera") : t("buttons.openCamera")}
+          </Text>
+        </Pressable>
+        {isCameraActive && (
+          <View style={styles.cameraBox}>
+            <CameraView style={{ flex: 1 }} facing="back" />
+          </View>
+        )}
+
+        {/* Timer Section */}
+        <Text style={styles.sectionHeader}>{t("activities.attempt")}</Text>
+        <View style={styles.cardRow}>
+          <Card metric="Time" value={`${timeValue.toFixed(2)}s`} maximumWidth={false} />
+          <Card metric="Trials" value={String(writeUpEntries.length)} maximumWidth={false} />
+        </View>
+
+        <View style={styles.timerRow}>
+          <Pressable style={[styles.timerBtn, { backgroundColor: theme.surfaceContainer }]} onPress={resetTimer}>
+            <Text style={[styles.timerBtnText, { color: theme.textMuted }]}>RESET</Text>
           </Pressable>
-          {isCameraActive && (
-            <View style={styles.cameraBox}>
-              <CameraView style={{ flex: 1 }} facing="back" />
-            </View>
-          )}
-
-          {/* Timer Section */}
-          <Text style={styles.sectionHeader}>{t("activities.attempt")}</Text>
-          <View style={styles.cardRow}>
-            <Card metric="Time" value={`${timeValue.toFixed(2)}s`} maximumWidth={false} />
-            <Card metric="Trials" value={String(writeUpEntries.length)} maximumWidth={false} />
-          </View>
-
-          <View style={styles.timerRow}>
-            <Pressable style={[styles.timerBtn, { backgroundColor: theme.surfaceContainer }]} onPress={resetTimer}>
-              <Text style={[styles.timerBtnText, { color: theme.textMuted }]}>RESET</Text>
-            </Pressable>
-            <Pressable style={[styles.timerBtn, { flex: 2, backgroundColor: isTimerRunning ? theme.danger : theme.primary }]} onPress={toggleTimer}>
-              <Text style={styles.timerBtnText}>{isTimerRunning ? t("buttons.stop") : t("buttons.start")}</Text>
-            </Pressable>
-          </View>
-
-          {/* PDF: Parameters */}
-          <Text style={styles.sectionHeader}>{t("activities.parachuteDropChallenge.parameters")}</Text>
-          <TextInput style={styles.input} value={dropHeight} onChangeText={setDropHeight} keyboardType="numeric" placeholder={t("activities.parachuteDropChallenge.dropHeightPlaceholder")} placeholderTextColor={theme.textMuted} />
-          <TextInput style={styles.input} value={toyMass} onChangeText={setToyMass} keyboardType="numeric" placeholder={t("activities.parachuteDropChallenge.toyMassPlaceholder")} placeholderTextColor={theme.textMuted} />
-          <TextInput style={styles.input} value={surfaceArea} onChangeText={setSurfaceArea} keyboardType="numeric" placeholder={t("activities.parachuteDropChallenge.surfaceAreaPlaceholder")} placeholderTextColor={theme.textMuted} />
-
-          {/* PDF: Physics Analytics */}
-          <Text style={styles.sectionHeader}>{t("activities.parachuteDropChallenge.analytics")}</Text>
-          <View style={styles.analyticsGrid}>
-            <Card metric="Velocity" value={`${vFinal.toFixed(2)} m/s`} maximumWidth={false} />
-            <Card metric="Accel" value={`${accel.toFixed(2)} m/s²`} maximumWidth={false} />
-            <Card metric="Weight" value={`${weight.toFixed(2)} N`} maximumWidth={false} />
-            <Card metric="Drag" value={`${dragForce.toFixed(2)} N`} maximumWidth={false} />
-          </View>
-
-          {/* PDF: G-Force Analysis Section */}
-          <Text style={styles.sectionHeader}>{t("activities.parachuteDropChallenge.gForce")}</Text>
-          <Text style={styles.gForceTip}>{t("activities.parachuteDropChallenge.gForceTip")}</Text>
-
-          <TextInput
-            style={styles.input}
-            value={contactTime}
-            onChangeText={setContactTime}
-            keyboardType="numeric"
-            placeholder={t("activities.parachuteDropChallenge.contactTimePlaceholder")}
-            placeholderTextColor={theme.textMuted}
-          />
-
-          <Pressable
-            style={[styles.bounceToggle, { backgroundColor: didBounce ? theme.primary : theme.surfaceContainer }]}
-            onPress={() => setDidBounce(!didBounce)}
-          >
-            <Text style={[styles.toggleText, { color: didBounce ? theme.buttonText : theme.secondary }]}>
-              {didBounce ? "✓ " : ""}{t("activities.parachuteDropChallenge.didBounce")}
-            </Text>
+          <Pressable style={[styles.timerBtn, { flex: 2, backgroundColor: isTimerRunning ? theme.danger : theme.primary }]} onPress={toggleTimer}>
+            <Text style={styles.timerBtnText}>{isTimerRunning ? t("buttons.stop") : t("buttons.start")}</Text>
           </Pressable>
+        </View>
 
-          {ct > 0 && vFinal > 0 && (
-            <View style={styles.gForceDisplay}>
-              <Card metric={t("activities.parachuteDropChallenge.gForceResult")} value={`${gForce.toFixed(1)} g`} maximumWidth={true} />
-              <Card metric={t("activities.parachuteDropChallenge.gForceRisk")} value={gForceRisk.risk} maximumWidth={true} />
+        {/* PDF: Parameters */}
+        <Text style={styles.sectionHeader}>{t("activities.parachuteDropChallenge.parameters")}</Text>
+        <TextInput style={styles.input} value={dropHeight} onChangeText={setDropHeight} keyboardType="numeric" placeholder={t("activities.parachuteDropChallenge.dropHeightPlaceholder")} placeholderTextColor={theme.textMuted} />
+        <TextInput style={styles.input} value={toyMass} onChangeText={setToyMass} keyboardType="numeric" placeholder={t("activities.parachuteDropChallenge.toyMassPlaceholder")} placeholderTextColor={theme.textMuted} />
+        <TextInput style={styles.input} value={surfaceArea} onChangeText={setSurfaceArea} keyboardType="numeric" placeholder={t("activities.parachuteDropChallenge.surfaceAreaPlaceholder")} placeholderTextColor={theme.textMuted} />
+
+        {/* PDF: Physics Analytics */}
+        <Text style={styles.sectionHeader}>{t("activities.parachuteDropChallenge.analytics")}</Text>
+        <View style={styles.analyticsGrid}>
+          <Card metric="Velocity" value={`${vFinal.toFixed(2)} m/s`} maximumWidth={false} />
+          <Card metric="Accel" value={`${accel.toFixed(2)} m/s²`} maximumWidth={false} />
+          <Card metric="Weight" value={`${weight.toFixed(2)} N`} maximumWidth={false} />
+          <Card metric="Drag" value={`${dragForce.toFixed(2)} N`} maximumWidth={false} />
+        </View>
+
+        {/* PDF: G-Force Analysis Section */}
+        <Text style={styles.sectionHeader}>{t("activities.parachuteDropChallenge.gForce")}</Text>
+        <Text style={styles.gForceTip}>{t("activities.parachuteDropChallenge.gForceTip")}</Text>
+
+        <TextInput
+          style={styles.input}
+          value={contactTime}
+          onChangeText={setContactTime}
+          keyboardType="numeric"
+          placeholder={t("activities.parachuteDropChallenge.contactTimePlaceholder")}
+          placeholderTextColor={theme.textMuted}
+        />
+
+        <Pressable
+          style={[styles.bounceToggle, { backgroundColor: didBounce ? theme.primary : theme.surfaceContainer }]}
+          onPress={() => setDidBounce(!didBounce)}
+        >
+          <Text style={[styles.toggleText, { color: didBounce ? theme.buttonText : theme.secondary }]}>
+            {didBounce ? "✓ " : ""}{t("activities.parachuteDropChallenge.didBounce")}
+          </Text>
+        </Pressable>
+
+        {ct > 0 && vFinal > 0 && (
+          <View style={styles.gForceDisplay}>
+            <Card metric={t("activities.parachuteDropChallenge.gForceResult")} value={`${gForce.toFixed(1)} g`} maximumWidth={true} />
+            <Card metric={t("activities.parachuteDropChallenge.gForceRisk")} value={gForceRisk.risk} maximumWidth={true} />
+          </View>
+        )}
+
+        {/* PDF: G-Force Risk Scale */}
+        <Text style={styles.subSectionHeader}>{t("activities.parachuteDropChallenge.gForceRiskScale")}</Text>
+        <View style={styles.riskScale}>
+          {GFORCE_RISK.map((item, i) => (
+            <View key={i} style={[styles.riskRow, { borderLeftColor: item.colorClass === "tertiary" ? theme.tertiary : theme.danger }]}>
+              <Text style={[styles.riskRange, { color: theme.textMuted }]}>{item.range}</Text>
+              <Text style={[styles.riskDesc, { color: theme.secondary }]}>{item.risk}</Text>
             </View>
-          )}
+          ))}
+        </View>
 
-          {/* PDF: G-Force Risk Scale */}
-          <Text style={styles.subSectionHeader}>{t("activities.parachuteDropChallenge.gForceRiskScale")}</Text>
-          <View style={styles.riskScale}>
-            {GFORCE_RISK.map((item, i) => (
-              <View key={i} style={[styles.riskRow, { borderLeftColor: item.colorClass === "tertiary" ? theme.tertiary : theme.danger }]}>
-                <Text style={[styles.riskRange, { color: theme.textMuted }]}>{item.range}</Text>
-                <Text style={[styles.riskDesc, { color: theme.secondary }]}>{item.risk}</Text>
+        {/* PDF: Write-up Prediction Section */}
+        <Text style={styles.sectionHeader}>{t("activities.parachuteDropChallenge.writeUpPrediction")}</Text>
+        <TextInput
+          style={styles.input}
+          value={predictedTime}
+          onChangeText={setPredictedTime}
+          keyboardType="numeric"
+          placeholder={t("activities.parachuteDropChallenge.predictTimePlaceholder")}
+          placeholderTextColor={theme.textMuted}
+        />
+
+        {/* Logged entries display - PDF write-up table */}
+        {writeUpEntries.length > 0 && (
+          <View style={styles.writeUpTable}>
+            <Text style={styles.tableTitle}>{t("journal.recordedTrials")}</Text>
+            {writeUpEntries.map((entry) => (
+              <View key={entry.id} style={styles.writeUpRow}>
+                <Text style={styles.trialName}>{entry.trialNumber}</Text>
+                <View style={styles.trialData}>
+                  {entry.surfaceArea !== "0" && <Text style={styles.trialDetail}>SA: {entry.surfaceArea}cm²</Text>}
+                  <Text style={styles.trialDetail}>Time: {entry.recordedTime}s</Text>
+                  {entry.predictedTime !== "0" && <Text style={styles.trialDetail}>Pred: {entry.predictedTime}s</Text>}
+                  <Text style={[styles.trialDetail, { color: entry.wasRight === "Yes" ? theme.tertiary : theme.danger }]}>
+                    {entry.wasRight ? (entry.wasRight === "Yes" ? "✓ Right" : "✗ Wrong") : ""}
+                  </Text>
+                  {entry.gForce > 0 && <Text style={styles.trialDetail}>G: {entry.gForce.toFixed(1)}g</Text>}
+                </View>
               </View>
             ))}
           </View>
+        )}
 
-          {/* PDF: Write-up Prediction Section */}
-          <Text style={styles.sectionHeader}>{t("activities.parachuteDropChallenge.writeUpPrediction")}</Text>
-          <TextInput
-            style={styles.input}
-            value={predictedTime}
-            onChangeText={setPredictedTime}
-            keyboardType="numeric"
-            placeholder={t("activities.parachuteDropChallenge.predictTimePlaceholder")}
-            placeholderTextColor={theme.textMuted}
-          />
+        {/* PDF: Write-up reflection */}
+        <Text style={styles.subSectionHeader}>{t("activities.parachuteDropChallenge.writeUpPrediction")}</Text>
+        <TextInput
+          style={styles.input}
+          value={easiestDesign}
+          onChangeText={setEasiestDesign}
+          placeholder={t("activities.parachuteDropChallenge.easiestDesignPlaceholder")}
+          placeholderTextColor={theme.textMuted}
+        />
 
-          {/* Logged entries display - PDF write-up table */}
+        <View style={styles.buttonContainer}>
+          <Button text={t("buttons.logTrial")} action={logExperiment} />
           {writeUpEntries.length > 0 && (
-            <View style={styles.writeUpTable}>
-              <Text style={styles.tableTitle}>{t("journal.recordedTrials")}</Text>
-              {writeUpEntries.map((entry) => (
-                <View key={entry.id} style={styles.writeUpRow}>
-                  <Text style={styles.trialName}>{entry.trialNumber}</Text>
-                  <View style={styles.trialData}>
-                    {entry.surfaceArea !== "0" && <Text style={styles.trialDetail}>SA: {entry.surfaceArea}cm²</Text>}
-                    <Text style={styles.trialDetail}>Time: {entry.recordedTime}s</Text>
-                    {entry.predictedTime !== "0" && <Text style={styles.trialDetail}>Pred: {entry.predictedTime}s</Text>}
-                    <Text style={[styles.trialDetail, { color: entry.wasRight === "Yes" ? theme.tertiary : theme.danger }]}>
-                      {entry.wasRight ? (entry.wasRight === "Yes" ? "✓ Right" : "✗ Wrong") : ""}
-                    </Text>
-                    {entry.gForce > 0 && <Text style={styles.trialDetail}>G: {entry.gForce.toFixed(1)}g</Text>}
-                  </View>
-                </View>
-              ))}
+            <View style={{ marginTop: 12 }}>
+              <Button text={t("buttons.finishActivity")} action={handleFinish} />
             </View>
           )}
-
-          {/* PDF: Write-up reflection */}
-          <Text style={styles.subSectionHeader}>{t("activities.parachuteDropChallenge.writeUpPrediction")}</Text>
-          <TextInput
-            style={styles.input}
-            value={easiestDesign}
-            onChangeText={setEasiestDesign}
-            placeholder={t("activities.parachuteDropChallenge.easiestDesignPlaceholder")}
-            placeholderTextColor={theme.textMuted}
-          />
-
-          <View style={styles.buttonContainer}>
-            <Button text={t("buttons.logTrial")} action={logExperiment} />
-            {writeUpEntries.length > 0 && (
-              <View style={{ marginTop: 12 }}>
-                <Button text={t("buttons.finishActivity")} action={handleFinish} />
-              </View>
-            )}
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 

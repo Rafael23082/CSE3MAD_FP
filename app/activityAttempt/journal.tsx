@@ -143,7 +143,7 @@ export default function JournalScreen() {
     const needsTeamConfirm = ['parachute-drop-challenge', 'earthquake-resistant-structure'].includes(activity.key);
 
     return (
-        <ScrollView style={styles.container} contentContainerStyle={{ padding: 20, paddingBottom: 80 }}>
+        <ScrollView style={styles.container} contentContainerStyle={{ padding: 24 }}>
             <Text style={styles.title}>{t("journal.title")}</Text>
             <Text style={styles.subtitle}>{activity.name}</Text>
 

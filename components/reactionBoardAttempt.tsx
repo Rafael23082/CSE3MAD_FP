@@ -6,7 +6,6 @@ import { use, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Alert, KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Circle } from "react-native-svg";
 import Button from "./button";
 import Card from "./card";
@@ -213,26 +212,24 @@ export default function ReactionBoardAttemptScreen(){
     };
 
     const logDesign = () => {
-        if (challengeState !== "finished"){
-            Alert.alert("Challenge Unfinished",
-                "Complete a challenge before logging this trial."
-            )
-            return;
-        }
+        setDesigns(prev => {
+            const index = prev.findIndex(d => d.key === presetKey);
 
-        setDesigns(prev => [...prev, {
-            id: Date.now() + Math.random(),
-            key: presetKey,
-            tracingAccuracy: accuracy ?? undefined,
-            reactionTime: reactionTime ?? undefined
-        }]);
+            const newDesign = {
+                id: Date.now() + Math.random(),
+                key: presetKey,
+                tracingAccuracy: accuracy ?? undefined,
+                reactionTime: reactionTime ?? undefined,
+            };
 
-        if (activityContext) {
-            activityContext.addExperimentLog({
-                activityKey: "reaction-board-challenge",
-                data: { presetKey, accuracy, reactionTime }
-            });
-        }
+            if (index === -1) {
+                return [...prev, newDesign];
+            }
+
+            return prev.map((design, i) =>
+                i === index ? newDesign : design
+            );
+        });
 
         setStartTime(0);
         setTime(10);
@@ -243,10 +240,39 @@ export default function ReactionBoardAttemptScreen(){
     }
 
     const handleFinish = () => {
+        if (designs.length < DESIGN_PRESETS.length){
+            Alert.alert(t("errorMessages.unfinishedChallenge"), t("errorMessages.unfinishedChallengeDescription"));
+            return;
+        }
+
         const results = designs.map(d => ({
             label: `${d.key}`,
             value: d.key == "activities.reactionBoardChallenge.tracingChallenge" ? `Tracing Accuracy: ${d.tracingAccuracy} %`: `Reaction Time: ${d.reactionTime} ms`
         }));
+
+        const dominantHand = designs.find(
+            d => d.key === "activities.reactionBoardChallenge.dominantHand"
+        );
+
+        const nonDominantHand = designs.find(
+            d => d.key === "activities.reactionBoardChallenge.nonDominantHand"
+        );
+
+        const tracingChallenge = designs.find(
+            d => d.key === "activities.reactionBoardChallenge.tracingChallenge"
+        );
+
+        if (activityContext) {
+            activityContext.addExperimentLog({
+                activityKey: "reaction-board-challenge",
+                data: {
+                    reactionTime1: dominantHand?.reactionTime,
+                    reactionTime2: nonDominantHand?.reactionTime,
+                    tracingAccuracy: tracingChallenge?.tracingAccuracy,
+                }
+            });
+        }
+
         router.push({
             pathname: "/activityResults",
             params: { results: JSON.stringify(results), activityKey: "reaction-board-challenge" }
@@ -254,77 +280,21 @@ export default function ReactionBoardAttemptScreen(){
     };
 
     return(
-        <SafeAreaView style={styles.outerContainer} edges={["top"]}>
-            <KeyboardAvoidingView style={{flex: 1}} behavior="height">
-                <ScrollView contentContainerStyle={styles.container}>
-                    <View>
-                        <Text style={styles.head}>{activity.name}</Text>
-                        <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
-                            <Text style={styles.sectionHeader}>{t("activities.attempt")}</Text>
-                            {presetKey == "activities.reactionBoardChallenge.tracingChallenge" && (
-                                <View style={styles.timerContainer}>
-                                    <Text style={[styles.sectionHeader, {
-                                        lineHeight: 20
-                                    }]}>{formatNumber(time)}</Text>
-                                </View>
-                            )}
-                        </View>
-                        <Text style={[styles.actionName, {marginTop: 24}]}>{presetKey == "activities.reactionBoardChallenge.tracingChallenge" ? t("activities.reactionBoardChallenge.measureTracingAccuracy"): t("activities.reactionBoardChallenge.recordReactionTime")}</Text>
-                        <View style={styles.cardContainer}>
-                            {presetKey !== "activities.reactionBoardChallenge.tracingChallenge" ? (
-                                <Card metric="ms" value={reactionTime == null ? "0": String(reactionTime)} maximumWidth={true} />
-                            ): (
-                                <Card metric={t("activities.reactionBoardChallenge.accuracyScore")} value={`${accuracy}%`} maximumWidth={true} />
-                            )}
-                        </View>
-                        <Text style={styles.actionName}>{presetKey == "activities.reactionBoardChallenge.tracingChallenge" ? t("activities.reactionBoardChallenge.tracingZone"): t("activities.reactionBoardChallenge.reactionZone")}</Text>
-                        {presetKey == "activities.reactionBoardChallenge.tracingChallenge" ? (
-                            <GestureDetector gesture={panGesture}>
-                                <View 
-                                    style={styles.reactionBoxContainer}
-                                    onLayout={(e) => {
-                                        const {width, height} = e.nativeEvent.layout;
-                                        setContainerSize({width, height});
-                                    }}
-                                >
-                                    {challengeState === "ready" ? (
-                                        <Svg height={"100%"} width={"100%"}>
-                                            <Circle
-                                                cx={circlePosition.x}
-                                                cy={circlePosition.y}
-                                                r={30}
-                                                fill={theme.primary}
-                                            />
-                                        </Svg>
-                                    ): (
-                                        <Text style={styles.placeholderText}>{t("activities.reactionBoardChallenge.tracingZonePlaceholder")}</Text>
-                                    )}
-                                </View>
-                            </GestureDetector>
-                        ): (
-                            <View 
-                                style={styles.reactionBoxContainer}
-                                onLayout={(e) => {
-                                    const {width, height} = e.nativeEvent.layout;
-                                    setContainerSize({width, height});
-                                }}
-                            >
-                                {challengeState === "ready" ? (
-                                    <Pressable 
-                                        style={[styles.button, {
-                                            top: buttonLocation.y,
-                                            left: buttonLocation.x
-                                        }]}
-                                        onPress={()=> {handleReactionPress()}
-                                    }>
-                                        <Text style={styles.buttonText}>{t("activities.reactionBoardChallenge.tap")}</Text>
-                                    </Pressable>
-                                ): (
-                                    <Text style={styles.placeholderText}>{t("activities.reactionBoardChallenge.reactionZonePlaceholder")}</Text>
-                                )}
+        <KeyboardAvoidingView style={styles.outerContainer} behavior="height">
+            <ScrollView contentContainerStyle={styles.container}>
+                <View>
+                    <Text style={styles.head}>{activity.name}</Text>
+                    <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
+                        <Text style={styles.sectionHeader}>{t("activities.attempt")}</Text>
+                        {presetKey == "activities.reactionBoardChallenge.tracingChallenge" && (
+                            <View style={styles.timerContainer}>
+                                <Text style={[styles.sectionHeader, {
+                                    lineHeight: 20
+                                }]}>{formatNumber(time)}</Text>
                             </View>
                         )}
                     </View>
+        
                     <PresetSelector 
                         designPresets={DESIGN_PRESETS}
                         onSelect={(preset) => {
@@ -339,27 +309,17 @@ export default function ReactionBoardAttemptScreen(){
                         placeholderTextColor={theme.textMuted}
                         editable={false}
                     />
-    
-                    <Text style={styles.actionNameLarge}>{t("attempt.structuralIterations")}</Text>
 
-                    {designs.length === 0 ? (
-                        <Text style={styles.emptyState}>
-                            {t("attempt.logTrialPlaceholder")}
-                        </Text>
-                    ): (
-                        <View>
-                            {designs.map((d) => (
-                                <View key={d.id} style={styles.designCard}>
-                                <View style={styles.designHeader}>
-                                    <Text style={styles.designName}>{t(d.key)}</Text>
-                                </View>
-                                <Text style={styles.designConfig}>{d.key == "activities.reactionBoardChallenge.tracingChallenge" ? `${t("activities.reactionBoardChallenge.tracingAccuracy")}: ${d.tracingAccuracy}%`: `${t("activities.reactionBoardChallenge.reactionTime")}: ${d.reactionTime} ms`}</Text>
-                                </View>
-                            ))}
-                        </View>
-                    )}
+                    <Text style={[styles.actionName, {marginTop: 24}]}>{presetKey == "activities.reactionBoardChallenge.tracingChallenge" ? t("activities.reactionBoardChallenge.measureTracingAccuracy"): t("activities.reactionBoardChallenge.recordReactionTime")}</Text>
+                    <View style={styles.cardContainer}>
+                        {presetKey !== "activities.reactionBoardChallenge.tracingChallenge" ? (
+                            <Card metric="ms" value={reactionTime == null ? "0": String(reactionTime)} maximumWidth={true} />
+                        ): (
+                            <Card metric={t("activities.reactionBoardChallenge.accuracyScore")} value={`${accuracy}%`} maximumWidth={true} />
+                        )}
+                    </View>
 
-                    <View style={styles.buttonContainer}>
+                    <View>
                         {challengeState == "idle" && (
                             <Button text={t("buttons.startChallenge")} action={() => {
                                 if (presetKey !== "activities.reactionBoardChallenge.tracingChallenge"){
@@ -382,14 +342,81 @@ export default function ReactionBoardAttemptScreen(){
                             />
                         )}
                     </View>
-                    <Pressable
-                        onPress={handleFinish}
-                        style={({ pressed }) => pressed && { opacity: 0.7 }}>
-                        <Text style={styles.skipText}>{t("buttons.finishActivity")}</Text>
-                    </Pressable>
-                </ScrollView>
-            </KeyboardAvoidingView>
-        </SafeAreaView>
+
+                    <Text style={styles.actionName}>{presetKey == "activities.reactionBoardChallenge.tracingChallenge" ? t("activities.reactionBoardChallenge.tracingZone"): t("activities.reactionBoardChallenge.reactionZone")}</Text>
+                    {presetKey == "activities.reactionBoardChallenge.tracingChallenge" ? (
+                        <GestureDetector gesture={panGesture}>
+                            <View 
+                                style={styles.reactionBoxContainer}
+                                onLayout={(e) => {
+                                    const {width, height} = e.nativeEvent.layout;
+                                    setContainerSize({width, height});
+                                }}
+                            >
+                                {challengeState === "ready" ? (
+                                    <Svg height={"100%"} width={"100%"}>
+                                        <Circle
+                                            cx={circlePosition.x}
+                                            cy={circlePosition.y}
+                                            r={30}
+                                            fill={theme.primary}
+                                        />
+                                    </Svg>
+                                ): (
+                                    <Text style={styles.placeholderText}>{t("activities.reactionBoardChallenge.tracingZonePlaceholder")}</Text>
+                                )}
+                            </View>
+                        </GestureDetector>
+                    ): (
+                        <View 
+                            style={styles.reactionBoxContainer}
+                            onLayout={(e) => {
+                                const {width, height} = e.nativeEvent.layout;
+                                setContainerSize({width, height});
+                            }}
+                        >
+                            {challengeState === "ready" ? (
+                                <Pressable 
+                                    style={[styles.button, {
+                                        top: buttonLocation.y,
+                                        left: buttonLocation.x
+                                    }]}
+                                    onPress={handleReactionPress}>
+                                    <Text style={styles.buttonText}>{t("activities.reactionBoardChallenge.tap")}</Text>
+                                </Pressable>
+                            ): (
+                                <Text style={styles.placeholderText}>{t("activities.reactionBoardChallenge.reactionZonePlaceholder")}</Text>
+                            )}
+                        </View>
+                    )}
+                </View>
+
+                <Text style={styles.actionNameLarge}>{t("attempt.structuralIterations")}</Text>
+
+                {DESIGN_PRESETS.map((design, index) => {
+                    const loggedDesign = designs.find((loggedDesign) => loggedDesign.key == design.key);
+                    return(
+                        <View key={index} style={styles.designCard}>
+                            <View style={styles.designHeader}>
+                                <Text style={styles.designName}>{t(design.key)}</Text>
+                            </View>
+                            {loggedDesign ? (
+                                <Text style={styles.designConfig}>{loggedDesign.key == "activities.reactionBoardChallenge.tracingChallenge" ? `${t("activities.reactionBoardChallenge.tracingAccuracy")}: ${loggedDesign.tracingAccuracy}%`: `${t("activities.reactionBoardChallenge.reactionTime")}: ${loggedDesign.reactionTime} ms`}</Text> 
+                            ): (
+                                <Text style={styles.designConfig}>No Recorded Attempt Yet.</Text>
+                            )}  
+                        </View>
+                    );
+                })}
+
+                <View style={styles.buttonContainer}>
+                    <Button
+                        text={t("buttons.finishActivity")} 
+                        action={handleFinish}
+                    />
+                </View>
+            </ScrollView>
+        </KeyboardAvoidingView>
     ) 
 } 
 
@@ -420,7 +447,8 @@ const createStyles = (colors: ThemeColors) => {
             fontFamily: "PoppinsRegular",
             fontSize: 18,
             color: colors.secondary,
-            marginVertical: 16
+            marginVertical: 16,
+            marginTop: 24
         },
         cardContainer: {
             marginBottom: 16

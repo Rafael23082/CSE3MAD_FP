@@ -6,11 +6,13 @@ import { Tabs, useRouter } from 'expo-router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TabLayout() {
   const { isDark, theme } = useTheme();
   const router = useRouter();
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
 
   return (
     <Tabs
@@ -33,8 +35,7 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: Colors[isDark ? 'dark' : 'light'].background,
           borderTopColor: Colors[isDark ? 'dark' : 'light'].background,
-          height: 64,
-          paddingBottom: 6,
+          paddingBottom: Math.max(insets.bottom, 6),
           paddingTop: 4,
         },
       }}
