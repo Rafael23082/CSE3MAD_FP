@@ -7,7 +7,6 @@ import { useRouter } from "expo-router";
 import React, { use, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import AdBanner from "./AdBanner";
 import Button from "./button";
 import Card from "./card";
@@ -190,8 +189,7 @@ export default function ParachuteAttemptScreen() {
   if (!permission) return null;
 
   return (
-    <SafeAreaView style={styles.outerContainer}>
-    <KeyboardAvoidingView style={{flex: 1}} behavior="height">
+    <KeyboardAvoidingView style={styles.outerContainer} behavior="height">
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.head}>{t("activities.parachuteDropChallenge.name")}</Text>
 
@@ -323,7 +321,6 @@ export default function ParachuteAttemptScreen() {
           <AdBanner />
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
   );
 }
 
