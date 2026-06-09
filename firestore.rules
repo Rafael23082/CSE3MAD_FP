@@ -1,7 +1,7 @@
 rules_version = '2';
 
 // STEMM Lab - Firestore Security Rules
-// Students can only access their own data and their team's data
+// Students can only access their own data
 
 // Helper: check if user is authenticated
 function isAuth() {
@@ -11,23 +11,6 @@ function isAuth() {
 // Helper: get the requesting user's UID
 function uid() {
   return request.auth.uid;
-}
-
-// Helper: check if the authenticated user is a member of a team
-// memberUids is a flat string array for rule matching
-function isTeamMember(teamId) {
-  return isAuth() && (
-    exists(/databases/$(database)/documents/teams/$(teamId)) &&
-    get(/databases/$(database)/documents/teams/$(teamId)).data.memberUids.hasAny([uid()])
-  );
-}
-
-// Helper: check if the authenticated user is the team creator (leader)
-function isTeamLeader(teamId) {
-  return isAuth() && (
-    exists(/databases/$(database)/documents/teams/$(teamId)) &&
-    get(/databases/$(database)/documents/teams/$(teamId)).data.members[0].uid == uid()
-  );
 }
 
 service cloud.firestore {
@@ -42,8 +25,8 @@ service cloud.firestore {
 
       // Allow create during signup
       allow create: if isAuth() && request.auth.uid == userId
-        && request.resource.data.keys().hasAll(['firstName', 'email', 'createdAt'])
-        && request.resource.data.firstName is string
+        && request.resource.data.keys().hasAll(['displayName', 'email', 'createdAt'])
+        && request.resource.data.displayName is string
         && request.resource.data.email is string
         && request.resource.data.createdAt is timestamp;
 
@@ -55,46 +38,11 @@ service cloud.firestore {
     }
 
     // ==========================================
-    // Teams collection
-    // ==========================================
-    match /teams/{teamId} {
-      // Any authenticated user can read any team (needed for team search/join flow)
-      allow read: if isAuth();
-
-      // Create: authenticated user creates team - they become the leader
-      allow create: if isAuth()
-        && request.resource.data.keys().hasAll(['teamId', 'teamName', 'gradeLevel', 'members', 'memberUids', 'inviteCode'])
-        && request.resource.data.members.size() >= 1
-        && request.resource.data.members[0].uid == uid()
-        && request.resource.data.members[0].role == 'leader'
-        && request.resource.data.memberUids.hasAny([uid()])
-        && request.resource.data.memberUids.size() >= 1
-        && request.resource.data.memberUids.size() <= 10
-        && request.resource.data.teamName is string
-        && request.resource.data.teamName.size() >= 1
-        && request.resource.data.teamName.size() <= 50
-        && request.resource.data.gradeLevel is string
-        && request.resource.data.gradeLevel in ['Primary', 'Year 7', 'Year 8', 'Year 9', 'Year 10']
-        && request.resource.data.inviteCode is string
-        && request.resource.data.inviteCode.size() == 6;
-
-      // Update: team members can update (for joining, modifying)
-      // Members cannot remove the leader unless they are the leader
-      allow update: if isAuth() && isTeamMember(teamId)
-        && (!request.resource.data.keys().hasAny(['members'])
-          || request.resource.data.members[0].uid == resource.data.members[0].uid
-          || isTeamLeader(teamId));
-
-      // Only the leader can delete
-      allow delete: if isAuth() && isTeamLeader(teamId);
-    }
-
-    // ==========================================
     // Submissions collection
     // ==========================================
     match /submissions/{submissionId} {
-      // Team members can read submissions that belong to their team
-      allow read: if isAuth() && resource.data.teamId is string && isTeamMember(resource.data.teamId);
+      // Users can read their own submissions
+      allow read: if isAuth() && resource.data.userId == uid();
 
       // Authenticated users can create submissions for themselves
       allow create: if isAuth()

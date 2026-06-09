@@ -38,10 +38,10 @@ export default function AccountSettingsScreen() {
     }
   }
 
-  const handleUpdateFirstName = async (newValue: string) => {
+  const handleUpdateDisplayName = async (newValue: string) => {
     try {
       if (!newValue) {
-        setError(t("errorMessages.emptyFirstName"));
+        setError(t("errorMessages.emptyDisplayName"));
         return;
       }
       const user = auth.currentUser;
@@ -50,10 +50,10 @@ export default function AccountSettingsScreen() {
         return;
       }
 
-      const formattedFirstName = newValue.charAt(0).toUpperCase() + newValue.slice(1).toLowerCase();
+      const formattedDisplayName = newValue.charAt(0).toUpperCase() + newValue.slice(1).toLowerCase();
 
       await updateDoc(doc(db, "users", user.uid), {
-        firstName: formattedFirstName,
+        displayName: formattedDisplayName,
       });
       setError("");
     } catch (error) {
@@ -72,10 +72,10 @@ export default function AccountSettingsScreen() {
         />
 
         <EditableInfoItem
-          label={t("forms.firstName")}
-          value={userProfile?.firstName || ""}
-          onSave={handleUpdateFirstName}
-          placeholder={t("forms.firstNamePlaceholder")}
+          label={t("forms.displayName")}
+          value={userProfile?.displayName || ""}
+          onSave={handleUpdateDisplayName}
+          placeholder={t("forms.displayNamePlaceholder")}
         />
 
         {error && (

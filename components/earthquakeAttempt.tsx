@@ -23,10 +23,6 @@ export default function EarthquakeAttemptScreen() {
   const { t } = useTranslation();
 
   const activityContext = useContext(ActivityContext);
-  if (!activityContext || !activityContext.activity) {
-    console.log("Activity Context Null!");
-    return null;
-  }
 
   // PDF: Accelerometer-based tracking
   const [recordingState, setRecordingState] = useState<"idle" | "recording" | "completed">("idle");
@@ -92,6 +88,11 @@ export default function EarthquakeAttemptScreen() {
       if (shakeInterval.current) clearInterval(shakeInterval.current);
     };
   }, []);
+
+  if (!activityContext || !activityContext.activity) {
+    console.log("Activity Context Null!");
+    return null;
+  }
 
   // PDF: Start/stop vibration + accelerometer tracking
   const triggerShake = () => {

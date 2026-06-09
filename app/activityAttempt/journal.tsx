@@ -37,7 +37,6 @@ export default function JournalScreen() {
     if (!activityContext || !activityContext.activity) return null;
 
     const { activity, experimentLogs, clearExperimentLogs } = activityContext;
-    const { team } = auth || {};
 
     const getMetricLabel = () => {
         switch(activity.key) {
@@ -123,7 +122,6 @@ export default function JournalScreen() {
         try {
             const payload = {
                 userId: auth?.user?.uid || "anonymous",
-                teamId: team?.teamId || "",
                 activityKey: activity.key,
                 logs: currentLogs.map((log) => ({
                     activityKey: log.activityKey,

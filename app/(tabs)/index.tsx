@@ -5,7 +5,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
+import { collection, getDocs, onSnapshot, query, where } from "firebase/firestore";
 import { useCallback, use, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -39,39 +39,37 @@ export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
-  const { userProfile, team } = auth || {};
+  const { userProfile, user } = auth || {};
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
-  const firstName = userProfile?.firstName ?? "";
-  const formattedName = firstName?.charAt(0).toUpperCase() + firstName?.slice(1).toLowerCase();
+  const displayName = userProfile?.displayName ?? "";
 
-  // Fetch submissions for this team
+  // Fetch submissions for this user
   useEffect(() => {
-    if (!team?.teamId) return;
-    const q = query(collection(db, "submissions"), where("teamId", "==", team.teamId));
+    if (!user?.uid) return;
+    const q = query(collection(db, "submissions"), where("userId", "==", user.uid));
     const unsub = onSnapshot(q, (snap) => {
       const subs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       setSubmissions(subs);
     });
     return unsub;
-  }, [team?.teamId]);
+  }, [user?.uid]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    if (team?.teamId) {
-      const q = query(collection(db, "submissions"), where("teamId", "==", team.teamId));
-      const snap = await Promise.resolve(onSnapshot(q, (s) => {
-        setSubmissions(s.docs.map(d => ({ id: d.id, ...d.data() })));
-      }));
+    if (user?.uid) {
+      const q = query(collection(db, "submissions"), where("userId", "==", user.uid));
+      const snap = await getDocs(q);
+      setSubmissions(snap.docs.map((d: any) => ({ id: d.id, ...d.data() })));
     }
     setRefreshing(false);
-  }, [team?.teamId]);
+  }, [user?.uid]);
 
   const completedCount = submissions.length;
 
-  // Rank calculation (placeholder - would need all teams' submissions for real ranking)
-  const rank = team ? Math.max(1, 5 - completedCount) : 0;
+  // Rank calculation (placeholder)
+  const rank = user ? Math.max(1, 5 - completedCount) : 0;
 
   return (
       <ScrollView
@@ -80,81 +78,67 @@ export default function HomeScreen() {
         contentInsetAdjustmentBehavior="automatic"
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.primary} />}
       >
-          {/* Team Card - only shown when user has a team */}
-          {team ? (
-            <View style={styles.teamCard}>
-              <View style={styles.teamHeader}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.welcomeMessage}>{t("home.welcome")}, {formattedName}!</Text>
-                  <Text style={styles.teamName}>{team.teamName}</Text>
-                </View>
-                <View style={styles.rankBadge}>
-                  <Text style={styles.rankLabel}>{t("home.rank")}</Text>
-                  <Text style={styles.rankValue}>#{rank}</Text>
-                </View>
+          {/* User Card */}
+          <View style={styles.teamCard}>
+            <View style={styles.teamHeader}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.welcomeMessage}>{t("home.welcome")}, {displayName}!</Text>
               </View>
-              <View style={styles.teamStats}>
-                <View style={styles.stat}>
-                  <MaterialCommunityIcons name="trophy" size={16} color={theme.primary} />
-                  <Text style={styles.statValue}>{completedCount}/7</Text>
-                  <Text style={styles.statLabel}>{t("home.completed")}</Text>
-                </View>
-                <View style={styles.stat}>
-                  <MaterialCommunityIcons name="account-group" size={16} color={theme.secondary} />
-                  <Text style={styles.statValue}>{team.members?.length || 0}</Text>
-                  <Text style={styles.statLabel}>{t("team.members")}</Text>
-                </View>
+              <View style={styles.rankBadge}>
+                <Text style={styles.rankLabel}>{t("home.rank")}</Text>
+                <Text style={styles.rankValue}>#{rank}</Text>
               </View>
             </View>
-          ) : (
-            <View style={styles.teamCard}>
-              <Text style={styles.welcomeMessage}>{t("home.welcome")}, {formattedName}!</Text>
+            <View style={styles.teamStats}>
+              <View style={styles.stat}>
+                <MaterialCommunityIcons name="trophy" size={16} color={theme.primary} />
+                <Text style={styles.statValue}>{completedCount}/7</Text>
+                <Text style={styles.statLabel}>{t("home.completed")}</Text>
+              </View>
             </View>
-          )}
+          </View>
 
           {/* Progress Section */}
-          {team && (
-            <View style={styles.teamCard}>
-              <View style={styles.progressHeader}>
-                <MaterialCommunityIcons name="chart-bar" size={18} color={theme.primary} />
-                <Text style={[styles.progressTitle, { color: theme.secondary }]}>{t("home.progress")}</Text>
-              </View>
-              <View style={styles.progressBarBg}>
-                <View
-                  style={[
-                    styles.progressBarFill,
-                    {
-                      width: `${Math.round((completedCount / 7) * 100)}%`,
-                      backgroundColor: theme.primary,
-                    },
-                  ]}
-                />
-              </View>
-              <Text style={styles.progressText}>
-                {t("home.progressSummary", { count: completedCount })}
-              </Text>
-              <View style={styles.bestActivityRow}>
-                <MaterialCommunityIcons name="trophy" size={14} color="#f59e0b" />
-                <Text style={styles.bestActivityLabel}>{t("home.bestActivity")}:</Text>
-                <Text style={styles.bestActivityValue}>
-                  {submissions.length > 0
-                    ? getBestActivity(submissions, ACTIVITIES)
-                    : t("home.noRecentActivity")}
-                </Text>
-              </View>
-              <View style={styles.viewProgressBtn}>
-                <Pressable
-                  style={[styles.viewProgressPressable, { backgroundColor: theme.primary + "20" }]}
-                  onPress={() => router.push("/progress")}
-                >
-                  <Text style={[styles.viewProgressText, { color: theme.primary }]}>
-                    {t("home.viewFullProgress")}
-                  </Text>
-                  <MaterialCommunityIcons name="arrow-right" size={14} color={theme.primary} />
-                </Pressable>
-              </View>
+          <View style={styles.teamCard}>
+            <View style={styles.progressHeader}>
+              <MaterialCommunityIcons name="chart-bar" size={18} color={theme.primary} />
+              <Text style={[styles.progressTitle, { color: theme.secondary }]}>{t("home.progress")}</Text>
             </View>
-          )}
+            <View style={styles.progressBarBg}>
+              <View
+                style={[
+                  styles.progressBarFill,
+                  {
+                    width: `${Math.round((completedCount / 7) * 100)}%`,
+                    backgroundColor: theme.primary,
+                  },
+                ]}
+              />
+            </View>
+            <Text style={styles.progressText}>
+              {t("home.progressSummary", { count: completedCount })}
+            </Text>
+            <View style={styles.bestActivityRow}>
+              <MaterialCommunityIcons name="trophy" size={14} color="#f59e0b" />
+              <Text style={styles.bestActivityLabel}>{t("home.bestActivity")}:</Text>
+              <Text style={styles.bestActivityValue}>
+                {submissions.length > 0
+                  ? getBestActivity(submissions, ACTIVITIES)
+                  : t("home.noRecentActivity")}
+              </Text>
+            </View>
+            <View style={styles.viewProgressBtn}>
+              <Pressable
+                style={[styles.viewProgressPressable, { backgroundColor: theme.primary + "20" }]}
+                onPress={() => router.push("/progress")}
+              >
+                <Text style={[styles.viewProgressText, { color: theme.primary }]}>
+                  {t("home.viewFullProgress")}
+                </Text>
+                <MaterialCommunityIcons name="arrow-right" size={14} color={theme.primary} />
+              </Pressable>
+            </View>
+          </View>
 
           {/* Recent Activity */}
           <Text style={styles.sectionHeader}>{t("home.recentActivity")}</Text>

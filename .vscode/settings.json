@@ -3,5 +3,10 @@
     "source.fixAll": "explicit",
     "source.organizeImports": "explicit",
     "source.sortMembers": "explicit"
-  }
+  },
+  "eslint.rules.customizations": [
+    { "rule": "*", "severity": "off", "fixable": true },
+    { "rule": "*", "severity": "warn" }
+  ],
+  "eslint.DiagnosticsDefaultSeverity": "Warning"
 }

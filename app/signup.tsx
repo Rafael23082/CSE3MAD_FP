@@ -16,7 +16,7 @@ export default function SignupScreen(){
     const styles = createStyles(theme);
     const router = useRouter();
 
-    const [firstName, setFirstName] = useState("");
+    const [displayName, setDisplayName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
@@ -25,7 +25,7 @@ export default function SignupScreen(){
 
     const handleSignup = async() => {
         try{
-            if (!firstName || !email || !password){
+            if (!displayName || !email || !password){
                 setError(t("errorMessages.fillInAllFields"));
                 return;
             };
@@ -33,17 +33,17 @@ export default function SignupScreen(){
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            const formattedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
+            const formattedDisplayName = displayName.charAt(0).toUpperCase() + displayName.slice(1).toLowerCase();
 
             await setDoc(doc(db, "users", user.uid), {  
                 uid: user.uid,
-                firstName: formattedFirstName,
+                displayName: formattedDisplayName,
                 email: email,
                 createdAt: new Date()
             })
 
             console.log("User created successfully!");
-            router.push("/teamInitialization");
+            router.push("/(tabs)");
         }
         catch(error: any){
             switch (error.code) {
@@ -78,11 +78,11 @@ export default function SignupScreen(){
                             
                             <InputGroup 
                                 first={true} 
-                                label={t("forms.firstName")} 
-                                text={firstName} 
-                                setText={setFirstName} 
+                                label={t("forms.displayName")} 
+                                text={displayName} 
+                                setText={setDisplayName} 
                                 isPassword={false} 
-                                placeholder={t("forms.firstNamePlaceholder")}
+                                placeholder={t("forms.displayNamePlaceholder")}
                                 isLabeled={true}
                             />
                             <InputGroup 

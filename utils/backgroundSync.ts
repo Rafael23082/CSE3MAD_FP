@@ -20,7 +20,6 @@ export async function syncPendingLogs(): Promise<SyncResult> {
       try {
         await saveSubmission({
           userId: group.userId,
-          teamId: group.teamId,
           activityKey: group.activityKey,
           logs: group.logs.map((l) => ({
             activityKey: group.activityKey,

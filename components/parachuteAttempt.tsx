@@ -3,10 +3,11 @@ import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { calculateAcceleration, calculateDragForce, calculateVelocity, getGForceRisk } from "@/utils/physics";
 import { CameraView, useCameraPermissions } from 'expo-camera';
+import * as MediaLibrary from 'expo-media-library';
 import { useRouter } from "expo-router";
 import React, { use, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import AdBanner from "./AdBanner";
 import Button from "./button";
 import Card from "./card";
@@ -18,6 +19,12 @@ const GFORCE_RISK = [
   { range: "30-50 g", examples: "Severe car crashes", risk: "High risk of severe injury", colorClass: "danger" },
   { range: "50+ g", examples: "Very sudden stops", risk: "Life-threatening", colorClass: "danger" },
 ];
+
+function formatRecordingTime(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+}
 
 export default function ParachuteAttemptScreen() {
   const { theme } = useTheme();
@@ -43,7 +50,9 @@ export default function ParachuteAttemptScreen() {
 
   const [isRecording, setIsRecording] = useState(false);
   const [recordedVideoUri, setRecordedVideoUri] = useState<string | null>(null);
+  const [recordingTime, setRecordingTime] = useState(0);
   const cameraRef = useRef<any>(null);
+  const recordingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   interface ParachuteWriteUpEntry {
     id: number;
@@ -91,15 +100,33 @@ export default function ParachuteAttemptScreen() {
   const startRecording = async () => {
     if (!cameraRef.current) return;
     try {
+      const { status } = await MediaLibrary.requestPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission required', 'Grant media library access to save recorded videos.');
+        return;
+      }
       setIsRecording(true);
+      setRecordingTime(0);
+      recordingTimerRef.current = setInterval(() => {
+        setRecordingTime(prev => prev + 1);
+      }, 1000);
       const result = await cameraRef.current.recordAsync({ maxDuration: 60 });
       if (result?.uri) {
         setRecordedVideoUri(result.uri);
+        const { status } = await MediaLibrary.getPermissionsAsync();
+        if (status === 'granted') {
+          await MediaLibrary.saveToLibraryAsync(result.uri);
+          Alert.alert('Video saved', 'Your recording has been saved to the gallery.');
+        }
       }
     } catch (err) {
       console.warn("Recording failed:", err);
     } finally {
       setIsRecording(false);
+      if (recordingTimerRef.current) {
+        clearInterval(recordingTimerRef.current);
+        recordingTimerRef.current = null;
+      }
     }
   };
 
@@ -107,6 +134,10 @@ export default function ParachuteAttemptScreen() {
     if (cameraRef.current && isRecording) {
       cameraRef.current.stopRecording();
       setIsRecording(false);
+      if (recordingTimerRef.current) {
+        clearInterval(recordingTimerRef.current);
+        recordingTimerRef.current = null;
+      }
     }
   };
 
@@ -213,6 +244,9 @@ export default function ParachuteAttemptScreen() {
                   {isRecording ? t("buttons.stop") : t("buttons.recordVideo")}
                 </Text>
               </Pressable>
+              {isRecording && (
+                <Text style={styles.recordingTimer}>{formatRecordingTime(recordingTime)}</Text>
+              )}
               {recordedVideoUri && (
                 <Text style={styles.recordedText}>Video saved</Text>
               )}
@@ -337,6 +371,7 @@ const createStyles = (colors: ThemeColors) => {
     recordRow: { flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 12 },
     recordBtn: { flex: 1, padding: 12, borderRadius: 8, alignItems: "center" },
     recordBtnText: { color: colors.buttonText, fontWeight: "bold", fontSize: 14 },
+    recordingTimer: { fontFamily: "monospace", fontSize: 18, fontWeight: "bold", color: colors.danger, minWidth: 60, textAlign: "center" },
     recordedText: { color: colors.tertiary, fontWeight: "bold", fontSize: 12 },
     cardRow: { flexDirection: "row", gap: 12, marginBottom: 8 },
     timerRow: { flexDirection: "row", gap: 12, marginBottom: 16 },

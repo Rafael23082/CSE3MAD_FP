@@ -188,25 +188,9 @@ export interface BreathingJournal {
   evidenceImages: string[];
 }
 
-export type TeamMember = {
-  uid: string;
-  role: 'leader' | 'member';
-};
-
-export type Team = {
-  teamId: string;
-  teamName: string;
-  gradeLevel: string;
-  members: TeamMember[];
-  memberUids: string[];
-  inviteCode: string;
-  createdAt?: any;
-};
-
 export type Submission = {
   id: string;
   userId: string;
-  teamId: string;
   activityKey: string;
   logs: any[];
   reflection: string;

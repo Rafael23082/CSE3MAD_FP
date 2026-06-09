@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Platform } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
+import Constants from "expo-constants";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 
-const isExpoGo = __DEV__ && Platform.OS !== "web" && !((global as any).Expo || (global as any).expo);
+const executionEnv = Constants.executionEnvironment;
+const isExpoGo = executionEnv === "storeClient";
 
 function PlaceholderAd({ theme, label }: { theme: ThemeColors; label: string }) {
   return (
@@ -18,16 +20,27 @@ function PlaceholderAd({ theme, label }: { theme: ThemeColors; label: string }) 
   );
 }
 
+let AdsLoaded = false;
+let AdsModule: any = null;
+
 function NativeAdBanner() {
   const { theme } = useTheme();
   const [loaded, setLoaded] = useState(false);
-  const [AdModule, setAdModule] = useState<any>(null);
+  const [AdModule, setAdModule] = useState<any>(AdsLoaded ? AdsModule : null);
 
   useEffect(() => {
+    if (AdsLoaded) return;
     let mounted = true;
     import("react-native-google-mobile-ads")
-      .then((m) => mounted && setAdModule(m))
-      .catch(() => mounted && setAdModule(null));
+      .then((m) => {
+        AdsLoaded = true;
+        AdsModule = m;
+        if (mounted) setAdModule(m);
+      })
+      .catch(() => {
+        AdsLoaded = true;
+        if (mounted) setAdModule(null);
+      });
     return () => {
       mounted = false;
     };

@@ -30,7 +30,6 @@ describe("activity persistence contracts", () => {
   test("builds a SQLite-ready activity result record", () => {
     const record = buildActivityResultRecord({
       userId: "user-1",
-      teamId: "team-1",
       activityKey: "sound-pollution-hunter",
       logs: [baseLog],
       rating: 4,
@@ -40,7 +39,6 @@ describe("activity persistence contracts", () => {
 
     expect(record.activityKey).toBe("sound-pollution-hunter");
     expect(record.userId).toBe("user-1");
-    expect(record.teamId).toBe("team-1");
     expect(record.rating).toBe(4);
     expect(record.latitude).toBe(-37.812);
     expect(record.longitude).toBe(144.963);
@@ -52,7 +50,6 @@ describe("activity persistence contracts", () => {
   test("builds Firestore payload with GPS attached", () => {
     const payload = buildFirestoreSubmissionPayload({
       userId: "user-1",
-      teamId: "team-1",
       activityKey: "sound-pollution-hunter",
       logs: [baseLog],
       reflection: "Measured hallway noise.",

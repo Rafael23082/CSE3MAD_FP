@@ -4,7 +4,6 @@ import { collection, query, where, getDocs, addDoc, orderBy, Timestamp } from 'f
 
 export interface SubmissionData {
   userId: string;
-  teamId: string;
   activityKey: string;
   logs: any[];
   reflection: string;
@@ -18,43 +17,43 @@ export interface SubmissionData {
 }
 
 /**
- * Fetch all submissions for the current user's team
+ * Fetch all submissions for the current user
  */
-export function useTeamSubmissions(teamId: string | undefined) {
+export function useUserSubmissions(userId: string | undefined) {
   return useQuery({
-    queryKey: ['submissions', 'team', teamId],
+    queryKey: ['submissions', 'user', userId],
     queryFn: async () => {
-      if (!teamId) return [];
+      if (!userId) return [];
       const q = query(
         collection(db, 'submissions'),
-        where('teamId', '==', teamId),
+        where('userId', '==', userId),
         orderBy('submittedAt', 'desc')
       );
       const snapshot = await getDocs(q);
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     },
-    enabled: !!teamId,
+    enabled: !!userId,
   });
 }
 
 /**
  * Fetch submissions for a specific activity
  */
-export function useActivitySubmissions(activityKey: string, teamId: string | undefined) {
+export function useActivitySubmissions(activityKey: string, userId: string | undefined) {
   return useQuery({
-    queryKey: ['submissions', 'activity', activityKey, teamId],
+    queryKey: ['submissions', 'activity', activityKey, userId],
     queryFn: async () => {
-      if (!teamId) return [];
+      if (!userId) return [];
       const q = query(
         collection(db, 'submissions'),
         where('activityKey', '==', activityKey),
-        where('teamId', '==', teamId),
+        where('userId', '==', userId),
         orderBy('submittedAt', 'desc')
       );
       const snapshot = await getDocs(q);
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     },
-    enabled: !!teamId && !!activityKey,
+    enabled: !!userId && !!activityKey,
   });
 }
 
@@ -73,8 +72,7 @@ export function useSubmitActivity() {
       return docRef.id;
     },
     onSuccess: (_data, variables) => {
-      // Invalidate relevant queries
-      queryClient.invalidateQueries({ queryKey: ['submissions', 'team', variables.teamId] });
+      queryClient.invalidateQueries({ queryKey: ['submissions', 'user', variables.userId] });
       queryClient.invalidateQueries({ queryKey: ['submissions', 'activity', variables.activityKey] });
     },
   });

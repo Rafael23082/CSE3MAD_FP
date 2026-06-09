@@ -60,14 +60,13 @@ export default function ReactionResultsScreen() {
 
   const handleSubmitToLeaderboard = () => {
     if (submitDone) return;
-    if (!auth?.user || !auth?.team) {
-      Alert.alert('Not signed in', 'Sign in to submit results to the leaderboard.');
+    if (!auth?.user) {
+      Alert.alert(t('results.notSignedIn'), t('results.notSignedInMessage'));
       return;
     }
     submitMutation.mutate(
       {
         userId: auth.user.uid,
-        teamId: auth.team.teamId,
         activityKey: 'reaction-board-challenge',
         logs,
         reflection: '',
@@ -77,10 +76,10 @@ export default function ReactionResultsScreen() {
       {
         onSuccess: () => {
           setSubmitDone(true);
-          Alert.alert('Submitted!', 'Your results are on the leaderboard.');
+          Alert.alert(t('results.submittedTitle'), t('results.submittedMessage'));
         },
         onError: (err) => {
-          Alert.alert('Submit failed', String(err));
+          Alert.alert(t('results.submitFailed'), String(err));
         },
       },
     );

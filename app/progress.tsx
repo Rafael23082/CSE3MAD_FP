@@ -2,7 +2,7 @@ import { ProgressChart } from '@/components/ProgressChart';
 import { ACTIVITIES } from '@/constants/data';
 import { AuthContext } from '@/context/AuthContext';
 import { useTheme } from '@/hooks/useTheme';
-import { useTeamSubmissions } from '@/hooks/useSubmissions';
+import { useUserSubmissions } from '@/hooks/useSubmissions';
 import { ThemeColors } from '@/theme/colors';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -46,10 +46,10 @@ export default function ProgressScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
-  const { team } = auth || {};
-  const teamId = team?.teamId;
+  const user = auth?.user;
+  const userId = user?.uid;
 
-  const { data: submissions, isLoading, isError, refetch, isRefetching } = useTeamSubmissions(teamId);
+  const { data: submissions, isLoading, isError, refetch, isRefetching } = useUserSubmissions(userId);
 
   // Derive per-activity data
   const { completionMap, latestScores, historyByActivity, completedCount, bestActivity } = useMemo(() => {
@@ -166,10 +166,10 @@ export default function ProgressScreen() {
         <View style={{ width: 32 }} />
       </View>
 
-      {!team ? (
+      {!user ? (
         <View style={[styles.emptyCard, { backgroundColor: theme.card, borderColor: theme.borderColor }]}>
-          <MaterialCommunityIcons name="account-group-outline" size={40} color={theme.textMuted} />
-          <Text style={[styles.emptyText, { color: theme.textMuted }]}>Join a team to track progress</Text>
+          <MaterialCommunityIcons name="account-outline" size={40} color={theme.textMuted} />
+          <Text style={[styles.emptyText, { color: theme.textMuted }]}>{t("home.signinToTrackProgress")}</Text>
         </View>
       ) : completedCount === 0 && (!submissions || submissions.length === 0) ? (
         <View style={[styles.emptyCard, { backgroundColor: theme.card, borderColor: theme.borderColor }]}>

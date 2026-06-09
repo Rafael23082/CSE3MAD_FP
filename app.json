@@ -8,7 +8,8 @@
     "scheme": "cse3madfp",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.matt92stan.CSE3MAD-FP"
     },
     "android": {
       "adaptiveIcon": {
@@ -17,7 +18,14 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.READ_MEDIA_VISUAL_USER_SELECTED",
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO",
+        "android.permission.READ_MEDIA_AUDIO"
+      ],
+      "package": "com.matt92stan.CSE3MAD_FP"
     },
     "web": {
       "output": "static",
@@ -44,7 +52,8 @@
           "motionPermission": "Allow STEMMLAB to access your device motion"
         }
       ],
-      "expo-localization"
+      "expo-localization",
+      "expo-media-library"
     ],
     "experiments": {
       "typedRoutes": true,

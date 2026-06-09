@@ -10,7 +10,6 @@ export interface SubmissionLogEntry {
 
 export interface SubmissionPayload {
   userId: string;
-  teamId: string;
   activityKey: string;
   logs: SubmissionLogEntry[];
   reflection: string;
@@ -75,7 +74,6 @@ export async function saveSubmission(
 
   const docRef = await addDoc(collection(db, "submissions"), {
     userId: payload.userId,
-    teamId: payload.teamId,
     activityKey: payload.activityKey,
     logs: payload.logs,
     reflection: payload.reflection,

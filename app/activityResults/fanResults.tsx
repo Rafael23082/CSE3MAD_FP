@@ -116,14 +116,13 @@ export default function FanResultsScreen() {
 
   const handleSubmitToLeaderboard = () => {
     if (submitDone) return;
-    if (!auth?.user || !auth?.team) {
+    if (!auth?.user) {
       Alert.alert(t('results.notSignedIn'), t('results.notSignedInMessage'));
       return;
     }
     submitMutation.mutate(
       {
         userId: auth.user.uid,
-        teamId: auth.team.teamId,
         activityKey: 'hand-fan-challenge',
         logs,
         reflection: '',

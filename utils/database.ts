@@ -19,7 +19,6 @@ async function initSchema(database: SQLite.SQLiteDatabase): Promise<void> {
     CREATE TABLE IF NOT EXISTS activities (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       activity_key TEXT NOT NULL,
-      team_id TEXT,
       user_id TEXT,
       started_at TEXT NOT NULL,
       completed_at TEXT,
@@ -46,13 +45,12 @@ async function initSchema(database: SQLite.SQLiteDatabase): Promise<void> {
 
 export async function saveActivityStart(
   activityKey: string,
-  teamId?: string,
   userId?: string,
 ): Promise<number> {
   const database = await getDb();
   const result = await database.runAsync(
-    `INSERT INTO activities (activity_key, team_id, user_id, started_at) VALUES (?, ?, ?, ?)`,
-    [activityKey, teamId ?? null, userId ?? null, new Date().toISOString()],
+    `INSERT INTO activities (activity_key, user_id, started_at) VALUES (?, ?, ?)`,
+    [activityKey, userId ?? null, new Date().toISOString()],
   );
   return result.lastInsertRowId;
 }
@@ -146,7 +144,6 @@ export async function getPendingSyncLogs(): Promise<{
 export async function getPendingSyncData(): Promise<{
   activityKey: string;
   userId: string;
-  teamId: string;
   logIds: number[];
   logs: { timestamp: number; data: Record<string, unknown> }[];
 }[]> {
@@ -155,11 +152,10 @@ export async function getPendingSyncData(): Promise<{
     id: number;
     activity_key: string;
     user_id: string;
-    team_id: string;
     timestamp: number;
     data_json: string;
   }>(
-    `SELECT el.id, el.activity_key, a.user_id, a.team_id, el.timestamp, el.data_json
+    `SELECT el.id, el.activity_key, a.user_id, el.timestamp, el.data_json
      FROM experiment_logs el
      JOIN activities a ON el.activity_id = a.id
      WHERE el.synced = 0
@@ -169,18 +165,16 @@ export async function getPendingSyncData(): Promise<{
   const groups = new Map<string, {
     activityKey: string;
     userId: string;
-    teamId: string;
     logIds: number[];
     logs: { timestamp: number; data: Record<string, unknown> }[];
   }>();
 
   for (const row of rows) {
-    const key = `${row.activity_key}|${row.user_id ?? ''}|${row.team_id ?? ''}`;
+    const key = `${row.activity_key}|${row.user_id ?? ''}`;
     if (!groups.has(key)) {
       groups.set(key, {
         activityKey: row.activity_key,
         userId: row.user_id ?? '',
-        teamId: row.team_id ?? '',
         logIds: [],
         logs: [],
       });

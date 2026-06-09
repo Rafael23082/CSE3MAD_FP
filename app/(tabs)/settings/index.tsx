@@ -21,7 +21,6 @@ export default function SettingsScreen() {
     >
       <Text style={styles.welcomeMessage}>{t("tabs.settings")}</Text>
       <SettingsSection label={t("tabs.account")} icon="person-outline" action={() => router.push("/settings/account")} />
-      <SettingsSection label={t("tabs.team")} icon="people-outline" action={() => {router.push("/settings/team")}} />
       <SettingsSection label={t("tabs.appearance")} icon="color-palette-outline" action={() => {router.push("/settings/appearance")}} />
       <SettingsSection label={t("tabs.language")} icon="language-outline" action={() => {router.push("/settings/language")}} />
       <SettingsSection label={t("tabs.about")} icon="information-circle-outline" action={() => {router.push("/settings/about")}} />

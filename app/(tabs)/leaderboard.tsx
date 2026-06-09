@@ -15,10 +15,9 @@ import { calculateOverallScore, getScoreExplanation, type ActivityScore } from "
 
 type RankEntry = {
   rank: number;
-  teamId: string;
-  teamName: string;
+  userId: string;
+  displayName: string;
   score: number;
-  membersCount: number;
   perActivity: ActivityScore[];
 };
 
@@ -66,37 +65,36 @@ export default function LeaderboardScreen() {
       const subsSnap = await getDocs(collection(db, 'submissions'));
       const subs = subsSnap.docs.map(d => ({ id: d.id, ...d.data() } as any));
 
-      // Group by team
-      const teamMap: Record<string, { submissions: any[]; teamName?: string }> = {};
+      // Group by userId
+      const userMap: Record<string, { submissions: any[]; displayName?: string }> = {};
 
       for (const sub of subs as any[]) {
         if (mode === 'activity' && selectedActivity && sub.activityKey !== selectedActivity) continue;
-        const teamId = sub.teamId;
-        if (!teamId) continue;
-        if (!teamMap[teamId]) {
-          teamMap[teamId] = { submissions: [] };
-          // Fetch team name
+        const uid = sub.userId;
+        if (!uid) continue;
+        if (!userMap[uid]) {
+          userMap[uid] = { submissions: [] };
+          // Fetch user displayName
           try {
-            const teamSnap = await getDoc(doc(db, 'teams', teamId));
-            if (teamSnap.exists()) {
-              teamMap[teamId].teamName = teamSnap.data().teamName;
+            const userSnap = await getDoc(doc(db, 'users', uid));
+            if (userSnap.exists()) {
+              userMap[uid].displayName = userSnap.data().displayName;
             }
           } catch (e) {
-            teamMap[teamId].teamName = teamId;
+            userMap[uid].displayName = uid.substring(0, 8);
           }
         }
-        teamMap[teamId].submissions.push(sub);
+        userMap[uid].submissions.push(sub);
       }
 
-      const ranked: RankEntry[] = Object.entries(teamMap)
-        .map(([teamId, data]) => {
+      const ranked: RankEntry[] = Object.entries(userMap)
+        .map(([userId, data]) => {
           const result = calculateOverallScore(data.submissions);
           return {
             rank: 0,
-            teamId,
-            teamName: data.teamName || teamId.substring(0, 8),
+            userId,
+            displayName: data.displayName || userId.substring(0, 8),
             score: result.total,
-            membersCount: 0,
             perActivity: result.perActivity,
           };
         })
@@ -122,7 +120,7 @@ export default function LeaderboardScreen() {
     setRefreshing(false);
   };
 
-  const userTeamId = auth?.team?.teamId;
+  const currentUserId = auth?.user?.uid;
 
   const showExplanation = (activityKey: string) => {
     Alert.alert(
@@ -189,7 +187,7 @@ export default function LeaderboardScreen() {
         >
           <View style={styles.columnHeader}>
             <Text style={[styles.col, { width: 40 }]}>{t("leaderboard.rank")}</Text>
-            <Text style={[styles.col, { flex: 1 }]}>{t("leaderboard.team")}</Text>
+            <Text style={[styles.col, { flex: 1 }]}>{t("leaderboard.user")}</Text>
             <Pressable
               style={{ width: 60, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 2 }}
               onPress={() => showExplanation(mode === 'activity' && selectedActivity ? selectedActivity : '')}
@@ -200,14 +198,14 @@ export default function LeaderboardScreen() {
           </View>
 
           {rankings.map((entry) => {
-            const isUserTeam = entry.teamId === userTeamId;
-            const isExpanded = expandedTeamId === entry.teamId;
+            const isCurrentUser = entry.userId === currentUserId;
+            const isExpanded = expandedTeamId === entry.userId;
             const scoreColor = getScoreColor(entry.score);
             return (
-              <View key={entry.teamId}>
+              <View key={entry.userId}>
                 <Pressable
-                  style={[styles.rankRow, isUserTeam && styles.userRow]}
-                  onPress={() => setExpandedTeamId(isExpanded ? null : entry.teamId)}
+                  style={[styles.rankRow, isCurrentUser && styles.userRow]}
+                  onPress={() => setExpandedTeamId(isExpanded ? null : entry.userId)}
                 >
                   <View style={{ width: 40, alignItems: 'center' }}>
                     {entry.rank <= 3 ? (
@@ -217,8 +215,8 @@ export default function LeaderboardScreen() {
                     )}
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text style={[styles.teamName, isUserTeam && styles.userTeamName]}>
-                      {entry.teamName}
+                    <Text style={[styles.teamName, isCurrentUser && styles.userTeamName]}>
+                      {entry.displayName}
                     </Text>
                   </View>
                   <Text style={[styles.score, { width: 60, textAlign: 'right', color: scoreColor }]}>

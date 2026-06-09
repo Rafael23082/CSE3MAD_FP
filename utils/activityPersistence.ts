@@ -21,7 +21,6 @@ export interface ActivityLogEntry {
 
 export interface ActivityResultInput {
   userId: string;
-  teamId: string;
   activityKey: string;
   logs: ActivityLogEntry[];
   reflection?: string;
@@ -32,7 +31,6 @@ export interface ActivityResultInput {
 
 export interface ActivityResultRecord {
   userId: string;
-  teamId: string;
   activityKey: string;
   logsJson: string;
   reflection: string;
@@ -45,7 +43,6 @@ export interface ActivityResultRecord {
 
 export interface FirestoreSubmissionPayload {
   userId: string;
-  teamId: string;
   activityKey: string;
   logs: ActivityLogEntry[];
   reflection: string;
@@ -62,7 +59,6 @@ export function buildActivityResultRecord(
 
   return {
     userId: input.userId,
-    teamId: input.teamId,
     activityKey: input.activityKey,
     logsJson: JSON.stringify(input.logs),
     reflection: input.reflection ?? "",
@@ -81,7 +77,6 @@ export function buildFirestoreSubmissionPayload(
 
   return {
     userId: input.userId,
-    teamId: input.teamId,
     activityKey: input.activityKey,
     logs: input.logs,
     reflection: input.reflection ?? "",
@@ -105,7 +100,6 @@ async function getDatabase() {
     CREATE TABLE IF NOT EXISTS results (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id TEXT NOT NULL,
-      team_id TEXT NOT NULL,
       activity_key TEXT NOT NULL,
       logs_json TEXT NOT NULL,
       reflection TEXT NOT NULL,
@@ -143,7 +137,6 @@ export async function saveActivityResultLocally(
   const result = await database.runAsync(
     `INSERT INTO results (
       user_id,
-      team_id,
       activity_key,
       logs_json,
       reflection,
@@ -152,9 +145,8 @@ export async function saveActivityResultLocally(
       longitude,
       accuracy,
       submitted_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     record.userId,
-    record.teamId,
     record.activityKey,
     record.logsJson,
     record.reflection,
@@ -197,7 +189,6 @@ export async function getPendingSyncResults(): Promise<{ id: number; payload: Ac
   const rows = await database.getAllAsync<{
     id: number;
     user_id: string;
-    team_id: string;
     activity_key: string;
     logs_json: string;
     reflection: string;
@@ -213,7 +204,6 @@ export async function getPendingSyncResults(): Promise<{ id: number; payload: Ac
     id: r.id,
     payload: {
       userId: r.user_id,
-      teamId: r.team_id,
       activityKey: r.activity_key,
       logs: JSON.parse(r.logs_json),
       reflection: r.reflection || undefined,

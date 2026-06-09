@@ -60,14 +60,13 @@ export default function HumanPerformanceResultsScreen() {
 
   const handleSubmitToLeaderboard = () => {
     if (submitDone) return;
-    if (!auth?.user || !auth?.team) {
+    if (!auth?.user) {
       Alert.alert(t('results.notSignedIn'), t('results.notSignedInMessage'));
       return;
     }
     submitMutation.mutate(
       {
         userId: auth.user.uid,
-        teamId: auth.team.teamId,
         activityKey: 'stretch-speed-and-gracefulness',
         logs,
         reflection: '',
