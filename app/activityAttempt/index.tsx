@@ -1,14 +1,15 @@
 import BreathingAttemptScreen from "@/components/breathingAttempt";
-import HumanPerformanceLabAttemptScreen from "@/components/humanPerformanceLabAttempt";
-import ReactionBoardAttemptScreen from "@/components/reactionBoardAttempt";
-import ParachuteAttemptScreen from "@/components/parachuteAttempt";
-import SoundAttemptScreen from "@/components/soundAttempt";
-import FanAttemptScreen from "@/components/fanAttempt";
 import EarthquakeAttemptScreen from "@/components/earthquakeAttempt";
+import FanAttemptScreen from "@/components/fanAttempt";
+import HumanPerformanceLabAttemptScreen from "@/components/humanPerformanceLabAttempt";
+import ParachuteAttemptScreen from "@/components/parachuteAttempt";
+import ReactionBoardAttemptScreen from "@/components/reactionBoardAttempt";
+import SoundAttemptScreen from "@/components/soundAttempt";
 import { ActivityContext } from "@/context/ActivityContext";
-import { use } from "react";
-import { Text } from "react-native";
+import * as Battery from "expo-battery";
+import { use, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { Alert, Text } from "react-native";
 
 export default function ActivityAttemptMainScreen(){
   const { t } = useTranslation();
@@ -16,6 +17,22 @@ export default function ActivityAttemptMainScreen(){
     if (!activityContext) return null;
 
     const {activity} = activityContext;
+
+    useEffect(() => {
+        async function checkPowerMode() {
+            const lowPowerMode =
+                await Battery.isLowPowerModeEnabledAsync();
+
+            if (lowPowerMode) {
+                Alert.alert(
+                    t("errorMessages.batterySaverOn"),
+                    t("errorMessages.batterySaverOnDescription")
+                );
+            }
+        }
+
+        checkPowerMode();
+    }, []);
 
     const renderScreen = () => {
         switch (activity?.key){

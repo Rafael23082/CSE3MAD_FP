@@ -46,7 +46,9 @@ export default function ActivityGroup({activityKey, activityName, description, i
                 <Image source={imagePath} style={styles.image} resizeMode="cover" />
             </Pressable>
             <Text style={styles.body}>{description}</Text>
-            <Text style={[styles.body, { paddingTop: 4 }]}>Rating: 4.8</Text>
+            <Text style={styles.rating}>
+                4.8 ★ (3)
+            </Text>
             </View>
         )
     );
@@ -78,6 +80,13 @@ const createStyles = (colors: ThemeColors) => {
         image: {
             width: "100%",
             height: "100%",
+        },
+        rating: {
+            fontFamily: "InterRegular",
+            color: colors.secondary,
+            fontSize: 14,
+            marginTop: 6,
+            opacity: 0.85,
         }
     })
     return styles;

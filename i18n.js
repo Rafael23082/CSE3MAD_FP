@@ -422,7 +422,9 @@ const resources = {
         passwordsDoNotMatch: "Passwords do not match",
         emptyDisplayName: "Display name cannot be empty",
         unfinishedChallenge: "Challenge Unfinished",
-        unfinishedChallengeDescription: "Complete and log all challenges before this attempt can be saved."
+        unfinishedChallengeDescription: "Complete and log all challenges before this attempt can be saved.",
+        batterySaverOn: "Power Saver Mode Enabled",
+        batterySaverOnDescription: "This activity collects experimental data using your device's sensors, timing functions, or media capabilities. Power Saver Mode may affect device performance and measurement consistency. For the most reliable results, consider disabling Power Saver Mode before continuing."
       },
       countdown: {
         getReady: "Get Ready"
@@ -902,7 +904,9 @@ const resources = {
         failedPasswordUpdate: "パスワードの更新に失敗しました",
         emptyDisplayName: "表示名は空欄にできません",
         unfinishedChallenge: "チャレンジ未完了",
-        unfinishedChallengeDescription: "この試行を保存する前に、すべてのチャレンジを完了して記録してください。"
+        unfinishedChallengeDescription: "この試行を保存する前に、すべてのチャレンジを完了して記録してください。",
+        batterySaverOn: "省電力モードが有効です",
+        batterySaverOnDescription: "このアクティビティでは、デバイスのセンサー、タイマー機能、またはメディア機能を使用して実験データを収集します。省電力モードが有効になっていると、デバイスのパフォーマンスや測定の一貫性に影響を与える可能性があります。より信頼性の高い結果を得るため、続行する前に省電力モードを無効にすることを検討してください。"
       },
       countdown: {
         getReady: "準備をしよう"
@@ -1484,7 +1488,9 @@ const resources = {
         passwordsDoNotMatch: "Kata sandi tidak cocok",
         emptyDisplayName: "Nama tampilan tidak boleh kosong",
         unfinishedChallenge: "Tantangan Belum Selesai",
-        unfinishedChallengeDescription: "Selesaikan dan simpan semua tantangan sebelum percobaan ini dapat disimpan."
+        unfinishedChallengeDescription: "Selesaikan dan simpan semua tantangan sebelum percobaan ini dapat disimpan.",
+        batterySaverOn: "Mode Hemat Daya Aktif",
+        batterySaverOnDescription: "Aktivitas ini mengumpulkan data eksperimen menggunakan sensor, fungsi pengukuran waktu, atau kemampuan media pada perangkat Anda. Mode Hemat Daya dapat memengaruhi performa perangkat dan konsistensi pengukuran. Untuk memperoleh hasil yang paling andal, pertimbangkan untuk menonaktifkan Mode Hemat Daya sebelum melanjutkan."
       },
       countdown: {
         getReady: "Bersiaplah"
@@ -2040,7 +2046,9 @@ const resources = {
         passwordsDoNotMatch: "密码不匹配",
         emptyDisplayName: "显示名称不能为空",
         unfinishedChallenge: "挑战未完成",
-        unfinishedChallengeDescription: "请先完成并记录所有挑战，然后才能保存本次尝试。"
+        unfinishedChallengeDescription: "请先完成并记录所有挑战，然后才能保存本次尝试。",
+        batterySaverOn: "省电模式已开启",
+        batterySaverOnDescription: "此活动会使用您设备的传感器、计时功能或媒体功能来收集实验数据。省电模式可能会影响设备性能和测量结果的一致性。为了获得最可靠的实验结果，建议您在继续之前关闭省电模式。"
       },
       countdown: {
         getReady: "准备"
