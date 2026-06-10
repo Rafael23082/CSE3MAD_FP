@@ -7,7 +7,6 @@ import { Subscription } from "expo-sensors/build/Pedometer";
 import { use, useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Alert, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "./button";
 import Card from "./card";
 import { LineChart } from "./lineChart";
@@ -248,118 +247,115 @@ export default function HumanPerformanceLabAttemptScreen(){
     }
 
     return(
-        <SafeAreaView style={styles.outerContainer} edges={["top"]}>
-            <KeyboardAvoidingView style={{flex: 1}} behavior="height">
-                <ScrollView contentContainerStyle={styles.container}>
-                    <View style={styles.subContainer}>
-                        <Text style={styles.head}>{activity.name}</Text>
-                        <View style={styles.headerContainer}>
-                            <Text style={styles.sectionHeader}>{t("activities.attempt")}</Text>
-                            <View style={styles.timerContainer}>
-                                <Text style={[styles.sectionHeader, {
-                                    lineHeight: 20
-                                }]}>{formatNumber(time)}</Text>
-                            </View>
+        <KeyboardAvoidingView style={styles.outerContainer} behavior="height">
+            <ScrollView contentContainerStyle={styles.container}>
+                <View style={styles.subContainer}>
+                    <Text style={styles.head}>{activity.name}</Text>
+                    <View style={styles.headerContainer}>
+                        <Text style={styles.sectionHeader}>{t("activities.attempt")}</Text>
+                        <View style={styles.timerContainer}>
+                            <Text style={[styles.sectionHeader, {
+                                lineHeight: 20
+                            }]}>{formatNumber(time)}</Text>
                         </View>
+                    </View>
 
-                        <PresetSelector 
-                            designPresets={DESIGN_PRESETS}
-                            onSelect={(preset) => {
-                                setPresetKey(preset.key);
-                            }}
-                        />
-                        <TextInput
-                            style={styles.input}
-                            value={t(presetKey)}
-                            onChangeText={setPresetKey}
-                            placeholder={"Enter Preset Name"}
-                            placeholderTextColor={theme.textMuted}
-                            editable={false}
-                        />
+                    <PresetSelector 
+                        designPresets={DESIGN_PRESETS}
+                        onSelect={(preset) => {
+                            setPresetKey(preset.key);
+                        }}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        value={t(presetKey)}
+                        onChangeText={setPresetKey}
+                        placeholder={"Enter Preset Name"}
+                        placeholderTextColor={theme.textMuted}
+                        editable={false}
+                    />
 
-                        <Text style={[styles.actionName, {marginTop: 24}]}>{t("activities.stretchSpeedAndGracefulness.recordMovement")}</Text>
+                    <Text style={[styles.actionName, {marginTop: 24}]}>{t("activities.stretchSpeedAndGracefulness.recordMovement")}</Text>
 
-                        <View style={styles.cardContainer}>
-                            <Card metric={t("activities.stretchSpeedAndGracefulness.vibrationsDetected")} value={String(vibrations)} maximumWidth={true} />
-                        </View>
+                    <View style={styles.cardContainer}>
+                        <Card metric={t("activities.stretchSpeedAndGracefulness.vibrationsDetected")} value={String(vibrations)} maximumWidth={true} />
+                    </View>
 
-                        <View style={styles.cardContainer}>
-                            <Card metric={t("activities.stretchSpeedAndGracefulness.smoothnessScore")} value={`${Math.round(smoothness)}%`} maximumWidth={true} />
-                        </View>
+                    <View style={styles.cardContainer}>
+                        <Card metric={t("activities.stretchSpeedAndGracefulness.smoothnessScore")} value={`${Math.round(smoothness)}%`} maximumWidth={true} />
+                    </View>
 
-                        <View>
-                            {recordingState === "idle" && (
-                                <Button text={t("buttons.startRecording")} action={() => {
-                                        setCountdown(3);
-                                    }}
-                                />
-                            )}
+                    <View>
+                        {recordingState === "idle" && (
+                            <Button text={t("buttons.startRecording")} action={() => {
+                                    setCountdown(3);
+                                }}
+                            />
+                        )}
 
-                            {recordingState === "recording" && (
-                                <Button text={t("buttons.recording")} action={() => {}} />
-                            )}
+                        {recordingState === "recording" && (
+                            <Button text={t("buttons.recording")} action={() => {}} />
+                        )}
 
-                            {recordingState === "completed" && (
-                                <Button 
-                                    text={t("buttons.logTrial")}
-                                    action={logDesign}
-                                />
-                            )}
-                        </View>
+                        {recordingState === "completed" && (
+                            <Button 
+                                text={t("buttons.logTrial")}
+                                action={logDesign}
+                            />
+                        )}
+                    </View>
 
-                        <Text style={styles.actionName}>
-                            {t("activities.stretchSpeedAndGracefulness.movementMonitor")}
-                        </Text>
+                    <Text style={styles.actionName}>
+                        {t("activities.stretchSpeedAndGracefulness.movementMonitor")}
+                    </Text>
 
-                        <View style={styles.chartContainer}>
+                    <View style={styles.chartContainer}>
 
-                            {graphValues.length != 0 ? (
-                                <LineChart
-                                    lineChartData={graphValues.map((value, index) => ({
-                                        time: index,
-                                        z: value
-                                    }))}
-                                />
-                            ): (
-                                <Text style={styles.placeholderText}>
-                                    {t("activities.stretchSpeedAndGracefulness.movementMonitorPlaceholder")}
-                                </Text>
-                            )}
-
-                        </View>
+                        {graphValues.length != 0 ? (
+                            <LineChart
+                                lineChartData={graphValues.map((value, index) => ({
+                                    time: index,
+                                    z: value
+                                }))}
+                            />
+                        ): (
+                            <Text style={styles.placeholderText}>
+                                {t("activities.stretchSpeedAndGracefulness.movementMonitorPlaceholder")}
+                            </Text>
+                        )}
 
                     </View>
 
-                    <Text style={styles.actionNameLarge}>{t("attempt.structuralIterations")}</Text>
+                </View>
 
-                    {DESIGN_PRESETS.map((design, index) => {
-                        const loggedDesign = designs.find((loggedDesign) => loggedDesign.key == design.key);
-                        return(
-                            <View key={index} style={styles.designCard}>
-                                <View style={styles.designHeader}>
-                                    <Text style={styles.designName}>{t(design.key)}</Text>
+                <Text style={styles.actionNameLarge}>{t("attempt.structuralIterations")}</Text>
+
+                {DESIGN_PRESETS.map((design, index) => {
+                    const loggedDesign = designs.find((loggedDesign) => loggedDesign.key == design.key);
+                    return(
+                        <View key={index} style={styles.designCard}>
+                            <View style={styles.designHeader}>
+                                <Text style={styles.designName}>{t(design.key)}</Text>
+                            </View>
+                            {loggedDesign ? (
+                                <View>
+                                    <Text style={styles.designConfig}>{t("activities.stretchSpeedAndGracefulness.smoothnessScore")}: {Math.floor(loggedDesign.smoothnessScore * 100) / 100}%</Text>
+                                    <Text style={styles.designConfig}>{t("activities.stretchSpeedAndGracefulness.vibrationsDetected")}: {loggedDesign.vibrations}</Text> 
                                 </View>
-                                {loggedDesign ? (
-                                    <View>
-                                        <Text style={styles.designConfig}>{t("activities.stretchSpeedAndGracefulness.smoothnessScore")}: {Math.floor(loggedDesign.smoothnessScore * 100) / 100}%</Text>
-                                        <Text style={styles.designConfig}>{t("activities.stretchSpeedAndGracefulness.vibrationsDetected")}: {loggedDesign.vibrations}</Text> 
-                                    </View>
-                                ): (
-                                    <Text style={styles.designConfig}>No Recorded Attempt Yet.</Text>
-                                )}  
-                            </View>
-                        );
-                    })}
+                            ): (
+                                <Text style={styles.designConfig}>No Recorded Attempt Yet.</Text>
+                            )}  
+                        </View>
+                    );
+                })}
 
-                    <View style={styles.buttonContainer}>
-                        <Button 
-                            text={t("buttons.finishActivity")}
-                            action={handleFinish}
-                        />
-                    </View>
-                </ScrollView>
-            </KeyboardAvoidingView>
-
+                <View style={styles.buttonContainer}>
+                    <Button 
+                        text={t("buttons.finishActivity")}
+                        action={handleFinish}
+                    />
+                </View>
+            </ScrollView>
             {countdown !== null && (
                 <View style={styles.overlay}>
                     <Text style={styles.readyText}>{t("countdown.getReady")}</Text>
@@ -369,8 +365,7 @@ export default function HumanPerformanceLabAttemptScreen(){
                     </Text>
                 </View>
             )}
-
-        </SafeAreaView>
+        </KeyboardAvoidingView>
     )
 }
 

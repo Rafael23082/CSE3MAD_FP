@@ -1,7 +1,7 @@
-import { registerSyncOnForeground, registerBackgroundTask } from '@/utils/backgroundSync';
 import { ActivityProvider } from '@/context/ActivityContext';
 import { AuthProvider } from '@/context/AuthContext';
 import { ThemeProvider } from '@/context/ThemeContext';
+import { registerBackgroundTask, registerSyncOnForeground } from '@/utils/backgroundSync';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import { Stack } from 'expo-router';
@@ -9,8 +9,8 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
-import { configureNotifications, requestNotificationPermissions } from '../utils/notifications';
 import { initI18n } from "../i18n";
+import { configureNotifications, requestNotificationPermissions } from '../utils/notifications';
 
 configureNotifications();
 
@@ -55,6 +55,7 @@ export default function RootLayout() {
                 <Stack.Screen name="activityAttempt" options={{ headerShown: false }} />
                 <Stack.Screen name="activityResults" options={{ headerShown: false }} />
                 <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+                <Stack.Screen name="sensor-debug" options={{ headerShown: false }} />
               </Stack>
               <StatusBar style="auto" />
             </QueryClientProvider>

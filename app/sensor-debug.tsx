@@ -3,9 +3,9 @@ import { ThemeColors } from "@/theme/colors";
 import { Audio } from "expo-av";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import * as Location from "expo-location";
+import { useRouter } from "expo-router";
 import { Accelerometer } from "expo-sensors";
 import React, { useEffect, useMemo, useState } from "react";
-import { useRouter } from "expo-router";
 import {
   ActivityIndicator,
   Alert,
@@ -15,7 +15,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface SensorStatus {
   granted: boolean;
@@ -299,95 +299,98 @@ export default function SensorDebugScreen() {
   ];
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={[styles.content, { paddingTop: insets.top + 20 }]}
-      contentInsetAdjustmentBehavior="automatic"
-    >
-        <View style={styles.headerRow}>
-          <View>
-            <Text style={styles.title}>Sensor Debug</Text>
-            <Text style={styles.subtitle}>
-              Use a physical Android device to verify live sensor data.
-            </Text>
+    <SafeAreaView style={styles.container}>
+      <ScrollView
+        style={styles.subContainer}
+        contentContainerStyle={[styles.content]}
+        contentInsetAdjustmentBehavior="automatic"
+      >
+          <View style={styles.headerRow}>
+            <View>
+              <Text style={styles.title}>Sensor Debug</Text>
+            </View>
+            <Pressable style={styles.backButton} onPress={() => router.back()}>
+              <Text style={styles.backButtonText}>Back</Text>
+            </Pressable>
           </View>
-          <Pressable style={styles.backButton} onPress={() => router.back()}>
-            <Text style={styles.backButtonText}>Back</Text>
+
+          <Text style={styles.subtitle}>
+            Use a physical Android device to verify live sensor data.
+          </Text>
+
+          <View style={styles.panel}>
+            <Text style={styles.sectionTitle}>Camera preview</Text>
+            {cameraPermission?.granted ? (
+              <View style={styles.cameraFrame}>
+                <CameraView style={StyleSheet.absoluteFill} facing="back" />
+              </View>
+            ) : (
+              <View style={styles.placeholder}>
+                <Text style={styles.placeholderText}>
+                  Camera permission required.
+                </Text>
+              </View>
+            )}
+          </View>
+
+          <View style={styles.grid}>
+            {sensorCards.map((card) => (
+              <View key={card.title} style={styles.sensorCard}>
+                <Text style={styles.sensorTitle}>{card.title}</Text>
+                <Text style={styles.sensorStatus}>{card.status}</Text>
+                <Text style={styles.sensorLive}>{card.live}</Text>
+                {card.error ? (
+                  <Text style={styles.sensorError}>{card.error}</Text>
+                ) : null}
+                <Pressable
+                  style={styles.sensorButton}
+                  onPress={() => void card.onPress()}
+                >
+                  <Text style={styles.sensorButtonText}>{card.buttonLabel}</Text>
+                </Pressable>
+              </View>
+            ))}
+          </View>
+
+          <View style={styles.panel}>
+            <Text style={styles.sectionTitle}>Live snapshot</Text>
+            {!accelerometerState && !locationState && micDb === 0 ? (
+              <ActivityIndicator color={theme.primary} />
+            ) : (
+              <View style={styles.snapshotList}>
+                <Text style={styles.snapshotItem}>Mic: {micDb} dB</Text>
+                <Text style={styles.snapshotItem}>
+                  GPS:{" "}
+                  {locationState
+                    ? `${formatCoordinate(locationState.latitude)}, ${formatCoordinate(locationState.longitude)}`
+                    : "Waiting"}
+                </Text>
+                <Text style={styles.snapshotItem}>
+                  Accelerometer:{" "}
+                  {accelerometerState
+                    ? accelerometerState.magnitude.toFixed(3)
+                    : "Waiting"}
+                </Text>
+              </View>
+            )}
+          </View>
+
+          <Pressable
+            style={[
+              styles.sensorButton,
+              { marginTop: 4, backgroundColor: theme.danger },
+            ]}
+            onPress={() => {
+              Alert.alert(
+                "Validation tip",
+                "Walk around the room, speak into the microphone, and rotate the device to confirm live readings on the physical phone.",
+              );
+            }}
+          >
+            <Text style={styles.sensorButtonText}>Show validation tip</Text>
           </Pressable>
-        </View>
-
-        <View style={styles.panel}>
-          <Text style={styles.sectionTitle}>Camera preview</Text>
-          {cameraPermission?.granted ? (
-            <View style={styles.cameraFrame}>
-              <CameraView style={StyleSheet.absoluteFill} facing="back" />
-            </View>
-          ) : (
-            <View style={styles.placeholder}>
-              <Text style={styles.placeholderText}>
-                Camera permission required.
-              </Text>
-            </View>
-          )}
-        </View>
-
-        <View style={styles.grid}>
-          {sensorCards.map((card) => (
-            <View key={card.title} style={styles.sensorCard}>
-              <Text style={styles.sensorTitle}>{card.title}</Text>
-              <Text style={styles.sensorStatus}>{card.status}</Text>
-              <Text style={styles.sensorLive}>{card.live}</Text>
-              {card.error ? (
-                <Text style={styles.sensorError}>{card.error}</Text>
-              ) : null}
-              <Pressable
-                style={styles.sensorButton}
-                onPress={() => void card.onPress()}
-              >
-                <Text style={styles.sensorButtonText}>{card.buttonLabel}</Text>
-              </Pressable>
-            </View>
-          ))}
-        </View>
-
-        <View style={styles.panel}>
-          <Text style={styles.sectionTitle}>Live snapshot</Text>
-          {!accelerometerState && !locationState && micDb === 0 ? (
-            <ActivityIndicator color={theme.primary} />
-          ) : (
-            <View style={styles.snapshotList}>
-              <Text style={styles.snapshotItem}>Mic: {micDb} dB</Text>
-              <Text style={styles.snapshotItem}>
-                GPS:{" "}
-                {locationState
-                  ? `${formatCoordinate(locationState.latitude)}, ${formatCoordinate(locationState.longitude)}`
-                  : "Waiting"}
-              </Text>
-              <Text style={styles.snapshotItem}>
-                Accelerometer:{" "}
-                {accelerometerState
-                  ? accelerometerState.magnitude.toFixed(3)
-                  : "Waiting"}
-              </Text>
-            </View>
-          )}
-        </View>
-
-        <Pressable
-          style={[
-            styles.sensorButton,
-            { marginTop: 4, backgroundColor: theme.danger },
-          ]}
-          onPress={() => {
-            Alert.alert(
-              "Validation tip",
-              "Walk around the room, speak into the microphone, and rotate the device to confirm live readings on the physical phone.",
-            );
-          }}
-        >
-          <Text style={styles.sensorButtonText}>Show validation tip</Text>
-        </Pressable>
-      </ScrollView>
+        </ScrollView>
+      </SafeAreaView>
   );
 }
 
@@ -397,15 +400,17 @@ const createStyles = (colors: ThemeColors) =>
       flex: 1,
       backgroundColor: colors.backgroundColor,
     },
+    subContainer: {
+      flex: 1,
+    },
     content: {
-      padding: 20,
-      gap: 14,
+      gap: 16,
+      padding: 24
     },
     headerRow: {
       flexDirection: "row",
       justifyContent: "space-between",
-      alignItems: "flex-start",
-      gap: 12,
+      alignItems: "center",
     },
     title: {
       fontFamily: "PoppinsBold",
@@ -413,10 +418,9 @@ const createStyles = (colors: ThemeColors) =>
       color: colors.primary,
     },
     subtitle: {
-      marginTop: 4,
       color: colors.textMuted,
       fontSize: 13,
-      lineHeight: 18,
+      paddingBottom: 8
     },
     backButton: {
       paddingHorizontal: 14,
