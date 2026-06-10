@@ -35,8 +35,11 @@ export default function Button({
       accessibilityLabel={text}
     >
       <View style={styles.buttonContent}>
-        {loading ? <ActivityIndicator color="#FFFFFF" /> : null}
-        <Text style={styles.buttonText}>{loading ? `${text}...` : text}</Text>
+        {loading ? (
+          <ActivityIndicator color="#FFFFFF" />
+        ) : (
+          <Text style={styles.buttonText}>{text}</Text>
+        )}
       </View>
     </Pressable>
   );

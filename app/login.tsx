@@ -19,10 +19,12 @@ export default function LoginScreen(){
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const {t} = useTranslation();
     
     const handleSignin = () => {
+        setLoading(true);
         if (!email || !password){
             setError(t("errorMessages.fillInAllFields"));
             return;
@@ -58,6 +60,9 @@ export default function LoginScreen(){
                         setError(t("errorMessages.defaultError"));
                 }
             })
+            .finally(() => {
+                setLoading(false);
+            })
     }
 
     return(
@@ -92,7 +97,7 @@ export default function LoginScreen(){
                                 <Text style={styles.errorMessage}>{error}</Text>
                             )}
                         </View>
-                        <Button text={t("buttons.login")} action={handleSignin} />
+                        <Button text={t("buttons.login")} action={handleSignin} loading={loading} />
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>

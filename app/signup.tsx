@@ -1,7 +1,9 @@
 import Button from "@/components/button";
 import InputGroup from "@/components/inputGroup";
+import { TeamMember } from "@/constants/types";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc, updateDoc } from "firebase/firestore";
@@ -10,8 +12,6 @@ import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth, db } from "../firebase";
-import { TeamMember } from "@/constants/types";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const MIN_MEMBERS = 1;
 const MAX_MEMBERS = 3;
@@ -30,11 +30,13 @@ export default function SignupScreen(){
         { firstName: "", lastName: "" }
     ]);
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const {t} = useTranslation();
 
     const handleSignup = async() => {
         try{
+            setLoading(true);
             if (!teamName || !email || !password){
                 setError(t("errorMessages.fillInAllFields"));
                 return;
@@ -73,11 +75,14 @@ export default function SignupScreen(){
                 default:
                     setError(t("errorMessages.defaultError"));
             }
+        }finally{
+            setLoading(false);
         }
     }
 
     const handleCompleteRegistration = async() => {
         try{
+            setLoading(true);
             const filledMembers = teamMembers.filter(
                 m => m.firstName.trim() !== "" && m.lastName.trim() !== ""
             );
@@ -106,6 +111,9 @@ export default function SignupScreen(){
         }
         catch{
             setError(t("errorMessages.defaultError"));
+        }
+        finally{
+            setLoading(false);
         }
     }
 
@@ -184,7 +192,7 @@ export default function SignupScreen(){
                                     <Text style={styles.errorMessage}>{error}</Text>
                                 )}
                             </View>
-                            <Button text={t("signup.completeRegistration")} action={handleCompleteRegistration} />
+                            <Button text={t("signup.completeRegistration")} action={handleCompleteRegistration} loading={loading} />
                         </View>
                     </ScrollView>
                 </KeyboardAvoidingView>
@@ -235,7 +243,7 @@ export default function SignupScreen(){
                                 <Text style={styles.errorMessage}>{error}</Text>
                             )}
                         </View>
-                        <Button text={t("buttons.register")} action={handleSignup} />
+                        <Button text={t("buttons.register")} action={handleSignup} loading={loading} />
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>
