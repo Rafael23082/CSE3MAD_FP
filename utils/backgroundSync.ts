@@ -1,6 +1,11 @@
 import { AppState } from 'react-native';
+import * as TaskManager from 'expo-task-manager';
+import * as BackgroundFetch from 'expo-background-fetch';
 import { getPendingSyncData, markLogSynced } from './database';
 import { saveSubmission } from './activitySubmissions';
+import { showSyncCompleted } from './notifications';
+
+export const BACKGROUND_SYNC_TASK = 'background-sync-task';
 
 export interface SyncResult {
   synced: number;
@@ -46,6 +51,53 @@ export async function syncPendingLogs(): Promise<SyncResult> {
   }
 
   return result;
+}
+
+/**
+ * Background task definition
+ */
+TaskManager.defineTask(BACKGROUND_SYNC_TASK, async () => {
+  try {
+    const result = await syncPendingLogs();
+    if (result.synced > 0) {
+      await showSyncCompleted(result.synced);
+    }
+    return result.synced > 0 ? BackgroundFetch.BackgroundFetchResult.NewData : BackgroundFetch.BackgroundFetchResult.NoData;
+  } catch {
+    return BackgroundFetch.BackgroundFetchResult.Failed;
+  }
+});
+
+/**
+ * Register background sync task (15-minute interval)
+ */
+export async function registerBackgroundTask(): Promise<void> {
+  try {
+    const isRegistered = await TaskManager.isTaskRegisteredAsync(BACKGROUND_SYNC_TASK);
+    if (isRegistered) return;
+
+    await BackgroundFetch.registerTaskAsync(BACKGROUND_SYNC_TASK, {
+      minimumInterval: 15 * 60,
+      stopOnTerminate: false,
+      startOnBoot: true,
+    });
+  } catch {
+    // Background task registration may fail on some devices
+  }
+}
+
+/**
+ * Unregister background sync task
+ */
+export async function unregisterBackgroundTask(): Promise<void> {
+  try {
+    const isRegistered = await TaskManager.isTaskRegisteredAsync(BACKGROUND_SYNC_TASK);
+    if (isRegistered) {
+      await BackgroundFetch.unregisterTaskAsync(BACKGROUND_SYNC_TASK);
+    }
+  } catch {
+    // Ignore errors
+  }
 }
 
 export function registerSyncOnForeground(): () => void {

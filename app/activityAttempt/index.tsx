@@ -10,6 +10,8 @@ import { AuthContext } from "@/context/AuthContext";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { createAttempt } from "@/utils/activityAttempts";
+import { captureLocation } from "@/utils/location";
+import { showActivitySaved } from "@/utils/notifications";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { use, useState } from "react";
@@ -42,6 +44,8 @@ export default function ActivityAttemptMainScreen(){
 
       setSaving(true);
       try {
+          const location = await captureLocation();
+
           await createAttempt(
               auth.user.uid,
               activity.key,
@@ -49,8 +53,13 @@ export default function ActivityAttemptMainScreen(){
                   activityKey: log.activityKey,
                   timestamp: log.timestamp,
                   data: { ...(log.data ?? {}) },
-              }))
+              })),
+              "",
+              null,
+              location ?? undefined
           );
+
+          await showActivitySaved();
 
           Alert.alert(
               t("journal.attemptSaved"),

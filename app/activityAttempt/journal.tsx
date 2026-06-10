@@ -9,6 +9,7 @@ import {
     submitToLeaderboard,
     replaceSubmission,
 } from '@/utils/activityAttempts';
+import { showActivitySubmitted } from '@/utils/notifications';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { use, useCallback, useEffect, useState } from 'react';
@@ -126,6 +127,7 @@ export default function JournalScreen() {
                             onPress: async () => {
                                 try {
                                     await replaceSubmission(attempt.id);
+                                    await showActivitySubmitted(100);
                                     Alert.alert(t("journal.submissionReplaced"));
                                     fetchAttempts();
                                 } catch (e: any) {
@@ -138,6 +140,7 @@ export default function JournalScreen() {
             } else {
                 // First submission
                 await submitToLeaderboard(attempt.id);
+                await showActivitySubmitted(100);
                 Alert.alert(t("journal.submitSuccess"));
                 fetchAttempts();
             }
@@ -208,6 +211,12 @@ export default function JournalScreen() {
                                     <Text style={styles.metricLabel}>
                                         {getMetricLabel()}: <Text style={styles.metricValue}>{getMetricValue(officialAttempt.logs).toFixed(2)}</Text>
                                     </Text>
+                                    {officialAttempt.location && (
+                                        <View style={styles.locationRow}>
+                                            <MaterialCommunityIcons name="map-marker" size={14} color={theme.primary} />
+                                            <Text style={styles.locationText}>{officialAttempt.location.formatted}</Text>
+                                        </View>
+                                    )}
                                     {officialAttempt.reflection ? (
                                         <Text style={styles.reflectionPreview} numberOfLines={2}>
                                             {officialAttempt.reflection}
@@ -265,6 +274,12 @@ export default function JournalScreen() {
                                         <Text style={styles.metricLabel}>
                                             {getMetricLabel()}: <Text style={styles.metricValue}>{getMetricValue(attempt.logs).toFixed(2)}</Text>
                                         </Text>
+                                        {attempt.location && (
+                                            <View style={styles.locationRow}>
+                                                <MaterialCommunityIcons name="map-marker" size={14} color={theme.primary} />
+                                                <Text style={styles.locationText}>{attempt.location.formatted}</Text>
+                                            </View>
+                                        )}
                                         {attempt.reflection ? (
                                             <Text style={styles.reflectionPreview} numberOfLines={2}>
                                                 {attempt.reflection}
@@ -384,6 +399,17 @@ const createStyles = (theme: ThemeColors) => StyleSheet.create({
         color: theme.textMuted,
         marginTop: 8,
         fontStyle: "italic",
+    },
+    locationRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 6,
+        marginTop: 8,
+    },
+    locationText: {
+        fontSize: 12,
+        fontFamily: "InterRegular",
+        color: theme.primary,
     },
     attemptActions: {
         flexDirection: "row",

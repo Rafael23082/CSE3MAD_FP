@@ -1,6 +1,7 @@
 import { db } from "@/firebase";
 import { POINTS_PER_ACTIVITY } from "@/constants/data";
 import { ActivityAttempt, ActivityProgress, ActivityLogEntry } from "@/constants/types";
+import { ActivityLocation } from "@/utils/location";
 import {
   collection,
   doc,
@@ -34,6 +35,7 @@ async function getDatabase() {
       rating INTEGER,
       is_leaderboard_submission INTEGER DEFAULT 0,
       submitted_to_leaderboard_at TEXT,
+      location_json TEXT,
       created_at TEXT NOT NULL,
       sync_status TEXT DEFAULT 'pending'
     );
@@ -45,6 +47,7 @@ async function getDatabase() {
       official_submission_attempt_id TEXT,
       is_completed INTEGER DEFAULT 0,
       completed_at TEXT,
+      current_score_reached_at TEXT,
       points INTEGER DEFAULT 0,
       updated_at TEXT NOT NULL
     );
@@ -62,7 +65,8 @@ export async function createAttempt(
   activityKey: string,
   logs: ActivityLogEntry[],
   reflection: string = "",
-  rating: number | null = null
+  rating: number | null = null,
+  location?: ActivityLocation
 ): Promise<string> {
   const now = new Date();
 
@@ -75,6 +79,7 @@ export async function createAttempt(
     rating,
     isLeaderboardSubmission: false,
     submittedToLeaderboardAt: null,
+    location: location ?? null,
     createdAt: Timestamp.fromDate(now),
     updatedAt: Timestamp.fromDate(now),
   });
@@ -87,8 +92,8 @@ export async function createAttempt(
     await database.runAsync(
       `INSERT INTO activity_attempts (
         firestore_id, user_id, activity_key, logs_json, reflection, rating,
-        is_leaderboard_submission, submitted_to_leaderboard_at, created_at, sync_status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        is_leaderboard_submission, submitted_to_leaderboard_at, location_json, created_at, sync_status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       firestoreId,
       userId,
       activityKey,
@@ -97,6 +102,7 @@ export async function createAttempt(
       rating,
       0,
       null,
+      location ? JSON.stringify(location) : null,
       now.toISOString(),
       "synced"
     );

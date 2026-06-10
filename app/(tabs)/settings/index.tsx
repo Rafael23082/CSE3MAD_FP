@@ -7,6 +7,9 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { showLowBatteryWarning } from "@/utils/notifications";
+
+const LOW_BATTERY_THRESHOLD = 35;
 
 export default function SettingsScreen() {
   const { theme } = useTheme();
@@ -15,15 +18,25 @@ export default function SettingsScreen() {
   const {t} = useTranslation();
   const insets = useSafeAreaInsets();
   const [batteryLevel, setBatteryLevel] = useState<number | null>(null);
+  const [hasShownLowBattery, setHasShownLowBattery] = useState(false);
 
   useEffect(() => {
     async function loadBatteryLevel() {
       const level = await Battery.getBatteryLevelAsync();
-      setBatteryLevel(Math.round(level * 100));
+      const percent = Math.round(level * 100);
+      setBatteryLevel(percent);
+
+      if (percent < LOW_BATTERY_THRESHOLD && !hasShownLowBattery) {
+        setHasShownLowBattery(true);
+        await showLowBatteryWarning(percent);
+      }
     }
 
     loadBatteryLevel();
-  }, []);
+
+    const interval = setInterval(loadBatteryLevel, 60000);
+    return () => clearInterval(interval);
+  }, [hasShownLowBattery]);
 
   return (
     <ScrollView

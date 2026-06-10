@@ -1,4 +1,4 @@
-import { registerSyncOnForeground } from '@/utils/backgroundSync';
+import { registerSyncOnForeground, registerBackgroundTask } from '@/utils/backgroundSync';
 import { ActivityProvider } from '@/context/ActivityContext';
 import { AuthProvider } from '@/context/AuthContext';
 import { ThemeProvider } from '@/context/ThemeContext';
@@ -9,7 +9,10 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
+import { configureNotifications, requestNotificationPermissions } from '../utils/notifications';
 import { initI18n } from "../i18n";
+
+configureNotifications();
 
 export default function RootLayout() {
   useFonts({
@@ -24,6 +27,8 @@ export default function RootLayout() {
 
   useEffect(() => {
     initI18n();
+    requestNotificationPermissions();
+    registerBackgroundTask();
 
     const cleanupSync = registerSyncOnForeground();
     return () => {

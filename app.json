@@ -53,7 +53,10 @@
         }
       ],
       "expo-localization",
-      "expo-media-library"
+      "expo-media-library",
+      "expo-notifications",
+      "expo-task-manager",
+      "expo-background-fetch"
     ],
     "experiments": {
       "typedRoutes": true,

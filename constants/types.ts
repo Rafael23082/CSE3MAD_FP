@@ -213,6 +213,11 @@ export interface ActivityAttempt {
   rating: number | null;
   isLeaderboardSubmission: boolean;
   submittedToLeaderboardAt: any; // Timestamp or null
+  location?: {
+    latitude: number;
+    longitude: number;
+    formatted: string;
+  } | null;
   createdAt: any; // Timestamp
   updatedAt: any; // Timestamp
 }
