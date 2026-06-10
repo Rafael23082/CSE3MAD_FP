@@ -4,32 +4,15 @@ import { AuthContext } from "@/context/AuthContext";
 import { db } from "@/firebase";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
+import { TOTAL_ACTIVITIES } from "@/constants/data";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { collection, getDocs, onSnapshot, query, where } from "firebase/firestore";
-import { use, useCallback, useEffect, useState } from "react";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
+import { useCallback, use, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-function getBestActivity(subs: any[], activities: any): string {
-  const countMap: Record<string, number> = {};
-  for (const s of subs) {
-    if (s.activityKey) {
-      countMap[s.activityKey] = (countMap[s.activityKey] || 0) + 1;
-    }
-  }
-  let bestKey = '';
-  let bestCount = 0;
-  for (const [key, count] of Object.entries(countMap)) {
-    if (count > bestCount) {
-      bestCount = count;
-      bestKey = key;
-    }
-  }
-  if (!bestKey) return 'N/A';
-  return activities[bestKey]?.title || bestKey;
-}
+import { calculateProgressPercentage, getProgressColor } from "@/utils/progressCalculation";
 
 export default function HomeScreen() {
   const { theme } = useTheme();
@@ -40,36 +23,31 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
 
   const { userProfile, user } = auth || {};
-  const [submissions, setSubmissions] = useState<any[]>([]);
+  const [progress, setProgress] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
   const displayName = userProfile?.displayName ?? "";
 
-  // Fetch submissions for this user
+  // Fetch activity progress for this team
   useEffect(() => {
     if (!user?.uid) return;
-    const q = query(collection(db, "submissions"), where("userId", "==", user.uid));
+    const q = query(collection(db, "activityProgress"), where("userId", "==", user.uid));
     const unsub = onSnapshot(q, (snap) => {
-      const subs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      setSubmissions(subs);
+      const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      setProgress(data);
     });
     return unsub;
   }, [user?.uid]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    if (user?.uid) {
-      const q = query(collection(db, "submissions"), where("userId", "==", user.uid));
-      const snap = await getDocs(q);
-      setSubmissions(snap.docs.map((d: any) => ({ id: d.id, ...d.data() })));
-    }
+    // Data will refresh via onSnapshot
     setRefreshing(false);
-  }, [user?.uid]);
+  }, []);
 
-  const completedCount = submissions.length;
-
-  // Rank calculation (placeholder)
-  const rank = user ? Math.max(1, 5 - completedCount) : 0;
+  const completedCount = progress.filter(p => p.isCompleted).length;
+  const progressPercent = calculateProgressPercentage(completedCount);
+  const progressColor = getProgressColor(progressPercent);
 
   return (
       <ScrollView
@@ -84,16 +62,12 @@ export default function HomeScreen() {
               <View style={{ flex: 1 }}>
                 <Text style={styles.welcomeMessage}>{t("home.welcome")}, {displayName}!</Text>
               </View>
-              <View style={styles.rankBadge}>
-                <Text style={styles.rankLabel}>{t("home.rank")}</Text>
-                <Text style={styles.rankValue}>#{rank}</Text>
-              </View>
             </View>
             <View style={styles.teamStats}>
               <View style={styles.stat}>
-                <MaterialCommunityIcons name="trophy" size={16} color={theme.primary} />
-                <Text style={styles.statValue}>{completedCount}/7</Text>
-                <Text style={styles.statLabel}>{t("home.completed")}</Text>
+                <MaterialCommunityIcons name="check-circle" size={20} color={progressColor} />
+                <Text style={[styles.statValue, { color: progressColor }]}>{completedCount}/{TOTAL_ACTIVITIES}</Text>
+                <Text style={styles.statLabel}>{t("home.activitiesCompleted")}</Text>
               </View>
             </View>
           </View>
@@ -109,8 +83,8 @@ export default function HomeScreen() {
                 style={[
                   styles.progressBarFill,
                   {
-                    width: `${Math.round((completedCount / 7) * 100)}%`,
-                    backgroundColor: theme.primary,
+                    width: `${progressPercent}%`,
+                    backgroundColor: progressColor,
                   },
                 ]}
               />
@@ -118,22 +92,13 @@ export default function HomeScreen() {
             <Text style={styles.progressText}>
               {t("home.progressSummary", { count: completedCount })}
             </Text>
-            <View style={styles.bestActivityRow}>
-              <MaterialCommunityIcons name="trophy" size={14} color="#f59e0b" />
-              <Text style={styles.bestActivityLabel}>{t("home.bestActivity")}:</Text>
-              <Text style={styles.bestActivityValue}>
-                {submissions.length > 0
-                  ? getBestActivity(submissions, ACTIVITIES)
-                  : t("home.noRecentActivity")}
-              </Text>
-            </View>
             <View style={styles.viewProgressBtn}>
               <Pressable
                 style={[styles.viewProgressPressable, { backgroundColor: theme.primary + "20" }]}
-                onPress={() => router.push("/progress")}
+                onPress={() => router.push("/(tabs)/leaderboard")}
               >
                 <Text style={[styles.viewProgressText, { color: theme.primary }]}>
-                  {t("home.viewFullProgress")}
+                  {t("home.viewProgressionBoard")}
                 </Text>
                 <MaterialCommunityIcons name="arrow-right" size={14} color={theme.primary} />
               </Pressable>
@@ -142,24 +107,27 @@ export default function HomeScreen() {
 
           {/* Recent Activity */}
           <Text style={styles.sectionHeader}>{t("home.recentActivity")}</Text>
-          {submissions.length === 0 ? (
+          {progress.length === 0 ? (
             <View style={styles.emptyCard}>
               <MaterialCommunityIcons name="flask-outline" size={32} color={theme.textMuted} />
               <Text style={styles.emptyText}>{t("home.noRecentActivity")}</Text>
               <Text style={styles.emptySubtext}>{t("home.seeActivityRequirement")}</Text>
             </View>
           ) : (
-            [...submissions].reverse().slice(0, 3).map((s) => (
-              <View key={s.id} style={styles.recentItem}>
-                <MaterialCommunityIcons name="clipboard-check" size={16} color={theme.primary} />
-                <View style={{ flex: 1, marginLeft: 10 }}>
-                  <Text style={styles.recentLabel}>{s.activityKey}</Text>
-                  <Text style={styles.recentDate}>
-                    {s.submittedAt?.toDate ? s.submittedAt.toDate().toLocaleDateString() : 'Just now'}
-                  </Text>
+            [...progress]
+              .sort((a, b) => (b.completedAt?.toMillis?.() ?? 0) - (a.completedAt?.toMillis?.() ?? 0))
+              .slice(0, 3)
+              .map((p) => (
+                <View key={p.id} style={styles.recentItem}>
+                  <MaterialCommunityIcons name="clipboard-check" size={16} color={theme.primary} />
+                  <View style={{ flex: 1, marginLeft: 10 }}>
+                    <Text style={styles.recentLabel}>{p.activityKey}</Text>
+                    <Text style={styles.recentDate}>
+                      {p.completedAt?.toDate ? p.completedAt.toDate().toLocaleDateString() : 'Just now'}
+                    </Text>
+                  </View>
                 </View>
-              </View>
-            ))
+              ))
           )}
 
           {/* Start Activity Button */}
@@ -222,6 +190,23 @@ const createStyles = (colors: ThemeColors) => {
       fontFamily: "PoppinsBold",
       fontSize: 18,
       color: colors.primary,
+    },
+    pointsBadge: {
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: 8,
+      alignItems: "center",
+      flexDirection: 'row',
+      gap: 4,
+    },
+    pointsValue: {
+      fontFamily: "PoppinsBold",
+      fontSize: 20,
+    },
+    pointsMax: {
+      fontFamily: "InterRegular",
+      fontSize: 12,
+      color: colors.textMuted,
     },
     teamStats: {
       flexDirection: "row",
@@ -314,23 +299,6 @@ const createStyles = (colors: ThemeColors) => {
       fontSize: 12,
       color: colors.textMuted,
       marginBottom: 10,
-    },
-    bestActivityRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 6,
-      marginBottom: 12,
-    },
-    bestActivityLabel: {
-      fontFamily: 'InterRegular',
-      fontSize: 12,
-      color: colors.textMuted,
-    },
-    bestActivityValue: {
-      fontFamily: 'PoppinsRegular',
-      fontSize: 12,
-      color: colors.secondary,
-      flex: 1,
     },
     viewProgressBtn: {},
     viewProgressPressable: {

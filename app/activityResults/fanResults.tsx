@@ -1,9 +1,7 @@
 import { BarChart } from "@/components/barChart";
 import Button from "@/components/button";
 import { ActivityContext } from "@/context/ActivityContext";
-import { AuthContext } from "@/context/AuthContext";
 import { useTheme } from "@/hooks/useTheme";
-import { useSubmitActivity } from "@/hooks/useSubmissions";
 import { degreesToRadians, calculateFanForce, getFlexibilityLabel } from "@/utils/physics";
 import { saveExperimentLog, saveRating as sqliteSaveRating } from "@/utils/database";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -11,7 +9,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import React, { useCallback, use, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const RATING_KEY = '@stemm_rating_';
@@ -36,11 +34,8 @@ export default function FanResultsScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const activityContext = use(ActivityContext);
-  const auth = use(AuthContext);
   const logs = activityContext?.experimentLogs?.filter(l => l.activityKey === 'hand-fan-challenge') || [];
   const [rating, setRating] = useState(0);
-  const [submitDone, setSubmitDone] = useState(false);
-  const submitMutation = useSubmitActivity();
 
   useEffect(() => {
     AsyncStorage.getItem(RATING_KEY + 'hand-fan-challenge').then(val => { if (val) setRating(parseInt(val, 10)); });
@@ -112,33 +107,6 @@ export default function FanResultsScreen() {
     High: "#22c55e",
     Medium: "#eab308",
     Low: "#ef4444",
-  };
-
-  const handleSubmitToLeaderboard = () => {
-    if (submitDone) return;
-    if (!auth?.user) {
-      Alert.alert(t('results.notSignedIn'), t('results.notSignedInMessage'));
-      return;
-    }
-    submitMutation.mutate(
-      {
-        userId: auth.user.uid,
-        activityKey: 'hand-fan-challenge',
-        logs,
-        reflection: '',
-        submittedAt: new Date(),
-        rating: rating || undefined,
-      },
-      {
-        onSuccess: () => {
-          setSubmitDone(true);
-          Alert.alert(t('results.submittedTitle'), t('results.submittedMessage'));
-        },
-        onError: (err) => {
-          Alert.alert(t('results.submitFailed'), String(err));
-        },
-      },
-    );
   };
 
   const saveRating = useCallback((n: number) => {
@@ -234,16 +202,6 @@ export default function FanResultsScreen() {
           <Text style={styles.sectionTitle}>{t("results.ratingPrompt")}</Text>
           <StarRating rating={rating} onChange={saveRating} />
           <Text style={styles.ratingHint}>{t("results.ratingHint")}</Text>
-        </View>
-
-        {/* Submit to Leaderboard */}
-        <View style={styles.card}>
-          <Text style={styles.sectionTitle}>{t("results.leaderboard")}</Text>
-          <Button
-            text={submitDone ? t("results.submitted") : t("results.submitToLeaderboard")}
-            action={handleSubmitToLeaderboard}
-            loading={submitMutation.isPending}
-          />
         </View>
 
         <View style={{ marginTop: 16, marginBottom: 40 }}>

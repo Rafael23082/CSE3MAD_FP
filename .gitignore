@@ -3,6 +3,7 @@ node_modules/
 .vscode/
 .qodo/
 .github/
+progress/
 
 # Expo
 .expo/
@@ -50,10 +51,4 @@ coverage/
 
 # local env files
 .env
-
-# Unnecessary files
-progress.md
-responsibilities.md
-checklist.md
-
 .fallow/

@@ -11,9 +11,15 @@ export interface PredictionEntry {
   notes: string;
 }
 
+export interface TeamMember {
+  firstName: string;
+  lastName: string;
+}
+
 export interface TeamProfile {
   name: string;
   code: string;
+  members: TeamMember[];
 }
 
 // Activity 1 Types (Parachute Drop)
@@ -186,6 +192,41 @@ export interface BreathingJournal {
   q2: string;
   q3: string;
   evidenceImages: string[];
+}
+
+// ==========================================
+// Activity Attempt Types
+// ==========================================
+
+export interface ActivityLogEntry {
+  activityKey: string;
+  timestamp: number;
+  data: Record<string, unknown>;
+}
+
+export interface ActivityAttempt {
+  id: string;
+  userId: string;
+  activityKey: string;
+  logs: ActivityLogEntry[];
+  reflection: string;
+  rating: number | null;
+  isLeaderboardSubmission: boolean;
+  submittedToLeaderboardAt: any; // Timestamp or null
+  createdAt: any; // Timestamp
+  updatedAt: any; // Timestamp
+}
+
+export interface ActivityProgress {
+  id: string;
+  userId: string;
+  activityKey: string;
+  officialSubmissionAttemptId: string | null;
+  isCompleted: boolean;
+  completedAt: any; // Timestamp or null
+  currentScoreReachedAt: any; // Timestamp — when team last gained points
+  points: number;
+  updatedAt: any; // Timestamp
 }
 
 export type Submission = {

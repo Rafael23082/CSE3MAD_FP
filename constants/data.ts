@@ -1,5 +1,9 @@
 import { ParachuteTrial, SoundReading, FanMaterial, FanDesign, EarthquakeDesign } from './types';
 
+export const TOTAL_ACTIVITIES = 7;
+export const POINTS_PER_ACTIVITY = 100;
+export const MAX_POINTS = TOTAL_ACTIVITIES * POINTS_PER_ACTIVITY;
+
 export interface ActivityMetadata {
   id: string;
   title: string;

@@ -1,19 +1,16 @@
 import { BarChart } from "@/components/barChart";
 import Button from "@/components/button";
 import { ActivityContext } from "@/context/ActivityContext";
-import { AuthContext } from "@/context/AuthContext";
 import { useTheme } from "@/hooks/useTheme";
-import { useSubmitActivity } from "@/hooks/useSubmissions";
 import { ThemeColors } from "@/theme/colors";
 import { calculateSafetyScore, getParachuteRating } from "@/utils/physics";
 import { saveExperimentLog, saveRating as sqliteSaveRating, getDb } from "@/utils/database";
-import { uploadFileFromUri } from "@/utils/activitySubmissions";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import React, { useCallback, use, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const RATING_KEY = '@stemm_rating_';
@@ -48,16 +45,11 @@ export default function ParachuteResultsScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
-  const params = useLocalSearchParams<{ videoUri?: string }>();
 
   const activityContext = use(ActivityContext);
-  const auth = use(AuthContext);
   const logs = activityContext?.experimentLogs?.filter(l => l.activityKey === 'parachute-drop-challenge') || [];
 
   const [rating, setRating] = useState(0);
-  const [submitDone, setSubmitDone] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const submitMutation = useSubmitActivity();
 
   useEffect(() => {
     AsyncStorage.getItem(RATING_KEY + 'parachute-drop-challenge').then(val => {
@@ -111,50 +103,6 @@ export default function ParachuteResultsScreen() {
       };
     });
   }, [logs]);
-
-  const handleSubmitToLeaderboard = async () => {
-    if (submitDone) return;
-    if (!auth?.user) {
-      Alert.alert(t('results.notSignedIn'), t('results.notSignedInMessage'));
-      return;
-    }
-
-    let mediaPayload: { type: "video"; url: string; path: string } | undefined;
-
-    if (params.videoUri) {
-      setUploading(true);
-      try {
-        const dest = `submissions/${auth.user.uid}/parachute-drop-challenge/${Date.now()}.mp4`;
-        const { downloadUrl, path } = await uploadFileFromUri(params.videoUri, dest, 'video/mp4');
-        mediaPayload = { type: "video", url: downloadUrl, path };
-      } catch (err) {
-        Alert.alert('Upload failed', 'Could not upload video. Submitting without video.');
-      } finally {
-        setUploading(false);
-      }
-    }
-
-    submitMutation.mutate(
-      {
-        userId: auth.user.uid,
-        activityKey: 'parachute-drop-challenge',
-        logs,
-        reflection: '',
-        submittedAt: new Date(),
-        rating: rating || undefined,
-        media: mediaPayload,
-      },
-      {
-        onSuccess: () => {
-          setSubmitDone(true);
-          Alert.alert(t('results.submittedTitle'), t('results.submittedMessage'));
-        },
-        onError: (err) => {
-          Alert.alert(t('results.submitFailed'), String(err));
-        },
-      },
-    );
-  };
 
   const saveRating = useCallback((n: number) => {
     setRating(n);
@@ -292,18 +240,6 @@ export default function ParachuteResultsScreen() {
         <Text style={styles.ratingHint}>{t("results.ratingHint")}</Text>
       </View>
 
-      <View style={styles.card}>
-        <Text style={styles.sectionTitle}>{t("results.leaderboard")}</Text>
-        {params.videoUri && !submitDone && (
-          <Text style={styles.uploadNote}>Video will be uploaded with your submission</Text>
-        )}
-        <Button
-          text={submitDone ? t("results.submitted") : t("results.submitToLeaderboard")}
-          action={handleSubmitToLeaderboard}
-          loading={submitMutation.isPending || uploading}
-        />
-      </View>
-
       <View style={{ marginTop: 16, marginBottom: 40 }}>
         <Button text={t("results.backToActivities")} action={() => router.push("/(tabs)/activities")} />
       </View>
@@ -341,5 +277,4 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   theoryText: { fontSize: 13, color: colors.textMuted, lineHeight: 20 },
   bodyText: { fontSize: 13, color: colors.textMuted },
   ratingHint: { textAlign: "center", fontSize: 11, color: colors.textMuted, marginTop: 8 },
-  uploadNote: { fontSize: 12, color: colors.tertiary, marginBottom: 8, fontStyle: "italic" },
 });

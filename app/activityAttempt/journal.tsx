@@ -2,17 +2,18 @@ import { ActivityContext } from '@/context/ActivityContext';
 import { AuthContext } from '@/context/AuthContext';
 import { useTheme } from '@/hooks/useTheme';
 import { ThemeColors } from '@/theme/colors';
+import { ActivityAttempt, ActivityLogEntry } from '@/constants/types';
 import {
-    ActivityLocation,
-    saveActivityResultLocally,
-    saveActivityResultToFirestore,
-    updateSyncStatus,
-    retryPendingSyncs,
-} from '@/utils/activityPersistence';
+    getAttemptsForActivity,
+    deleteAttempt,
+    submitToLeaderboard,
+    replaceSubmission,
+} from '@/utils/activityAttempts';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import React, { use, useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'expo-router';
+import React, { use, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 export default function JournalScreen() {
     const { t } = useTranslation();
@@ -20,26 +21,47 @@ export default function JournalScreen() {
     const styles = createStyles(theme);
     const activityContext = use(ActivityContext);
     const auth = use(AuthContext);
+    const router = useRouter();
 
-    const [reflection, setReflection] = useState("");
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [teamConfirmed, setTeamConfirmed] = useState(false);
+    const [attempts, setAttempts] = useState<ActivityAttempt[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [submittingId, setSubmittingId] = useState<string | null>(null);
 
-    const currentLogs = useMemo(
-        () => (activityContext?.experimentLogs ?? []).filter(log => log.activityKey === activityContext?.activity?.key),
-        [activityContext?.experimentLogs, activityContext?.activity?.key]
-    );
+    const activity = activityContext?.activity;
+    const userId = auth?.user?.uid;
+
+    const fetchAttempts = useCallback(async () => {
+        if (!userId || !activity) return;
+        setLoading(true);
+        try {
+            const data = await getAttemptsForActivity(userId, activity.key);
+            setAttempts(data);
+        } catch (e) {
+            console.error("Failed to fetch attempts:", e);
+        } finally {
+            setLoading(false);
+        }
+    }, [userId, activity]);
 
     useEffect(() => {
-        retryPendingSyncs();
-    }, []);
+        fetchAttempts();
+    }, [fetchAttempts]);
 
-    if (!activityContext || !activityContext.activity) return null;
+    if (!activity) return null;
 
-    const { activity, experimentLogs, clearExperimentLogs } = activityContext;
+    const formatTime = (timestamp: any) => {
+        if (!timestamp) return "";
+        const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+        return date.toLocaleString([], {
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        });
+    };
 
     const getMetricLabel = () => {
-        switch(activity.key) {
+        switch (activity.key) {
             case 'parachute-drop-challenge': return t('journal.velocityMetric');
             case 'sound-pollution-hunter': return t('journal.decibelMetric');
             case 'hand-fan-challenge': return t('journal.forceMetric');
@@ -48,305 +70,337 @@ export default function JournalScreen() {
         }
     };
 
-    interface LogWithData {
-        activityKey: string;
-        timestamp: number;
-        data?: Record<string, unknown>;
-    }
-
     const toNumber = (value: unknown) => typeof value === 'number' ? value : 0;
 
-    const getMetricValue = (log: LogWithData) => {
-        switch(activity.key) {
-            case 'parachute-drop-challenge': return toNumber(log.data?.vFinal);
-            case 'sound-pollution-hunter': return toNumber(log.data?.db);
-            case 'hand-fan-challenge': return toNumber(log.data?.force);
-            case 'earthquake-resistant-structure': return toNumber(log.data?.observed);
+    const getMetricValue = (logs: ActivityLogEntry[]) => {
+        if (!logs || logs.length === 0) return 0;
+        const lastLog = logs[logs.length - 1];
+        switch (activity.key) {
+            case 'parachute-drop-challenge': return toNumber(lastLog.data?.vFinal);
+            case 'sound-pollution-hunter': return toNumber(lastLog.data?.db);
+            case 'hand-fan-challenge': return toNumber(lastLog.data?.force);
+            case 'earthquake-resistant-structure': return toNumber(lastLog.data?.observed);
             default: return 0;
         }
     };
 
-    const getSubmissionLocation = (logs: LogWithData[]): ActivityLocation | null => {
-        for (const log of logs) {
-            const latitude = log.data?.latitude;
-            const longitude = log.data?.longitude;
-            const accuracy = log.data?.accuracy;
+    const handleDelete = (attempt: ActivityAttempt) => {
+        if (attempt.isLeaderboardSubmission) {
+            Alert.alert(
+                t("journal.deleteSubmittedTitle"),
+                t("journal.deleteSubmittedWarning")
+            );
+            return;
+        }
 
-            if (typeof latitude === 'number' && typeof longitude === 'number') {
-                return {
-                    latitude,
-                    longitude,
-                    accuracy: typeof accuracy === 'number' || accuracy === null ? accuracy : null,
-                };
+        Alert.alert(t("journal.deleteAttempt"), t("journal.deleteMsg"), [
+            { text: t("common.cancel"), style: "cancel" },
+            {
+                text: t("common.delete"), style: "destructive", onPress: async () => {
+                    try {
+                        await deleteAttempt(attempt.id);
+                        setAttempts(prev => prev.filter(a => a.id !== attempt.id));
+                    } catch (e: any) {
+                        Alert.alert(t("journal.deleteFailed"), e.message);
+                    }
+                }
             }
-        }
-
-        return null;
-    };
-
-    const handleDeleteTrial = (timestamp: number) => {
-        Alert.alert(t("journal.deleteTitle"), t("journal.deleteMsg"), [
-            { text: t("common.cancel"), style: "cancel" },
-            { text: t("common.delete"), style: "destructive", onPress: () => {
-                // Clear all and re-add except this one
-                const remaining = experimentLogs.filter(l => l.timestamp !== timestamp);
-                clearExperimentLogs(activity.key);
-                remaining.filter(l => l.activityKey === activity.key).forEach(l => {
-                    activityContext.addExperimentLog({ activityKey: l.activityKey, data: l.data });
-                });
-            }}
         ]);
     };
 
-    const handleClearAll = () => {
-        Alert.alert(t("journal.clearAllTitle"), t("journal.clearAllMsg"), [
-            { text: t("common.cancel"), style: "cancel" },
-            { text: t("common.clear"), style: "destructive", onPress: () => clearExperimentLogs(activity.key) }
-        ]);
-    };
-
-    const handleSubmit = async () => {
-        if (!reflection.trim()) {
-            Alert.alert(t("journal.missingReflection"), t("journal.missingReflectionMsg"));
-            return;
-        }
-
-        // Check if activity requires team confirmation
-        const needsConfirm = ['parachute-drop-challenge', 'earthquake-resistant-structure'].includes(activity.key);
-        if (needsConfirm && !teamConfirmed) {
-            Alert.alert(t("journal.confirmRequired"), t("journal.confirmRequiredMsg"));
-            return;
-        }
-
-        setIsSubmitting(true);
+    const handleSubmitToLeaderboard = async (attempt: ActivityAttempt) => {
+        setSubmittingId(attempt.id);
         try {
-            const payload = {
-                userId: auth?.user?.uid || "anonymous",
-                activityKey: activity.key,
-                logs: currentLogs.map((log) => ({
-                    activityKey: log.activityKey,
-                    timestamp: log.timestamp,
-                    data: { ...(log.data ?? {}) },
-                })),
-                reflection,
-                location: getSubmissionLocation(currentLogs),
-            };
+            // Check if activity already has official submission
+            const existingOfficial = attempts.find(a => a.isLeaderboardSubmission);
 
-            const localId = await saveActivityResultLocally(payload);
-            try {
-                await saveActivityResultToFirestore(payload);
-                await updateSyncStatus(localId, 'synced');
-            } catch (e) {
-                console.warn('Firestore save failed, queued for retry:', e);
+            if (existingOfficial) {
+                // Replace submission
+                Alert.alert(
+                    t("journal.confirmReplace"),
+                    t("journal.confirmReplaceMsg"),
+                    [
+                        { text: t("common.cancel"), style: "cancel" },
+                        {
+                            text: t("journal.replaceSubmission"),
+                            onPress: async () => {
+                                try {
+                                    await replaceSubmission(attempt.id);
+                                    Alert.alert(t("journal.submissionReplaced"));
+                                    fetchAttempts();
+                                } catch (e: any) {
+                                    Alert.alert(t("journal.submitError"), e.message);
+                                }
+                            }
+                        }
+                    ]
+                );
+            } else {
+                // First submission
+                await submitToLeaderboard(attempt.id);
+                Alert.alert(t("journal.submitSuccess"));
+                fetchAttempts();
             }
-            Alert.alert(t("journal.submitSuccess"));
-            setReflection("");
-            setTeamConfirmed(false);
-        } catch (error) {
-            console.error("Submission error:", error);
-            Alert.alert(t("journal.submitError"));
+        } catch (e: any) {
+            Alert.alert(t("journal.submitError"), e.message);
         } finally {
-            setIsSubmitting(false);
+            setSubmittingId(null);
         }
     };
 
-    const labResultRoute = () => {
-        // Navigate to per-activity results
-        const routeMap: Record<string, string> = {
-            'parachute-drop-challenge': '/activityResults/parachuteResults',
-            'sound-pollution-hunter': '/activityResults/soundResults',
-            'hand-fan-challenge': '/activityResults/fanResults',
-            'earthquake-resistant-structure': '/activityResults/earthquakeResults',
-            'breathing-pace-trainer': '/activityResults/breathingResults',
-            'reaction-board-challenge': '/activityResults/reactionResults',
-            'stretch-speed-and-gracefulness': '/activityResults/humanPerformanceResults',
-        };
-        const route = routeMap[activity.key] || '/activityResults';
-        return route;
+    const handleCreateNewAttempt = () => {
+        router.push("/activityAttempt");
     };
 
-    const handleViewResults = () => {
-        // Navigate to per-activity results screen
-        const route = labResultRoute();
-        const results = currentLogs.map(log => ({
-            label: `Trial`,
-            value: String(getMetricValue(log)),
-            ...log.data
-        }));
-        // We'll use expo-router to navigate - but since the results screens
-        // pull from ActivityContext directly, we just navigate
-        // Import router at top
-    };
-
-    // Format timestamp for display
-    const formatTime = (ts: number) => {
-        const d = new Date(ts);
-        return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    };
-
-    const metricLabel = getMetricLabel();
-    const needsTeamConfirm = ['parachute-drop-challenge', 'earthquake-resistant-structure'].includes(activity.key);
+    const officialAttempt = attempts.find(a => a.isLeaderboardSubmission);
+    const draftAttempts = attempts.filter(a => !a.isLeaderboardSubmission);
 
     return (
-        <ScrollView style={styles.container} contentContainerStyle={{ padding: 24 }}>
+        <ScrollView style={styles.container} contentContainerStyle={styles.content}>
             <Text style={styles.title}>{t("journal.title")}</Text>
             <Text style={styles.subtitle}>{activity.name}</Text>
 
-            {/* Experiment Logs Feed with Review */}
-            <View style={styles.card}>
-                <View style={styles.cardHeader}>
-                    <MaterialCommunityIcons name="chart-line" size={18} color={theme.primary} />
-                    <Text style={styles.cardTitle}>{t("journal.experimentRecords")}</Text>
-                    {currentLogs.length > 0 && (
-                        <Pressable
-                            onPress={handleClearAll}
-                            style={({ pressed }) => [{ marginLeft: 'auto' }, pressed && { opacity: 0.7 }]}>
-                            <Text style={{ color: theme.danger, fontSize: 11 }}>{t("journal.clearAll")}</Text>
-                        </Pressable>
-                    )}
-                </View>
+            {/* Create New Attempt Button */}
+            <Pressable
+                style={({ pressed }) => [
+                    styles.createBtn,
+                    { backgroundColor: theme.primary },
+                    pressed && { opacity: 0.85 },
+                ]}
+                onPress={handleCreateNewAttempt}
+            >
+                <MaterialCommunityIcons name="plus" size={20} color="#fff" />
+                <Text style={styles.createBtnText}>{t("journal.createNewAttempt")}</Text>
+            </Pressable>
 
-                {currentLogs.length === 0 ? (
-                    <View style={styles.emptyState}>
-                        <MaterialCommunityIcons name="flask-outline" size={40} color={theme.textMuted} />
-                        <Text style={styles.emptyText}>{t("journal.noData")}</Text>
-                        <Text style={styles.emptySubtext}>{t("journal.noDataSubtext")}</Text>
-                    </View>
-                ) : (
-                    <>
-                        <Text style={styles.logCount}>{t(currentLogs.length === 1 ? 'journal.trialCount' : 'journal.trialCount_plural', {count: currentLogs.length})} recorded</Text>
-                        {[...currentLogs].reverse().map((log, i) => (
-                            <View key={log.timestamp} style={styles.logItem}>
-                                <View style={styles.logHeader}>
-                                    <Text style={styles.logNumber}>{t("journal.trialNumber", {number: currentLogs.length - i})}</Text>
-                                    <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
-                                        <Text style={styles.logTime}>{formatTime(log.timestamp)}</Text>
+            {loading ? (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color={theme.primary} />
+                </View>
+            ) : attempts.length === 0 ? (
+                <View style={styles.emptyState}>
+                    <MaterialCommunityIcons name="flask-outline" size={48} color={theme.textMuted} />
+                    <Text style={styles.emptyText}>{t("journal.noAttempts")}</Text>
+                    <Text style={styles.emptySubtext}>{t("journal.noAttemptsSubtext")}</Text>
+                </View>
+            ) : (
+                <>
+                    {/* Official Submission */}
+                    {officialAttempt && (
+                        <View style={styles.section}>
+                            <Text style={styles.sectionTitle}>{t("journal.submitted")}</Text>
+                            <View style={[styles.attemptCard, styles.officialCard]}>
+                                <View style={styles.attemptHeader}>
+                                    <View style={styles.attemptInfo}>
+                                        <Text style={styles.attemptNumber}>
+                                            {t("journal.attemptNumber", { number: attempts.length - attempts.indexOf(officialAttempt) })}
+                                        </Text>
+                                        <Text style={styles.attemptTime}>{formatTime(officialAttempt.createdAt)}</Text>
+                                    </View>
+                                    <View style={styles.officialBadge}>
+                                        <MaterialCommunityIcons name="check-circle" size={16} color={theme.tertiary} />
+                                        <Text style={styles.officialBadgeText}>{t("journal.submitted")}</Text>
+                                    </View>
+                                </View>
+
+                                {/* Attempt Summary */}
+                                <View style={styles.attemptSummary}>
+                                    <Text style={styles.metricLabel}>
+                                        {getMetricLabel()}: <Text style={styles.metricValue}>{getMetricValue(officialAttempt.logs).toFixed(2)}</Text>
+                                    </Text>
+                                    {officialAttempt.reflection ? (
+                                        <Text style={styles.reflectionPreview} numberOfLines={2}>
+                                            {officialAttempt.reflection}
+                                        </Text>
+                                    ) : null}
+                                </View>
+
+                                {/* Actions */}
+                                <View style={styles.attemptActions}>
+                                    <Pressable
+                                        style={[styles.actionBtn, styles.viewBtn]}
+                                        onPress={() => Alert.alert("View", "Attempt details coming soon")}
+                                    >
+                                        <MaterialCommunityIcons name="eye" size={16} color={theme.primary} />
+                                        <Text style={[styles.actionText, { color: theme.primary }]}>{t("journal.viewAttempt")}</Text>
+                                    </Pressable>
+                                    <Pressable
+                                        style={[styles.actionBtn, styles.replaceBtn]}
+                                        onPress={() => {
+                                            Alert.alert(
+                                                t("journal.replaceSubmission"),
+                                                t("journal.confirmReplaceMsg"),
+                                                [
+                                                    { text: t("common.cancel"), style: "cancel" },
+                                                    { text: t("journal.replaceSubmission"), onPress: () => {} }
+                                                ]
+                                            );
+                                        }}
+                                    >
+                                        <MaterialCommunityIcons name="swap-horizontal" size={16} color={theme.secondary} />
+                                        <Text style={[styles.actionText, { color: theme.secondary }]}>{t("journal.replaceSubmission")}</Text>
+                                    </Pressable>
+                                </View>
+                            </View>
+                        </View>
+                    )}
+
+                    {/* Draft Attempts */}
+                    {draftAttempts.length > 0 && (
+                        <View style={styles.section}>
+                            <Text style={styles.sectionTitle}>{t("journal.drafts")}</Text>
+                            {draftAttempts.map((attempt, index) => (
+                                <View key={attempt.id} style={styles.attemptCard}>
+                                    <View style={styles.attemptHeader}>
+                                        <View style={styles.attemptInfo}>
+                                            <Text style={styles.attemptNumber}>
+                                                {t("journal.attemptNumber", { number: attempts.length - attempts.indexOf(attempt) })}
+                                            </Text>
+                                            <Text style={styles.attemptTime}>{formatTime(attempt.createdAt)}</Text>
+                                        </View>
+                                    </View>
+
+                                    {/* Attempt Summary */}
+                                    <View style={styles.attemptSummary}>
+                                        <Text style={styles.metricLabel}>
+                                            {getMetricLabel()}: <Text style={styles.metricValue}>{getMetricValue(attempt.logs).toFixed(2)}</Text>
+                                        </Text>
+                                        {attempt.reflection ? (
+                                            <Text style={styles.reflectionPreview} numberOfLines={2}>
+                                                {attempt.reflection}
+                                            </Text>
+                                        ) : null}
+                                    </View>
+
+                                    {/* Actions */}
+                                    <View style={styles.attemptActions}>
                                         <Pressable
-                                            onPress={() => handleDeleteTrial(log.timestamp)}
-                                            style={({ pressed }) => pressed && { opacity: 0.7 }}>
-                                            <MaterialCommunityIcons name="close-circle" size={18} color={theme.danger} />
+                                            style={[styles.actionBtn, styles.viewBtn]}
+                                            onPress={() => Alert.alert("View", "Attempt details coming soon")}
+                                        >
+                                            <MaterialCommunityIcons name="eye" size={16} color={theme.primary} />
+                                            <Text style={[styles.actionText, { color: theme.primary }]}>{t("journal.viewAttempt")}</Text>
+                                        </Pressable>
+                                        <Pressable
+                                            style={[styles.actionBtn, styles.deleteBtn]}
+                                            onPress={() => handleDelete(attempt)}
+                                        >
+                                            <MaterialCommunityIcons name="delete" size={16} color={theme.danger} />
+                                            <Text style={[styles.actionText, { color: theme.danger }]}>{t("journal.deleteAttempt")}</Text>
+                                        </Pressable>
+                                        <Pressable
+                                            style={[styles.actionBtn, styles.submitBtn]}
+                                            onPress={() => handleSubmitToLeaderboard(attempt)}
+                                            disabled={submittingId === attempt.id}
+                                        >
+                                            {submittingId === attempt.id ? (
+                                                <ActivityIndicator size="small" color="#fff" />
+                                            ) : (
+                                                <MaterialCommunityIcons name="trophy" size={16} color="#fff" />
+                                            )}
+                                            <Text style={[styles.actionText, { color: "#fff" }]}>{t("journal.submitToLeaderboard")}</Text>
                                         </Pressable>
                                     </View>
                                 </View>
-                                <Text style={styles.logMetric}>
-                                    {metricLabel}: <Text style={styles.logValue}>{typeof getMetricValue(log) === 'number' ? getMetricValue(log).toFixed(2) : getMetricValue(log)}</Text>
-                                </Text>
-                                {log.data && Object.keys(log.data).filter(k => k !== 'timestamp').map(key => (
-                                    key !== 'vFinal' && key !== 'db' && key !== 'force' && key !== 'observed' ? (
-                                        <Text key={key} style={styles.logDetail}>
-                                            {key}: {typeof log.data[key] === 'number' ? log.data[key].toFixed(2) : String(log.data[key])}
-                                        </Text>
-                                    ) : null
-                                ))}
-                            </View>
-                        ))}
-                    </>
-                )}
-            </View>
-
-            {/* Team Confirmation (for certain activities) */}
-            {needsTeamConfirm && (
-                <View style={styles.card}>
-                    <View style={styles.cardHeader}>
-                        <MaterialCommunityIcons name="account-group" size={18} color={theme.secondary} />
-                        <Text style={styles.cardTitle}>{t("journal.teamConfirmation")}</Text>
-                    </View>
-                    <Text style={{ color: theme.textMuted, fontSize: 12, marginBottom: 10 }}>
-                        {t("journal.confirmSubtext")}
-                    </Text>
-                    <Pressable
-                        style={({ pressed }) => [
-                            styles.confirmBtn,
-                            { backgroundColor: teamConfirmed ? theme.tertiary + '20' : theme.surfaceContainer },
-                            pressed && { opacity: 0.85 },
-                        ]}
-                        onPress={() => setTeamConfirmed(!teamConfirmed)}
-                    >
-                        <MaterialCommunityIcons
-                            name={teamConfirmed ? 'check-circle' : 'circle-outline'}
-                            size={22}
-                            color={teamConfirmed ? theme.tertiary : theme.textMuted}
-                        />
-                        <Text style={[styles.confirmText, { color: teamConfirmed ? theme.tertiary : theme.textMuted }]}>
-                            {teamConfirmed ? t("journal.confirmed") : t("journal.confirmText")}
-                        </Text>
-                    </Pressable>
-                    <Text style={{ color: theme.textMuted, fontSize: 10, marginTop: 8, fontStyle: 'italic' }}>
-                        {t("journal.confirmNote")}
-                    </Text>
-                </View>
+                            ))}
+                        </View>
+                    )}
+                </>
             )}
-
-            {/* Reflection */}
-            <View style={styles.card}>
-                <View style={styles.cardHeader}>
-                    <MaterialCommunityIcons name="note-edit-outline" size={18} color={theme.secondary} />
-                    <Text style={styles.cardTitle}>{t("journal.teamReflection")}</Text>
-                </View>
-                <TextInput
-                    style={styles.textInput}
-                    placeholder={t("journal.reflectionPlaceholder")}
-                    placeholderTextColor={theme.textMuted}
-                    multiline
-                    numberOfLines={4}
-                    value={reflection}
-                    onChangeText={setReflection}
-                />
-            </View>
-
-            <Pressable
-                style={({ pressed }) => [
-                    styles.button,
-                    { backgroundColor: isSubmitting ? theme.textMuted : theme.secondary },
-                    pressed && !isSubmitting && { opacity: 0.85 },
-                ]}
-                onPress={handleSubmit}
-                disabled={isSubmitting}
-            >
-                <MaterialCommunityIcons name="send" size={18} color={theme.secondary} style={{marginRight: 8}} />
-                <Text style={styles.buttonText}>{isSubmitting ? t("journal.submitting") : t("journal.submitMission")}</Text>
-            </Pressable>
         </ScrollView>
     );
 }
 
 const createStyles = (theme: ThemeColors) => StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.backgroundColor },
-    title: { fontSize: 24, fontWeight: 'bold', color: theme.secondary, marginBottom: 4 },
-    subtitle: { fontSize: 14, color: theme.textMuted, marginBottom: 20 },
-    card: { backgroundColor: theme.card, padding: 15, borderRadius: 10, marginBottom: 15, borderWidth: 1, borderColor: theme.borderColor },
-    cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
-    cardTitle: { fontSize: 12, fontWeight: 'bold', color: theme.textMuted },
-    emptyState: { alignItems: 'center', paddingVertical: 30, gap: 8 },
-    emptyText: { color: theme.textMuted, fontSize: 16, fontWeight: 'bold' },
-    emptySubtext: { color: theme.textMuted, fontSize: 12, textAlign: 'center' },
-    logCount: { fontSize: 11, color: theme.primary, fontWeight: 'bold', marginBottom: 10 },
-    logItem: {
+    content: { padding: 24, paddingBottom: 40 },
+    title: { fontSize: 24, fontFamily: "PoppinsBold", color: theme.secondary, marginBottom: 4 },
+    subtitle: { fontSize: 14, fontFamily: "InterRegular", color: theme.textMuted, marginBottom: 20 },
+    createBtn: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 8,
+        padding: 14,
+        borderRadius: 10,
+        marginBottom: 24,
+    },
+    createBtnText: { color: "#fff", fontFamily: "InterBold", fontSize: 14 },
+    loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center", paddingVertical: 40 },
+    emptyState: { alignItems: "center", paddingVertical: 40, gap: 12 },
+    emptyText: { color: theme.textMuted, fontSize: 16, fontFamily: "PoppinsBold" },
+    emptySubtext: { color: theme.textMuted, fontSize: 12, fontFamily: "InterRegular", textAlign: "center" },
+    section: { marginBottom: 24 },
+    sectionTitle: {
+        fontSize: 12,
+        fontFamily: "InterBold",
+        color: theme.textMuted,
+        textTransform: "uppercase",
+        letterSpacing: 1,
+        marginBottom: 12,
+    },
+    attemptCard: {
+        backgroundColor: theme.card,
+        padding: 16,
+        borderRadius: 12,
+        marginBottom: 12,
+        borderWidth: 1,
+        borderColor: theme.borderColor,
+    },
+    officialCard: {
+        borderColor: theme.tertiary,
+        borderWidth: 2,
+    },
+    attemptHeader: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "flex-start",
+        marginBottom: 12,
+    },
+    attemptInfo: { flex: 1 },
+    attemptNumber: { fontSize: 16, fontFamily: "PoppinsBold", color: theme.secondary },
+    attemptTime: { fontSize: 12, fontFamily: "InterRegular", color: theme.textMuted, marginTop: 2 },
+    officialBadge: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 4,
+        backgroundColor: theme.tertiary + "20",
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 12,
+    },
+    officialBadgeText: { fontSize: 11, fontFamily: "InterBold", color: theme.tertiary },
+    attemptSummary: {
         backgroundColor: theme.surfaceContainer,
         padding: 12,
         borderRadius: 8,
-        marginBottom: 8,
-        borderWidth: 1,
-        borderColor: theme.borderColor,
+        marginBottom: 12,
     },
-    logHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
-    logNumber: { fontSize: 13, fontWeight: 'bold', color: theme.secondary },
-    logTime: { fontSize: 10, color: theme.textMuted },
-    logMetric: { fontSize: 12, color: theme.textMuted, marginTop: 2 },
-    logValue: { color: theme.primary, fontWeight: 'bold' },
-    logDetail: { fontSize: 11, color: theme.textMuted, marginLeft: 8, marginTop: 1 },
-    textInput: {
-        backgroundColor: theme.surfaceContainer,
-        color: theme.secondary,
-        padding: 15,
+    metricLabel: { fontSize: 13, fontFamily: "InterRegular", color: theme.textMuted },
+    metricValue: { fontFamily: "PoppinsBold", color: theme.primary },
+    reflectionPreview: {
+        fontSize: 12,
+        fontFamily: "InterRegular",
+        color: theme.textMuted,
+        marginTop: 8,
+        fontStyle: "italic",
+    },
+    attemptActions: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        gap: 8,
+    },
+    actionBtn: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 6,
+        paddingHorizontal: 12,
+        paddingVertical: 8,
         borderRadius: 8,
-        minHeight: 100,
-        textAlignVertical: 'top',
-        borderWidth: 1,
-        borderColor: theme.borderColor,
     },
-    button: { padding: 15, borderRadius: 8, alignItems: 'center', marginTop: 10, flexDirection: 'row', justifyContent: 'center' },
-    buttonText: { color: theme.buttonText, fontWeight: 'bold' },
-    confirmBtn: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 14, borderRadius: 8 },
-    confirmText: { fontSize: 14, fontWeight: 'bold' },
+    viewBtn: { backgroundColor: theme.primary + "15" },
+    deleteBtn: { backgroundColor: theme.danger + "15" },
+    submitBtn: { backgroundColor: theme.secondary },
+    replaceBtn: { backgroundColor: theme.secondary + "15" },
+    actionText: { fontSize: 12, fontFamily: "InterBold" },
 });

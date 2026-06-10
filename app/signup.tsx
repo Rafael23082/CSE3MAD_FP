@@ -4,28 +4,38 @@ import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { useRouter } from "expo-router";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, updateDoc } from "firebase/firestore";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, View } from "react-native";
+import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth, db } from "../firebase";
+import { TeamMember } from "@/constants/types";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+
+const MIN_MEMBERS = 1;
+const MAX_MEMBERS = 3;
 
 export default function SignupScreen(){
     const { theme } = useTheme();
     const styles = createStyles(theme);
     const router = useRouter();
 
-    const [displayName, setDisplayName] = useState("");
+    const [step, setStep] = useState(1);
+    const [teamName, setTeamName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [userId, setUserId] = useState("");
+    const [teamMembers, setTeamMembers] = useState<TeamMember[]>([
+        { firstName: "", lastName: "" }
+    ]);
     const [error, setError] = useState("");
 
     const {t} = useTranslation();
 
     const handleSignup = async() => {
         try{
-            if (!displayName || !email || !password){
+            if (!teamName || !email || !password){
                 setError(t("errorMessages.fillInAllFields"));
                 return;
             };
@@ -33,17 +43,18 @@ export default function SignupScreen(){
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            const formattedDisplayName = displayName.charAt(0).toUpperCase() + displayName.slice(1).toLowerCase();
+            const formattedTeamName = teamName.charAt(0).toUpperCase() + teamName.slice(1).toLowerCase();
 
             await setDoc(doc(db, "users", user.uid), {  
                 uid: user.uid,
-                displayName: formattedDisplayName,
+                displayName: formattedTeamName,
                 email: email,
                 createdAt: new Date()
             })
 
-            console.log("User created successfully!");
-            router.push("/(tabs)");
+            setUserId(user.uid);
+            setStep(2);
+            setError("");
         }
         catch(error: any){
             switch (error.code) {
@@ -65,6 +76,122 @@ export default function SignupScreen(){
         }
     }
 
+    const handleCompleteRegistration = async() => {
+        try{
+            const filledMembers = teamMembers.filter(
+                m => m.firstName.trim() !== "" && m.lastName.trim() !== ""
+            );
+
+            if (filledMembers.length < MIN_MEMBERS){
+                setError(t("signup.minMembers"));
+                return;
+            }
+
+            if (filledMembers.length > MAX_MEMBERS){
+                setError(t("signup.maxMembers"));
+                return;
+            }
+
+            const formattedMembers = filledMembers.map(m => ({
+                firstName: m.firstName.charAt(0).toUpperCase() + m.firstName.slice(1).toLowerCase(),
+                lastName: m.lastName.charAt(0).toUpperCase() + m.lastName.slice(1).toLowerCase()
+            }));
+
+            await updateDoc(doc(db, "users", userId), {
+                teamMembers: formattedMembers
+            });
+
+            console.log("Team members saved successfully!");
+            router.push("/(tabs)");
+        }
+        catch{
+            setError(t("errorMessages.defaultError"));
+        }
+    }
+
+    const addMember = () => {
+        if (teamMembers.length < MAX_MEMBERS){
+            setTeamMembers([...teamMembers, { firstName: "", lastName: "" }]);
+        }
+    }
+
+    const removeMember = (index: number) => {
+        if (teamMembers.length > MIN_MEMBERS){
+            setTeamMembers(teamMembers.filter((_, i) => i !== index));
+        }
+    }
+
+    const updateMember = (index: number, field: "firstName" | "lastName", value: string) => {
+        const updated = [...teamMembers];
+        updated[index] = { ...updated[index], [field]: value };
+        setTeamMembers(updated);
+    }
+
+    if (step === 2){
+        return(
+            <SafeAreaView style={styles.container}>
+                <KeyboardAvoidingView style={styles.keyboardView} behavior="height">
+                    <ScrollView contentContainerStyle={styles.scrollView} keyboardShouldPersistTaps="handled">
+                        <View style={styles.top}>
+                            <Text style={styles.welcomeText}>{t("forms.hello")}</Text>
+                        </View>
+                        <View style={styles.formsContainer}>
+                            <View style={styles.topForms}>
+                                <Text style={styles.header}>{t("signup.teamMembersTitle")}</Text>
+                                <Text style={styles.subtitle}>{t("signup.teamMembersSubtitle")}</Text>
+
+                                {teamMembers.map((member, index) => (
+                                    <View key={index} style={styles.memberRow}>
+                                        <View style={styles.memberInputs}>
+                                            <InputGroup 
+                                                first={index === 0}
+                                                label={t("signup.firstName")}
+                                                text={member.firstName}
+                                                setText={(value) => updateMember(index, "firstName", value)}
+                                                isPassword={false}
+                                                placeholder={t("signup.firstNamePlaceholder")}
+                                                isLabeled={true}
+                                            />
+                                            <InputGroup 
+                                                first={false}
+                                                label={t("signup.lastName")}
+                                                text={member.lastName}
+                                                setText={(value) => updateMember(index, "lastName", value)}
+                                                isPassword={false}
+                                                placeholder={t("signup.lastNamePlaceholder")}
+                                                isLabeled={true}
+                                            />
+                                        </View>
+                                        {teamMembers.length > MIN_MEMBERS && (
+                                            <Pressable 
+                                                style={styles.removeBtn}
+                                                onPress={() => removeMember(index)}
+                                            >
+                                                <MaterialCommunityIcons name="close" size={20} color={theme.danger} />
+                                            </Pressable>
+                                        )}
+                                    </View>
+                                ))}
+
+                                {teamMembers.length < MAX_MEMBERS && (
+                                    <Pressable style={[styles.addMemberBtn, { borderColor: theme.primary }]} onPress={addMember}>
+                                        <MaterialCommunityIcons name="plus" size={20} color={theme.primary} />
+                                        <Text style={[styles.addMemberText, { color: theme.primary }]}>{t("signup.addMember")}</Text>
+                                    </Pressable>
+                                )}
+
+                                {error && (
+                                    <Text style={styles.errorMessage}>{error}</Text>
+                                )}
+                            </View>
+                            <Button text={t("signup.completeRegistration")} action={handleCompleteRegistration} />
+                        </View>
+                    </ScrollView>
+                </KeyboardAvoidingView>
+            </SafeAreaView>
+        );
+    }
+
     return(
         <SafeAreaView style={styles.container}>
             <KeyboardAvoidingView style={styles.keyboardView} behavior="height">
@@ -78,11 +205,11 @@ export default function SignupScreen(){
                             
                             <InputGroup 
                                 first={true} 
-                                label={t("forms.displayName")} 
-                                text={displayName} 
-                                setText={setDisplayName} 
+                                label={t("signup.teamName")} 
+                                text={teamName} 
+                                setText={setTeamName} 
                                 isPassword={false} 
-                                placeholder={t("forms.displayNamePlaceholder")}
+                                placeholder={t("signup.teamNamePlaceholder")}
                                 isLabeled={true}
                             />
                             <InputGroup 
@@ -152,10 +279,45 @@ const createStyles = (colors: ThemeColors) => {
             fontFamily: "PoppinsBold",
             textAlign: "center",
             color: colors.secondary
-        }, 
+        },
+        subtitle: {
+            fontSize: 13,
+            fontFamily: "InterRegular",
+            textAlign: "center",
+            color: colors.textMuted,
+            marginTop: 8,
+            marginBottom: 16
+        },
         topForms: {
             flexGrow: 1,
             paddingBottom: 24
+        },
+        memberRow: {
+            flexDirection: "row",
+            alignItems: "flex-start",
+            gap: 8
+        },
+        memberInputs: {
+            flex: 1
+        },
+        removeBtn: {
+            marginTop: 44,
+            padding: 8
+        },
+        addMemberBtn: {
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            paddingVertical: 12,
+            borderWidth: 1,
+            borderStyle: "dashed",
+            borderRadius: 8,
+            marginTop: 24
+        },
+        addMemberText: {
+            fontFamily: "InterRegular",
+            fontSize: 14
         },
         errorMessage: {
             fontFamily: "InterRegular",

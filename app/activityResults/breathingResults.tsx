@@ -1,14 +1,12 @@
 import Button from "@/components/button";
 import { ActivityContext } from "@/context/ActivityContext";
-import { AuthContext } from "@/context/AuthContext";
 import { useTheme } from "@/hooks/useTheme";
-import { useSubmitActivity } from "@/hooks/useSubmissions";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import React, { use, useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { saveExperimentLog, saveRating as sqliteSaveRating } from "@/utils/database";
 
@@ -34,11 +32,8 @@ export default function BreathingResultsScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const activityContext = use(ActivityContext);
-  const auth = use(AuthContext);
   const logs = activityContext?.experimentLogs?.filter(l => l.activityKey === 'breathing-pace-trainer') || [];
   const [rating, setRating] = useState(0);
-  const [submitDone, setSubmitDone] = useState(false);
-  const submitMutation = useSubmitActivity();
 
   useEffect(() => {
     AsyncStorage.getItem(RATING_KEY + 'breathing-pace-trainer').then(val => { if (val) setRating(parseInt(val, 10)); });
@@ -57,33 +52,6 @@ export default function BreathingResultsScreen() {
       }
     })();
   }, []);
-
-  const handleSubmitToLeaderboard = () => {
-    if (submitDone) return;
-    if (!auth?.user) {
-      Alert.alert(t('results.notSignedIn'), t('results.notSignedInMessage'));
-      return;
-    }
-    submitMutation.mutate(
-      {
-        userId: auth.user.uid,
-        activityKey: 'breathing-pace-trainer',
-        logs,
-        reflection: '',
-        submittedAt: new Date(),
-        rating: rating || undefined,
-      },
-      {
-        onSuccess: () => {
-          setSubmitDone(true);
-          Alert.alert(t('results.submittedTitle'), t('results.submittedMessage'));
-        },
-        onError: (err) => {
-          Alert.alert(t('results.submitFailed'), String(err));
-        },
-      },
-    );
-  };
 
   const saveRating = useCallback((n: number) => {
     setRating(n);
@@ -133,16 +101,6 @@ export default function BreathingResultsScreen() {
           <Text style={styles.sectionTitle}>{t("results.ratingPrompt")}</Text>
           <StarRating rating={rating} onChange={saveRating} />
           <Text style={styles.ratingHint}>{t("results.ratingHint")}</Text>
-        </View>
-
-        {/* Submit to Leaderboard */}
-        <View style={styles.card}>
-          <Text style={styles.sectionTitle}>{t("results.leaderboard")}</Text>
-          <Button
-            text={submitDone ? t("results.submitted") : t("results.submitToLeaderboard")}
-            action={handleSubmitToLeaderboard}
-            loading={submitMutation.isPending}
-          />
         </View>
 
         <View style={{ marginTop: 16, marginBottom: 40 }}>
