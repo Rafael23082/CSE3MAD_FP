@@ -1,10 +1,10 @@
 import { AuthContext } from "@/context/AuthContext";
 import { usePathname, useRouter } from "expo-router";
-import { use, useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { ActivityIndicator, View } from "react-native";
 
 export default function Index() {
-    const context = use(AuthContext);
+    const context = useContext(AuthContext);
     const router = useRouter();
     const pathname = usePathname();
 
@@ -12,10 +12,10 @@ export default function Index() {
         if (!context || context.loading) return;
         if (pathname !== "/") return;
 
-        if (!context.user) {
-            router.replace("/home");
-        } else {
+        if (context.user) {
             router.replace("/(tabs)");
+        } else {
+            router.replace("/home");
         }
     }, [context?.user, context?.loading, pathname]);
 

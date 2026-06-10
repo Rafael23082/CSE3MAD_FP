@@ -1,4 +1,5 @@
 import Button from "@/components/button";
+import { ACTIVITIES } from "@/constants/data";
 import { AuthContext } from "@/context/AuthContext";
 import { db } from "@/firebase";
 import { useTheme } from "@/hooks/useTheme";
@@ -6,10 +7,9 @@ import { ThemeColors } from "@/theme/colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { collection, getDocs, onSnapshot, query, where } from "firebase/firestore";
-import { useCallback, use, useEffect, useState } from "react";
+import { use, useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
-import { ACTIVITIES } from "@/constants/data";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 function getBestActivity(subs: any[], activities: any): string {
