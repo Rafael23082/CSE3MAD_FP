@@ -11,9 +11,8 @@ import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { createAttempt } from "@/utils/activityAttempts";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import * as Battery from "expo-battery";
 import { useRouter } from "expo-router";
-import { use, useEffect, useState } from "react";
+import { use, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -29,22 +28,6 @@ export default function ActivityAttemptMainScreen(){
   if (!activityContext) return null;
 
   const {activity, experimentLogs} = activityContext;
-
-  useEffect(() => {
-      async function checkPowerMode() {
-          const lowPowerMode =
-              await Battery.isLowPowerModeEnabledAsync();
-
-          if (lowPowerMode) {
-              Alert.alert(
-                  t("errorMessages.batterySaverOn"),
-                  t("errorMessages.batterySaverOnDescription")
-              );
-          }
-      }
-
-      checkPowerMode();
-  }, []);
 
   const handleSaveAttempt = async () => {
       if (!activity || !auth?.user?.uid) return;

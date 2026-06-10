@@ -1,9 +1,11 @@
 import { SettingsSection } from "@/components/settingsSection";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from '@/theme/colors';
+import * as Battery from "expo-battery";
 import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ScrollView, StyleSheet, Text } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function SettingsScreen() {
@@ -12,6 +14,16 @@ export default function SettingsScreen() {
   const router = useRouter();
   const {t} = useTranslation();
   const insets = useSafeAreaInsets();
+  const [batteryLevel, setBatteryLevel] = useState<number | null>(null);
+
+  useEffect(() => {
+    async function loadBatteryLevel() {
+      const level = await Battery.getBatteryLevelAsync();
+      setBatteryLevel(Math.round(level * 100));
+    }
+
+    loadBatteryLevel();
+  }, []);
 
   return (
     <ScrollView
@@ -24,6 +36,17 @@ export default function SettingsScreen() {
       <SettingsSection label={t("tabs.appearance")} icon="color-palette-outline" action={() => {router.push("/settings/appearance")}} />
       <SettingsSection label={t("tabs.language")} icon="language-outline" action={() => {router.push("/settings/language")}} />
       <SettingsSection label={t("tabs.about")} icon="information-circle-outline" action={() => {router.push("/settings/about")}} />
+
+      <View style={styles.batteryCard}>
+        <Text style={styles.batteryLabel}>
+          {t("settings.batteryLevel")}
+        </Text>
+
+        <Text style={styles.batteryValue}>
+          {batteryLevel !== null ? `${batteryLevel}%` : "--"}
+        </Text>
+      </View>
+
     </ScrollView>
   );
 }
@@ -43,6 +66,23 @@ const createStyles = (colors: ThemeColors) => {
       fontSize: 22,
       color: colors.primary,
       marginBottom: 16,
+    },
+    batteryCard: {
+      marginTop: 16,
+      padding: 16,
+      borderRadius: 12,
+      backgroundColor: colors.card,
+    },
+    batteryLabel: {
+      fontFamily: "PoppinsMedium",
+      fontSize: 14,
+      color: colors.secondary,
+    },
+    batteryValue: {
+      marginTop: 4,
+      fontFamily: "PoppinsBold",
+      fontSize: 28,
+      color: colors.secondary,
     },
   });
   return styles;
