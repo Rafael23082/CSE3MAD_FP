@@ -349,12 +349,6 @@ export default function HumanPerformanceLabAttemptScreen(){
                     );
                 })}
 
-                <View style={styles.buttonContainer}>
-                    <Button 
-                        text={t("buttons.finishActivity")}
-                        action={handleFinish}
-                    />
-                </View>
             </ScrollView>
             {countdown !== null && (
                 <View style={styles.overlay}>
@@ -469,10 +463,6 @@ const createStyles = (colors: ThemeColors) => {
             textAlign: "center",
             width: "100%",
             paddingHorizontal: 24
-        },
-
-        buttonContainer: {
-            marginTop: 32
         },
 
         input: {

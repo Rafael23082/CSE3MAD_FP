@@ -21,7 +21,7 @@ export default function PresetSelector({designPresets, onSelect}: PresetSelector
     const [showPresets, setShowPresets] = useState(false);
     const {t} = useTranslation();
     return(
-        <View>
+        <View style={styles.wrapper}>
             <Text style={styles.actionNameLarge}>{t("attempt.newTrial")}</Text>
             <Pressable style={styles.presetsToggle} onPress={() => setShowPresets(!showPresets)}>
                 <Text style={styles.presetsToggleText}>
@@ -71,11 +71,16 @@ const createStyles = (colors: ThemeColors) => {
             fontSize: 16
         },
         presetsList: { 
-            backgroundColor: colors.card, 
-            borderRadius: 8, 
-            borderWidth: 1, 
+            position: "absolute",
+            top: 140,
+            left: 0,
+            right: 0,
+            backgroundColor: colors.card,
+            borderRadius: 8,
+            borderWidth: 1,
             borderColor: colors.borderColor,
-            marginBottom: 16
+            zIndex: 1000,
+            elevation: 10,
         },
         presetItem: { 
             padding: 16, 
@@ -87,6 +92,9 @@ const createStyles = (colors: ThemeColors) => {
             fontWeight: "bold",     
             fontSize: 16
         },
+        wrapper: {
+            position: "relative",
+        }
     })
     return styles;
 }

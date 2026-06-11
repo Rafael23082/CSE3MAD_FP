@@ -4,7 +4,7 @@ import { ThemeColors } from "@/theme/colors";
 import { useRouter } from "expo-router";
 import { use, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Alert, KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Svg, { Circle } from "react-native-svg";
 import Button from "./button";
@@ -239,46 +239,6 @@ export default function ReactionBoardAttemptScreen(){
         trackingSamples.current = [];
     }
 
-    const handleFinish = () => {
-        if (designs.length < DESIGN_PRESETS.length){
-            Alert.alert(t("errorMessages.unfinishedChallenge"), t("errorMessages.unfinishedChallengeDescription"));
-            return;
-        }
-
-        const results = designs.map(d => ({
-            label: `${d.key}`,
-            value: d.key == "activities.reactionBoardChallenge.tracingChallenge" ? `Tracing Accuracy: ${d.tracingAccuracy} %`: `Reaction Time: ${d.reactionTime} ms`
-        }));
-
-        const dominantHand = designs.find(
-            d => d.key === "activities.reactionBoardChallenge.dominantHand"
-        );
-
-        const nonDominantHand = designs.find(
-            d => d.key === "activities.reactionBoardChallenge.nonDominantHand"
-        );
-
-        const tracingChallenge = designs.find(
-            d => d.key === "activities.reactionBoardChallenge.tracingChallenge"
-        );
-
-        if (activityContext) {
-            activityContext.addExperimentLog({
-                activityKey: "reaction-board-challenge",
-                data: {
-                    reactionTime1: dominantHand?.reactionTime,
-                    reactionTime2: nonDominantHand?.reactionTime,
-                    tracingAccuracy: tracingChallenge?.tracingAccuracy,
-                }
-            });
-        }
-
-        router.push({
-            pathname: "/activityResults",
-            params: { results: JSON.stringify(results), activityKey: "reaction-board-challenge" }
-        });
-    };
-
     return(
         <KeyboardAvoidingView style={styles.outerContainer} behavior="height">
             <ScrollView contentContainerStyle={styles.container}>
@@ -408,13 +368,6 @@ export default function ReactionBoardAttemptScreen(){
                         </View>
                     );
                 })}
-
-                <View style={styles.buttonContainer}>
-                    <Button
-                        text={t("buttons.finishActivity")} 
-                        action={handleFinish}
-                    />
-                </View>
             </ScrollView>
         </KeyboardAvoidingView>
     ) 
@@ -469,9 +422,6 @@ const createStyles = (colors: ThemeColors) => {
             textAlign: "center",
             width: "100%",
             paddingHorizontal: 24
-        },
-        buttonContainer: {
-            marginTop: 32
         },
         button: {
             backgroundColor: colors.primary,

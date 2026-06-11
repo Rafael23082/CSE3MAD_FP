@@ -12,48 +12,75 @@ import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const DISCUSSION_QUESTIONS: Record<string, { id: string; question: string }[]> = {
-  "parachute-drop-challenge": [
-    { id: "predictionsCorrect", question: "Were your predictions correct?" },
-    { id: "bestDesign", question: "Which parachute design worked best?" },
-    { id: "effectiveDesign", question: "What made that design effective?" },
-    { id: "improvements", question: "What would you improve next time?" },
-  ],
-  "sound-pollution-hunter": [
-    { id: "loudestAction", question: "Which action was loudest?" },
-    { id: "quietestAction", question: "Which action was quietest?" },
-    { id: "surprise", question: "What surprised you?" },
-    { id: "noiseReduction", question: "How can noise pollution be reduced?" },
-  ],
-  "hand-fan-challenge": [
-    { id: "largestMovement", question: "Which distance produced the largest movement?" },
-    { id: "distanceEffect", question: "How did distance affect airflow?" },
-    { id: "improvements", question: "What would you improve?" },
-  ],
-  "earthquake-resistant-structure": [
-    { id: "mostStable", question: "Which structure was most stable?" },
-    { id: "mostMovement", question: "Which moved the most?" },
-    { id: "designFeature", question: "What design feature improved stability?" },
-    { id: "changes", question: "What would you change next time?" },
-  ],
-};
+    "parachute-drop-challenge": [
+        { id: "predictionsCorrect", question: "Were your predictions correct?" },
+        { id: "bestDesign", question: "Which parachute design worked best?" },
+        { id: "effectiveDesign", question: "What made that design effective?" },
+        { id: "improvements", question: "What would you improve next time?" },
+    ],
+    "sound-pollution-hunter": [
+        { id: "loudestAction", question: "Which action was loudest?" },
+        { id: "quietestAction", question: "Which action was quietest?" },
+        { id: "surprise", question: "What surprised you?" },
+        { id: "noiseReduction", question: "How can noise pollution be reduced?" },
+    ],
+    "hand-fan-challenge": [
+        { id: "largestMovement", question: "Which distance produced the largest movement?" },
+        { id: "distanceEffect", question: "How did distance affect airflow?" },
+        { id: "improvements", question: "What would you improve?" },
+    ],
+    "earthquake-resistant-structure": [
+        { id: "mostStable", question: "Which structure was most stable?" },
+        { id: "mostMovement", question: "Which moved the most?" },
+        { id: "designFeature", question: "What design feature improved stability?" },
+        { id: "changes", question: "What would you change next time?" },
+    ],
+    "stretch-speed-and-gracefulness": [
+        { id: "hardestMovement", question: "Which movement was the hardest to keep the vibration low?" },
+        { id: "results", question: "Record your results." },
+        { id: "correctPrediction", question: "Were you right?" },
+        { id: "surprises", question: "Any surprises?" },
+    ],
+    "reaction-board-challenge": [
+        { id: "prediction", question: "What was your predicted reaction time?" },
+        { id: "results", question: "Record the results." },
+        { id: "correctPrediction", question: "Were you right?" },
+        { id: "surprises", question: "Any surprises?" },
+    ],
+    "breathing-pace-trainer": [
+        { id: "prediction", question: "Predict your breathing rate per minute." },
+        { id: "results", question: "Record the results." },
+        { id: "correctPrediction", question: "Were you right?" },
+        { id: "surprises", question: "Any surprises?" },
+    ],
+    };
 
 const PREDICTION_FIELDS: Record<string, { id: string; label: string; type: "radio" | "text" | "dropdown"; options?: string[] }[]> = {
-  "parachute-drop-challenge": [
-    { id: "bestDesign", label: "Which parachute design do you think will stay in the air the longest?", type: "radio", options: ["Design 1", "Design 2", "Design 3"] },
-    { id: "bestDesignReason", label: "Why do you think this design will perform best?", type: "text" },
-  ],
-  "sound-pollution-hunter": [
-    { id: "loudestAction", label: "Which action do you think will produce the loudest sound?", type: "dropdown", options: ["Drop Book", "Talking", "Conversation", "Walking", "Stomping Feet", "Closing Door"] },
-    { id: "loudestReason", label: "Why?", type: "text" },
-  ],
-  "hand-fan-challenge": [
-    { id: "bestDistance", label: "Which fan distance will create the largest movement?", type: "radio", options: ["15 cm", "30 cm", "45 cm"] },
-    { id: "bestDistanceReason", label: "Why?", type: "text" },
-  ],
-  "earthquake-resistant-structure": [
-    { id: "mostStable", label: "Which structure do you think will be most stable?", type: "text" },
-    { id: "mostStableReason", label: "Why?", type: "text" },
-  ],
+    "parachute-drop-challenge": [
+        { id: "bestDesign", label: "Which parachute design do you think will stay in the air the longest?", type: "radio", options: ["Design 1", "Design 2", "Design 3"] },
+        { id: "bestDesignReason", label: "Why do you think this design will perform best?", type: "text" },
+    ],
+    "sound-pollution-hunter": [
+        { id: "loudestAction", label: "Which action do you think will produce the loudest sound?", type: "dropdown", options: ["Drop Book", "Talking", "Conversation", "Walking", "Stomping Feet", "Closing Door"] },
+        { id: "loudestReason", label: "Why?", type: "text" },
+    ],
+    "hand-fan-challenge": [
+        { id: "bestDistance", label: "Which fan distance will create the largest movement?", type: "radio", options: ["15 cm", "30 cm", "45 cm"] },
+        { id: "bestDistanceReason", label: "Why?", type: "text" },
+    ],
+    "earthquake-resistant-structure": [
+        { id: "mostStable", label: "Which structure do you think will be most stable?", type: "text" },
+        { id: "mostStableReason", label: "Why?", type: "text" },
+    ],
+    "stretch-speed-and-gracefulness": [
+        { id: "vibrationPrediction", label: "Predict the phone vibration count.", type: "text" },
+    ],
+    "reaction-board-challenge": [
+        { id: "reactionTimePrediction", label: "Predict your reaction time (in miliseconds).", type: "text" },
+    ],
+    "breathing-pace-trainer": [
+        { id: "restBreathing", label: "Predict breathing rate at rest (breaths/min).", type: "text" },
+    ],
 };
 
 export default function ActivityAttemptMainScreen(){

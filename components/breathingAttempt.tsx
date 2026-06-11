@@ -6,7 +6,7 @@ import { Accelerometer } from 'expo-sensors';
 import { Subscription } from "expo-sensors/build/Pedometer";
 import { use, useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Alert, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import Button from "./button";
 import Card from "./card";
 import { LineChart } from "./lineChart";
@@ -210,49 +210,6 @@ export default function BreathingAttemptScreen(){
         setCentered([]);
     };
 
-    const handleFinish = () => {
-        if (designs.length < DESIGN_PRESETS.length){
-            Alert.alert(t("errorMessages.unfinishedChallenge"), t("errorMessages.unfinishedChallengeDescription"));
-            return;
-        }
-
-        const results = designs.map(d => ({
-            label: `${d.key}`,
-            value: `Breaths Recorded: ${d.breathsRecorded} | BPM: ${d.bpm}}`
-        }));
-
-        const rest = designs.find(
-            d => d.key === "activities.breathingPaceTrainer.rest"
-        );
-
-        const jogging = designs.find(
-            d => d.key === "activities.breathingPaceTrainer.jogging"
-        );
-
-        const starJumps = designs.find(
-            d => d.key === "activities.breathingPaceTrainer.starJumps"
-        );
-
-        if (activityContext) {
-            activityContext.addExperimentLog({
-                activityKey: "breathing-pace-trainer",
-                data: { 
-                    restBreaths: rest?.breathsRecorded,
-                    restBpm: rest?.bpm,
-                    joggingBreaths: jogging?.breathsRecorded,
-                    joggingBpm: jogging?.bpm,
-                    starJumpsBreaths: starJumps?.breathsRecorded,
-                    starJumpsBpm: starJumps?.bpm
-                 }
-            });
-        }
-
-        router.push({
-            pathname: "/activityResults",
-            params: { results: JSON.stringify(results), activityKey: "breathing-pace-trainer" }
-        });
-    };
-
     return(
         <KeyboardAvoidingView style={styles.outerContainer} behavior="height">
             <ScrollView contentContainerStyle={styles.container}>
@@ -342,13 +299,6 @@ export default function BreathingAttemptScreen(){
                         </View>
                     );
                 })}
-
-                <View style={styles.buttonContainer}>
-                    <Button 
-                        text={t("buttons.finishActivity")}
-                        action={handleFinish}
-                    />
-                </View>
             </ScrollView>
             {countdown !== null && (
                 <View style={styles.overlay}>

@@ -1,4 +1,4 @@
-import { ParachuteTrial, SoundReading, FanMaterial, FanDesign, EarthquakeDesign, ActionConfig } from './types';
+import { ActionConfig, EarthquakeDesign, FanDesign, FanMaterial, ParachuteTrial, SoundReading } from './types';
 
 export const TOTAL_ACTIVITIES = 7;
 export const POINTS_PER_ACTIVITY = 100;
@@ -134,6 +134,102 @@ export const ACTION_CONFIGS: Record<string, ActionConfig[]> = {
       ],
     },
   ],
+  "stretch-speed-and-gracefulness": [
+    {
+      id: "action-1",
+      label: "Clockwise Movement",
+      subtitle: "Move your phone in a clockwise movement.",
+      inputs: [
+        { id: "predictedVibrations", label: "Predicted Vibrations", type: "number", placeholder: "0.0" },
+        { id: "measuredVibrations", label: "Measured Vibrations", type: "number", placeholder: "Use movement test" },
+        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what happened..." },
+      ],
+    },
+    {
+      id: "action-2",
+      label: "Horizontal Movement",
+      subtitle: "Move your phone in a horizontal movement.",
+      inputs: [
+        { id: "predictedVibrations", label: "Predicted Vibrations", type: "number", placeholder: "0.0" },
+        { id: "measuredVibrations", label: "Measured Vibrations", type: "number", placeholder: "Use movement test" },
+        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what happened..." },
+      ],
+    },
+    {
+      id: "action-3",
+      label: "Vertical Movement",
+      subtitle: "Move your phone in a vertical movement.",
+      inputs: [
+        { id: "predictedVibrations", label: "Predicted Vibrations", type: "number", placeholder: "0.0" },
+        { id: "measuredVibrations", label: "Measured Vibrations", type: "number", placeholder: "Use movement test" },
+        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what happened..." },
+      ],
+    }
+  ],
+  "reaction-board-challenge": [
+    {
+      id: "action-1",
+      label: "Dominant Hand Tap Challenge",
+      subtitle: "React and tap the hidden button using your dominant hand.",
+      inputs: [
+        { id: "predictedReactionTime", label: "Predicted Reaction Time (ms)", type: "number", placeholder: "0.0" },
+        { id: "measuredReactionTime", label: "Measured Reaction Time (ms)", type: "number", placeholder: "Use reaction time test" },
+        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what happened..." },
+      ],
+    },
+    {
+      id: "action-2",
+      label: "Non-Dominant Hand Tap Challenge",
+      subtitle: "React and tap the hidden button using your non-dominant hand.",
+      inputs: [
+        { id: "predictedReactionTime", label: "Predicted Reaction Time (ms)", type: "number", placeholder: "0.0" },
+        { id: "measuredReactionTime", label: "Measured Reaction Time (ms)", type: "number", placeholder: "Use reaction time test" },
+        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what happened..." },
+      ],
+    },
+    {
+      id: "action-3",
+      label: "Tracing Challenge",
+      subtitle: "Trace the moving object.",
+      inputs: [
+        { id: "predictedTracingAccuracy", label: "Predicted Tracing Accuracy (%)", type: "number", placeholder: "0.0" },
+        { id: "measureTracingAccuracy", label: "Measured Tracing Accuracy (%)", type: "number", placeholder: "Use tracing test" },
+        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what happened..." },
+      ],
+    }
+  ],
+  "breathing-pace-trainer": [
+    {
+      id: "action-1",
+      label: "Rest",
+      subtitle: "Record your BPM during rest.",
+      inputs: [
+        { id: "predictedBPM", label: "Predicted BPM", type: "number", placeholder: "0.0" },
+        { id: "measuredBPM", label: "Measured BPM", type: "number", placeholder: "Use breathing test" },
+        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what happened..." },
+      ],
+    },
+    {
+      id: "action-2",
+      label: "Jogging",
+      subtitle: "Record your BPM after jogging for 1 minute.",
+      inputs: [
+        { id: "predictedBPM", label: "Predicted BPM", type: "number", placeholder: "0.0" },
+        { id: "measuredBPM", label: "Measured BPM", type: "number", placeholder: "Use breathing test" },
+        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what happened..." },
+      ],
+    },
+    {
+      id: "action-3",
+      label: "Star Jumps",
+      subtitle: "Record your BPM after doing 100 star jumps.",
+      inputs: [
+        { id: "predictedBPM", label: "Predicted BPM", type: "number", placeholder: "0.0" },
+        { id: "measuredBPM", label: "Measured BPM", type: "number", placeholder: "Use breathing test" },
+        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what happened..." },
+      ],
+    }
+  ]
 };
 
 export interface ActivityMetadata {

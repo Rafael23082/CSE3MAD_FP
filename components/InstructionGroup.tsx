@@ -14,9 +14,12 @@ export default function InstructionGroup({texts, imagePath}: InputProps){
     return(
         <View style={styles.container}>
             {texts.map((text, index) => (
-                <Text style={[styles.body, {
-                    paddingTop: index == 0 ? 16: 16
-                }]}>{index + 1}. {text}</Text>
+                <Text 
+                    style={[styles.body, {
+                        paddingTop: index == 0 ? 16: 16
+                    }]}
+                    key={index}
+                >{index + 1}. {text}</Text>
             ))}
             <View style={styles.instructionBox}>
                 <Image source={imagePath} style={styles.image} resizeMode="cover" />
