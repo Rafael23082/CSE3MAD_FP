@@ -36,22 +36,20 @@ const DISCUSSION_QUESTIONS: Record<string, { id: string; question: string }[]> =
         { id: "changes", question: "What would you change next time?" },
     ],
     "stretch-speed-and-gracefulness": [
+        { id: "predictionsCorrect", question: "Were your predictions correct?" },
+        { id: "results", question: "Which movement was the easiest to keep stable?" },
         { id: "hardestMovement", question: "Which movement was the hardest to keep the vibration low?" },
-        { id: "results", question: "Record your results." },
-        { id: "correctPrediction", question: "Were you right?" },
         { id: "surprises", question: "Any surprises?" },
     ],
     "reaction-board-challenge": [
-        { id: "prediction", question: "What was your predicted reaction time?" },
-        { id: "results", question: "Record the results." },
-        { id: "correctPrediction", question: "Were you right?" },
+        { id: "predictionsCorrect", question: "Were your predictions correct?" },
+        { id: "harderChallenge", question: "Which of the two category challenges were more challenging?" },
         { id: "surprises", question: "Any surprises?" },
     ],
     "breathing-pace-trainer": [
-        { id: "prediction", question: "Predict your breathing rate per minute." },
-        { id: "results", question: "Record the results." },
-        { id: "correctPrediction", question: "Were you right?" },
+        { id: "predictionsCorrect", question: "Were your predictions correct?" },
         { id: "surprises", question: "Any surprises?" },
+        { id: "activityImpact", question: "How did different levels of physical activity change your breathing rate?" },
     ],
     };
 
@@ -73,13 +71,16 @@ const PREDICTION_FIELDS: Record<string, { id: string; label: string; type: "radi
         { id: "mostStableReason", label: "Why?", type: "text" },
     ],
     "stretch-speed-and-gracefulness": [
-        { id: "vibrationPrediction", label: "Predict the phone vibration count.", type: "text" },
+        { id: "mostStable", label: "Which movement do you think will be most stable?", type: "text" },
+        { id: "mostStableReason", label: "Why?", type: "text" },
     ],
     "reaction-board-challenge": [
-        { id: "reactionTimePrediction", label: "Predict your reaction time (in miliseconds).", type: "text" },
+        { id: "reactionTimeDifferencePrediction", label: "How much do you think will be the difference between your dominant and non-dominant hand reaction time (ms)?", type: "text" },
+        { id: "reactionTimeDifferenceReason", label: "Why?", type: "text" },
     ],
     "breathing-pace-trainer": [
-        { id: "restBreathing", label: "Predict breathing rate at rest (breaths/min).", type: "text" },
+        { id: "mostBpm", label: "Which activitiy do you think will result in the hights BPM?", type: "text" },
+        { id: "mostBpmReason", label: "Why?", type: "text" },
     ],
 };
 
