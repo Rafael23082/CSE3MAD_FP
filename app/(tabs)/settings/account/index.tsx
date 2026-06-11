@@ -72,6 +72,24 @@ export default function AccountSettingsScreen() {
     }
   };
 
+  const formatDate = (dateInput: string | number | Date | undefined | null): string => {
+    if (!dateInput) return '';
+
+    const date = new Date(dateInput);
+
+    // Check if the date parsing failed (Invalid Date)
+    if (isNaN(date.getTime())) {
+      return '';
+    }
+
+    // Formats to: "Month DD, YYYY" (e.g., "June 11, 2026")
+    return date.toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.infoSection}>
@@ -95,6 +113,12 @@ export default function AccountSettingsScreen() {
         <InfoItem 
           label={t("forms.email")}
           value={user?.email || ""}
+          marginTop={true}
+        />
+
+        <InfoItem 
+          label={"Joined"}
+          value={String(formatDate(userProfile?.createdAt))}
           marginTop={true}
         />
       </View>

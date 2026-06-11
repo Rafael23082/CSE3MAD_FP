@@ -240,7 +240,7 @@ const resources = {
             "Repeat with different fan designs and fan distances (15 cm, 30 cm, 45 cm)."
           ],
           equipments: [
-            { name: "Paper and cardboard", description: "Used as raw materials to construct both the fan and the vertical target." },
+            { name: "Paper", description: "Used as raw materials to construct both the fan and the vertical target." },
             { name: "Scissors", description: "Enables precise cutting of materials to create specific fan shapes and sizes." },
             { name: "Sticky Tape", description: "Secures the vertical target to the table so it can bend without falling." }
           ],
@@ -322,7 +322,7 @@ const resources = {
             "Hold the phone firmly in one hand. Activate the app vibration sensor.",
             "Perform guided movement slowly as shown in the app. Record the vibration.",
             "Repeat the activity with vibration feedback enabled.",
-            "Review speed, smoothness, and range-of-motion data.",
+            "Review smoothness, and vibrations data.",
             "Upload results and reflect as a group."
           ],
           equipments: [
@@ -350,7 +350,7 @@ const resources = {
             "Trace a moving shape on the screen. Review accuracy and delay."
           ],
           equipments: [
-            { name: "Variable Distractions", description: "Music, conversation, or physical tasks used to test how cognitive load affects response time." }
+            { name: "None", description: "No Equipments Required." }
           ],
           dominantHand: "Dominant Hand Tap Reaction",
           nonDominantHand: "Non-Dominant Hand Tap Reaction",
@@ -377,7 +377,7 @@ const resources = {
             "Record breathing again and compare results."
           ],
           equipments: [
-            { name: "Flat surface", description: "Music, conversation, or physical tasks used to test how cognitive load affects response time." }
+            { name: "Flat surface", description: "A stable, level surface used to place the phone during breathing measurements. It helps keep the device steady and ensures more accurate detection of chest movements and breathing patterns." }
           ],
           rest: "Rest",
           jogging: "Jogging One Minute",
@@ -883,7 +883,10 @@ const resources = {
             "画面上で動く図形をなぞってください。精度と遅延を確認してください。"
           ],
           equipments: [
-            { name: "さまざまな気晴らし", description: "認知的負荷が反応時間にどのような影響を与えるかを調べるために用いられる、音楽、会話、または身体的な課題。" }
+            {
+              name: "なし",
+              description: "必要な器具はありません。"
+            }
           ],
           dominantHand: "利き手のタップ反応",
           nonDominantHand: "非利き手のタップ反応",
@@ -910,7 +913,7 @@ const resources = {
             "もう一度呼吸を記録し、結果を比較してください。"
           ],
           equipments: [
-            { name: "平らな面", description: "認知的負荷が反応時間にどのような影響を与えるかを調べるために用いられる、音楽、会話、または身体的な課題。" }
+            { name: "平らな面", description: "呼吸測定中にスマートフォンを置くための、安定した平らな面です。デバイスをしっかり固定し、胸の動きや呼吸パターンをより正確に検出するのに役立ちます。" }
           ],
           rest: "安静（休憩）",
           jogging: "1分間のジョギング",
@@ -1498,7 +1501,10 @@ const resources = {
             "Telusuri bentuk bergerak di layar. Tinjau akurasi dan penundaan."
           ],
           equipments: [
-            { name: "Berbagai Gangguan", description: "Musik, percakapan, atau tugas fisik yang digunakan untuk menguji bagaimana beban kognitif mempengaruhi waktu respons." }
+            {
+              name: "Tidak Ada",
+              description: "Tidak memerlukan peralatan apa pun."
+            }
           ],
           dominantHand: "Reaksi Ketukan Tangan Dominan",
           nonDominantHand: "Reaksi Ketukan Tangan Non-Dominan",
@@ -1525,7 +1531,7 @@ const resources = {
             "Rekam pernapasan lagi dan bandingkan hasilnya."
           ],
           equipments: [
-            { name: "Permukaan Datar", description: "Musik, percakapan, atau tugas fisik yang digunakan untuk menguji bagaimana beban kognitif mempengaruhi waktu respons." }
+            { name: "Permukaan Datar", description: "Permukaan yang stabil dan rata untuk meletakkan ponsel selama pengukuran pernapasan. Membantu menjaga perangkat tetap stabil sehingga gerakan dada dan pola pernapasan dapat terdeteksi dengan lebih akurat." }
           ],
           rest: "Istirahat",
           jogging: "Joging Satu Menit",
@@ -2084,7 +2090,10 @@ const resources = {
             "描摹屏幕上移动的形状。查看准确度和延迟。"
           ],
           equipments: [
-            { name: "各种干扰", description: "用于测试认知负荷如何影响反应时间的音乐、对话或体力任务。" }
+            {
+              name: "无",
+              description: "无需任何器材。"
+            }
           ],
           dominantHand: "优势手点击反应",
           nonDominantHand: "非优势手点击反应",
@@ -2111,7 +2120,7 @@ const resources = {
             "再次记录呼吸并比较结果。"
           ],
           equipments: [
-            { name: "平坦表面", description: "用于测试认知负荷如何影响反应时间的工具。" }
+            { name: "平坦表面", description: "用于在呼吸测量过程中放置手机的稳定平坦表面。它有助于保持设备稳定，从而更准确地检测胸部运动和呼吸模式。" }
           ],
           rest: "静止休息",
           jogging: "慢跑一分钟",

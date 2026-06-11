@@ -71,20 +71,6 @@ export async function showActivitySubmitted(points: number): Promise<void> {
 }
 
 /**
- * Show low battery warning notification
- */
-export async function showLowBatteryWarning(level: number): Promise<void> {
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title: 'Low Battery',
-      body: `Your battery is at ${level}%. Consider charging.`,
-      sound: true,
-    },
-    trigger: null,
-  });
-}
-
-/**
  * Show background sync completed notification
  */
 export async function showSyncCompleted(count: number): Promise<void> {

@@ -4,19 +4,22 @@ import { Image, StyleSheet, Text, View } from "react-native";
 
 type InputProps =
  {
-    text: string,
-    videoPath: any,
-    number: number
+    texts: string[],
+    imagePath: any
 };
 
-export default function InstructionGroup({text, videoPath, number}: InputProps){
+export default function InstructionGroup({texts, imagePath}: InputProps){
     const {theme} = useTheme();
     const styles = createStyles(theme);
     return(
         <View style={styles.container}>
-            <Text style={styles.body}>{number}. {text}</Text>
+            {texts.map((text, index) => (
+                <Text style={[styles.body, {
+                    paddingTop: index == 0 ? 16: 16
+                }]}>{index + 1}. {text}</Text>
+            ))}
             <View style={styles.instructionBox}>
-                <Image source={videoPath} style={styles.video} resizeMode="cover" />
+                <Image source={imagePath} style={styles.image} resizeMode="cover" />
             </View>
         </View>
     );
@@ -31,18 +34,17 @@ const createStyles = (colors: ThemeColors) => {
             borderColor: colors.borderColor,
             borderWidth: 1,
             overflow: "hidden",
-            marginTop: 16
+            marginTop: 24
         },
         body: {
             fontFamily: "InterRegular",
             color: colors.secondary,
-            paddingTop: 16,
             fontSize: 16
         },
         container: {
             marginBottom: 24
         },
-        video: {
+        image: {
             width: "100%",
             height: "100%",
         }

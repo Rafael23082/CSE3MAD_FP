@@ -10,7 +10,8 @@ export type Activity = {
     image: any,
     equipments: any[],
     instructions: any[],
-    phases?: string[]
+    phases?: string[],
+    instructionImage: any
 }
 
 export type ExperimentLog = {

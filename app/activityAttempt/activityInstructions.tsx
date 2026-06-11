@@ -22,14 +22,10 @@ export default function ActivityAttemptInstructionsScreen(){
             <ScrollView contentContainerStyle={styles.container}>
                 <Text style={styles.head}>{activity.name}</Text>
                 <Text style={styles.sectionHeader}>{t("activities.instructions")}</Text>
-                {activity.instructions.map((instruction, index) => (
-                    <InstructionGroup 
-                        text={instruction.instruction} 
-                        videoPath={instruction.video} 
-                        key={index} 
-                        number={index+1} 
-                    />
-                ))}
+                <InstructionGroup 
+                    texts={activity.instructions} 
+                    imagePath={activity.instructionImage} 
+                />
             </ScrollView>
         </KeyboardAvoidingView>
     )
