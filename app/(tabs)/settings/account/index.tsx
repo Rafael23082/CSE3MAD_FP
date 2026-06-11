@@ -2,13 +2,13 @@ import EditableInfoItem from "@/components/editableInfoItem";
 import { InfoItem } from "@/components/infoItem";
 import { SettingsOption } from "@/components/settingsOption";
 import { AuthContext } from "@/context/AuthContext";
-import { auth, db } from "@/firebase";
+import { auth } from "@/firebase";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
+import { updateDisplayName } from "@/utils/database";
 import { useFocusEffect, useRouter } from "expo-router";
 import { signOut } from "firebase/auth";
-import { doc, updateDoc } from "firebase/firestore";
-import { useCallback, use, useState } from "react";
+import { use, useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
@@ -27,7 +27,7 @@ export default function AccountSettingsScreen() {
   )
 
   if (!authContext) return;
-  const { userProfile, user } = authContext;
+  const { userProfile, setUserProfile, user } = authContext;
 
   async function handleLogout() {
     try {
@@ -40,25 +40,35 @@ export default function AccountSettingsScreen() {
 
   const handleUpdateDisplayName = async (newValue: string) => {
     try {
-      if (!newValue) {
+      if (!newValue.trim()) {
         setError(t("errorMessages.emptyDisplayName"));
         return;
       }
+
       const user = auth.currentUser;
 
       if (!user) {
+        setError(t("errorMessages.defaultError"));
         return;
       }
 
-      const formattedDisplayName = newValue.charAt(0).toUpperCase() + newValue.slice(1).toLowerCase();
+      const formattedDisplayName =
+        newValue.charAt(0).toUpperCase() +
+        newValue.slice(1).toLowerCase();
 
-      await updateDoc(doc(db, "users", user.uid), {
-        displayName: formattedDisplayName,
-      });
+      await updateDisplayName(
+        user.uid,
+        formattedDisplayName
+      );
+
+    setUserProfile(prev =>
+      prev ? {...prev, displayName: formattedDisplayName}: null
+    );
+
       setError("");
     } catch (error) {
-      setError(t("errorMessages.defaultError"))
-      console.log(error);
+      console.error("Update display name error:", error);
+      setError(t("errorMessages.defaultError"));
     }
   };
 

@@ -1,4 +1,5 @@
 import * as SQLite from 'expo-sqlite';
+import { Alert } from "react-native";
 
 let db: SQLite.SQLiteDatabase | null = null;
 let dbPromise: Promise<SQLite.SQLiteDatabase> | null = null;
@@ -39,6 +40,14 @@ async function initSchema(database: SQLite.SQLiteDatabase): Promise<void> {
       activity_key TEXT PRIMARY KEY,
       rating INTEGER NOT NULL,
       updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS users (
+      uid TEXT PRIMARY KEY,
+      displayName TEXT NOT NULL,
+      email TEXT NOT NULL,
+      teamMembers TEXT,
+      createdAt TEXT NOT NULL
     );
   `);
 }
@@ -192,4 +201,99 @@ export async function getPendingSyncData(): Promise<{
 export async function markLogSynced(id: number): Promise<void> {
   const database = await getDb();
   await database.runAsync(`UPDATE experiment_logs SET synced = 1 WHERE id = ?`, [id]);
+}
+
+export async function saveUserProfile(uid: string, profile: { displayName: string; email: string; teamMembers?: Record<string, unknown>[] }): Promise<void> {
+  const database = await getDb();
+  
+  await database.runAsync(
+    `INSERT OR REPLACE INTO users (uid, displayName, email, teamMembers, createdAt) 
+     VALUES (?, ?, ?, COALESCE((SELECT teamMembers FROM users WHERE uid = ?), ?), COALESCE((SELECT createdAt FROM users WHERE uid = ?), ?))`,
+    [
+      uid,
+      profile.displayName,
+      profile.email,
+      uid, profile.teamMembers ? JSON.stringify(profile.teamMembers) : null,
+      uid, new Date().toISOString()
+    ]
+  );
+}
+
+export async function updateTeamMembers(uid: string, teamMembers: Record<string, unknown>[]): Promise<void> {
+  const database = await getDb();
+  await database.runAsync(
+    `UPDATE users SET teamMembers = ? WHERE uid = ?`,
+    [JSON.stringify(teamMembers), uid]
+  );
+}
+
+export async function verifyStoredProfile(uid: string) {
+  try {
+    const database = await getDb();
+
+    const result = await database.getFirstAsync<{
+      displayName: string;
+      email: string;
+      teamMembers: string | null;
+    }>(
+      `SELECT displayName, email, teamMembers
+       FROM users
+       WHERE uid = ?`,
+      [uid]
+    );
+
+    if (!result) {
+      Alert.alert(
+        "Verification Failed",
+        `No user found for UID: ${uid}`
+      );
+      return;
+    }
+
+    Alert.alert(
+      "SQLite Verification Success",
+      JSON.stringify(
+        {
+          displayName: result.displayName,
+          email: result.email,
+          teamMembers: result.teamMembers
+            ? JSON.parse(result.teamMembers)
+            : [],
+        },
+        null,
+        2
+      )
+    );
+  } catch (err) {
+    Alert.alert(
+      "SQLite Error",
+      err instanceof Error ? err.message : String(err)
+    );
+  }
+}
+
+export async function getUserProfile(uid: string) {
+  const database = await getDb();
+
+  return await database.getFirstAsync<{
+    uid: string;
+    displayName: string;
+    email: string;
+    teamMembers: string | null;
+    createdAt: string;
+  }>(
+    `SELECT * FROM users WHERE uid = ?`,
+    [uid]
+  );
+}
+
+export async function updateDisplayName(uid: string, displayName: string): Promise<void> {
+  const database = await getDb();
+
+  await database.runAsync(
+    `UPDATE users
+     SET displayName = ?
+     WHERE uid = ?`,
+    [displayName, uid]
+  );
 }

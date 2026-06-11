@@ -3,15 +3,15 @@ import InputGroup from "@/components/inputGroup";
 import { TeamMember } from "@/constants/types";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
+import { saveUserProfile, updateTeamMembers, verifyStoredProfile } from "@/utils/database";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc, updateDoc } from "firebase/firestore";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { auth, db } from "../firebase";
+import { auth } from "../firebase";
 
 const MIN_MEMBERS = 1;
 const MAX_MEMBERS = 3;
@@ -37,8 +37,11 @@ export default function SignupScreen(){
     const handleSignup = async() => {
         try{
             setLoading(true);
+            setError("");
+            
             if (!teamName || !email || !password){
                 setError(t("errorMessages.fillInAllFields"));
+                setLoading(false);
                 return;
             };
 
@@ -47,18 +50,18 @@ export default function SignupScreen(){
 
             const formattedTeamName = teamName.charAt(0).toUpperCase() + teamName.slice(1).toLowerCase();
 
-            await setDoc(doc(db, "users", user.uid), {  
-                uid: user.uid,
+            await saveUserProfile(user.uid, {
                 displayName: formattedTeamName,
-                email: email,
-                createdAt: new Date()
-            })
+                email: email
+            });
 
             setUserId(user.uid);
             setStep(2);
-            setError("");
         }
         catch(error: any){
+            console.log("Signup error:", error);
+            console.log("Signup error code:", error?.code);
+
             switch (error.code) {
                 case "auth/weak-password":
                     setError("Password should be at least 6 characters");
@@ -83,17 +86,21 @@ export default function SignupScreen(){
     const handleCompleteRegistration = async() => {
         try{
             setLoading(true);
+            setError("");
+            
             const filledMembers = teamMembers.filter(
                 m => m.firstName.trim() !== "" && m.lastName.trim() !== ""
             );
 
             if (filledMembers.length < MIN_MEMBERS){
                 setError(t("signup.minMembers"));
+                setLoading(false);
                 return;
             }
 
             if (filledMembers.length > MAX_MEMBERS){
                 setError(t("signup.maxMembers"));
+                setLoading(false);
                 return;
             }
 
@@ -102,14 +109,14 @@ export default function SignupScreen(){
                 lastName: m.lastName.charAt(0).toUpperCase() + m.lastName.slice(1).toLowerCase()
             }));
 
-            await updateDoc(doc(db, "users", userId), {
-                teamMembers: formattedMembers
-            });
+            await updateTeamMembers(userId, formattedMembers);
+            await verifyStoredProfile(userId);
 
-            console.log("Team members saved successfully!");
+            console.log("Team members saved locally to SQLite successfully!");
             router.push("/(tabs)");
         }
-        catch{
+        catch (err) {
+            console.error("Local SQLite update error:", err);
             setError(t("errorMessages.defaultError"));
         }
         finally{
