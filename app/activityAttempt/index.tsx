@@ -349,7 +349,7 @@ export default function ActivityAttemptMainScreen(){
           </ScrollView>
 
           {/* Save Button */}
-          <View style={[styles.saveContainer, { paddingBottom: insets.bottom + 16 }]}>
+          <View style={[styles.saveContainer]}>
               <Pressable
                   style={({ pressed }) => [
                       styles.saveBtn,
