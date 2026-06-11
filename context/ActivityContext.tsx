@@ -20,12 +20,29 @@ export type ExperimentLog = {
     data: any;
 };
 
+type ActionValues = Record<string, Record<string, string | number>>;
+
 type ActivityContextProps = {
     activity: Activity | undefined;
     setActivity: Dispatch<SetStateAction<Activity | undefined>>;
     experimentLogs: ExperimentLog[];
     addExperimentLog: (log: Omit<ExperimentLog, 'timestamp'>) => void;
     clearExperimentLogs: (activityKey?: string) => void;
+    predictions: Record<string, string>;
+    setPredictions: Dispatch<SetStateAction<Record<string, string>>>;
+    discussionAnswers: Record<string, string>;
+    setDiscussionAnswers: Dispatch<SetStateAction<Record<string, string>>>;
+    reflection: string;
+    setReflection: Dispatch<SetStateAction<string>>;
+    rating: number | null;
+    setRating: Dispatch<SetStateAction<number | null>>;
+    evidenceUri: string | null;
+    setEvidenceUri: Dispatch<SetStateAction<string | null>>;
+    clearActivityState: () => void;
+    actionSubmissions: ActionValues;
+    submitAction: (actionId: string, values: Record<string, string | number>) => void;
+    completedActions: string[];
+    isActionComplete: (actionId: string) => boolean;
 }
 
 export const ActivityContext = createContext<ActivityContextProps | undefined>(undefined);
@@ -33,7 +50,13 @@ export const ActivityContext = createContext<ActivityContextProps | undefined>(u
 export function ActivityProvider({ children }: { children: ReactNode }) {
     const [activity, setActivity] = useState<Activity | undefined>(undefined);
     const [experimentLogs, setExperimentLogs] = useState<ExperimentLog[]>([]);
+    const [predictions, setPredictions] = useState<Record<string, string>>({});
+    const [discussionAnswers, setDiscussionAnswers] = useState<Record<string, string>>({});
+    const [reflection, setReflection] = useState("");
+    const [rating, setRating] = useState<number | null>(null);
+    const [evidenceUri, setEvidenceUri] = useState<string | null>(null);
     const [loaded, setLoaded] = useState(false);
+    const [actionSubmissions, setActionSubmissions] = useState<ActionValues>({});
 
     // Load persisted logs on mount
     useEffect(() => {
@@ -79,8 +102,43 @@ export function ActivityProvider({ children }: { children: ReactNode }) {
         }
     }, []);
 
+    const clearActivityState = useCallback(() => {
+        setPredictions({});
+        setDiscussionAnswers({});
+        setReflection("");
+        setRating(null);
+        setEvidenceUri(null);
+        setActionSubmissions({});
+    }, []);
+
+    const submitAction = useCallback((actionId: string, values: Record<string, string | number>) => {
+        setActionSubmissions(prev => ({ ...prev, [actionId]: values }));
+        setExperimentLogs(prev => [...prev, {
+            activityKey: activity?.key ?? '',
+            data: { actionId, ...values },
+            timestamp: Date.now()
+        }]);
+    }, [activity?.key]);
+
+    const completedActions = Object.keys(actionSubmissions);
+
+    const isActionComplete = useCallback((actionId: string): boolean => {
+        return actionId in actionSubmissions;
+    }, [actionSubmissions]);
+
     return (
-        <ActivityContext.Provider value={{activity, setActivity, experimentLogs, addExperimentLog, clearExperimentLogs}}>
+        <ActivityContext.Provider value={{
+            activity, setActivity,
+            experimentLogs, addExperimentLog, clearExperimentLogs,
+            predictions, setPredictions,
+            discussionAnswers, setDiscussionAnswers,
+            reflection, setReflection,
+            rating, setRating,
+            evidenceUri, setEvidenceUri,
+            clearActivityState,
+            actionSubmissions, submitAction,
+            completedActions, isActionComplete
+        }}>
             {children}
         </ActivityContext.Provider>
     );

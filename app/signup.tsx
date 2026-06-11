@@ -13,8 +13,8 @@ import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, View } f
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth } from "../firebase";
 
-const MIN_MEMBERS = 1;
-const MAX_MEMBERS = 3;
+const MIN_MEMBERS = 2;
+const MAX_MEMBERS = 4;
 
 export default function SignupScreen(){
     const { theme } = useTheme();

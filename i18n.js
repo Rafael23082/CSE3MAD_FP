@@ -452,6 +452,32 @@ const resources = {
         noDataSubtext: "Go to the Experiment tab and log your first trial!",
         saving: "Saving..."
       },
+      worksheet: {
+        title: "Worksheet",
+        predictions: "Predictions",
+        designRecords: "Design Records",
+        discussion: "Discussion Questions",
+        complete: "Worksheet Completed",
+        incomplete: "Incomplete Worksheet",
+        incompleteMsg: "Please fill in at least one prediction, one design record, and one discussion question.",
+        continueToReflection: "Save & Continue to Reflection"
+      },
+      reflection: {
+        title: "Reflection",
+        subtitle: "Think about what you learned and how you could improve",
+        placeholder: "Write your reflection here...",
+        whatDidYouLearn: "What did you learn from this experiment?",
+        rateExperience: "How would you rate your experience?",
+        reflectionRequired: "Reflection Required",
+        reflectionRequiredMsg: "Please write a reflection before saving."
+      },
+      validation: {
+        worksheetRequired: "Worksheet",
+        reflectionRequired: "Reflection",
+        experimentRequired: "Experiment Data",
+        incompleteAttempt: "Incomplete Attempt",
+        incompleteAttemptMsg: "Cannot submit without: {{missing}}"
+      },
       errorMessages: {
         invalidCredential: "Invalid email or password",
         fillInAllFields: "Please fill in all fields",

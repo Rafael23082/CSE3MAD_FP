@@ -1,11 +1,12 @@
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
-import { Audio } from "expo-av";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import * as Location from "expo-location";
 import { useRouter } from "expo-router";
 import { Accelerometer } from "expo-sensors";
-import React, { useEffect, useMemo, useState } from "react";
+import { AudioModule, RecordingPresets, setAudioModeAsync, requestRecordingPermissionsAsync, getRecordingPermissionsAsync } from 'expo-audio';
+import type { AudioRecorder } from 'expo-audio';
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -47,7 +48,7 @@ export default function SensorDebugScreen() {
   const insets = useSafeAreaInsets();
 
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
-  const [audioPermission, requestAudioPermission] = Audio.usePermissions();
+  const [audioGranted, setAudioGranted] = useState(false);
   const [locationPermission, requestLocationPermission] =
     Location.useForegroundPermissions();
 
@@ -71,6 +72,7 @@ export default function SensorDebugScreen() {
   const [accelerometerState, setAccelerometerState] =
     useState<AccelerometerState | null>(null);
   const [isRecording, setIsRecording] = useState(false);
+  const debugRecorderRef = useRef<AudioRecorder | null>(null);
 
   useEffect(() => {
     let locationSubscription: { remove: () => void } | null = null;
@@ -121,6 +123,13 @@ export default function SensorDebugScreen() {
       locationSubscription?.remove();
     };
   }, [locationPermission?.granted]);
+
+  useEffect(() => {
+    return () => {
+      const r = debugRecorderRef.current;
+      if (r) { r.stop().catch(() => {}); r.release(); }
+    };
+  }, []);
 
   useEffect(() => {
     let accelerometerSubscription: { remove: () => void } | null = null;
@@ -185,34 +194,41 @@ export default function SensorDebugScreen() {
       setIsStartingMic(true);
       setAudioError(null);
 
-      if (audioPermission?.status !== "granted") {
-        const result = await requestAudioPermission();
-        if (result.status !== "granted") {
+      const p = await getRecordingPermissionsAsync();
+      if (p.status !== "granted") {
+        const result = await requestRecordingPermissionsAsync();
+        setAudioGranted(result.granted);
+        if (!result.granted) {
           setAudioError("Microphone permission denied.");
           return;
         }
+      } else {
+        setAudioGranted(true);
       }
 
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
+      await setAudioModeAsync({
+        allowsRecording: true,
+        playsInSilentMode: true,
       });
 
-      const { recording } = await Audio.Recording.createAsync(
-        Audio.RecordingOptionsPresets.HIGH_QUALITY,
-      );
-      recording.setProgressUpdateInterval(250);
-      recording.setOnRecordingStatusUpdate((status) => {
+      const rec = new AudioModule.AudioRecorder({ ...RecordingPresets.HIGH_QUALITY, isMeteringEnabled: true });
+      await rec.prepareToRecordAsync();
+      rec.record();
+      debugRecorderRef.current = rec;
+      setIsRecording(true);
+
+      const meterInterval = setInterval(() => {
+        const status = rec.getStatus();
         if (status.isRecording && typeof status.metering === "number") {
           const db = Math.max(0, status.metering + 100);
           setMicDb(Math.round(db));
         }
-      });
-      setIsRecording(true);
+      }, 250);
 
-      const stop = async () => {
+      setTimeout(async () => {
+        clearInterval(meterInterval);
         try {
-          await recording.stopAndUnloadAsync();
+          await rec.stop();
         } catch (error) {
           setAudioError(
             error instanceof Error
@@ -220,14 +236,12 @@ export default function SensorDebugScreen() {
               : "Unable to stop microphone meter.",
           );
         } finally {
-          await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
+          await setAudioModeAsync({ allowsRecording: false });
+          rec.release();
+          debugRecorderRef.current = null;
           setIsRecording(false);
           setMicDb(0);
         }
-      };
-
-      setTimeout(() => {
-        void stop();
       }, 5000);
     } catch (error) {
       setAudioError(
@@ -257,12 +271,7 @@ export default function SensorDebugScreen() {
     },
     {
       title: "Microphone",
-      status:
-        audioPermission?.status === "granted"
-          ? "Granted"
-          : audioPermission?.canAskAgain === false
-            ? "Denied"
-            : "Not requested",
+      status: audioGranted ? "Granted" : "Not requested",
       live: isRecording ? `${micDb} dB` : "Tap to sample live audio",
       error: audioError,
       onPress: startMicMeter,

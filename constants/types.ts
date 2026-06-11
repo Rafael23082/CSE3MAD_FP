@@ -195,6 +195,24 @@ export interface BreathingJournal {
 }
 
 // ==========================================
+// Structured Activity Types
+// ==========================================
+
+export interface ActionInput {
+  id: string;
+  label: string;
+  type: 'text' | 'number';
+  placeholder?: string;
+}
+
+export interface ActionConfig {
+  id: string;
+  label: string;
+  subtitle?: string;
+  inputs: ActionInput[];
+}
+
+// ==========================================
 // Activity Attempt Types
 // ==========================================
 
@@ -202,6 +220,14 @@ export interface ActivityLogEntry {
   activityKey: string;
   timestamp: number;
   data: Record<string, unknown>;
+}
+
+export interface WorksheetData {
+  predictions?: Record<string, string>;
+  observations?: Record<string, string>;
+  calculations?: Record<string, string>;
+  discussionAnswers?: Record<string, string>;
+  designRecords?: Record<string, unknown>[];
 }
 
 export interface ActivityAttempt {
@@ -218,6 +244,11 @@ export interface ActivityAttempt {
     longitude: number;
     formatted: string;
   } | null;
+  worksheetData?: WorksheetData;
+  photoUri?: string;        // For Fan Challenge evidence photo
+  videoUri?: string;        // For Parachute video evidence
+  predictions?: Record<string, string>;
+  discussionAnswers?: Record<string, string>;
   createdAt: any; // Timestamp
   updatedAt: any; // Timestamp
 }

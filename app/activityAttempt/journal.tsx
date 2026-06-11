@@ -9,12 +9,12 @@ import {
     submitToLeaderboard,
     replaceSubmission,
 } from '@/utils/activityAttempts';
-import { showActivitySubmitted } from '@/utils/notifications';
+import { showActivityCompleted } from '@/utils/notifications';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import React, { use, useCallback, useEffect, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import React, { use, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 export default function JournalScreen() {
     const { t } = useTranslation();
@@ -22,11 +22,16 @@ export default function JournalScreen() {
     const styles = createStyles(theme);
     const activityContext = use(ActivityContext);
     const auth = use(AuthContext);
-    const router = useRouter();
 
     const [attempts, setAttempts] = useState<ActivityAttempt[]>([]);
     const [loading, setLoading] = useState(true);
     const [submittingId, setSubmittingId] = useState<string | null>(null);
+
+    // Reflection modal state
+    const [showReflectionModal, setShowReflectionModal] = useState(false);
+    const [modalAttemptId, setModalAttemptId] = useState<string | null>(null);
+    const [modalReflection, setModalReflection] = useState('');
+    const [modalRating, setModalRating] = useState<number | null>(null);
 
     const activity = activityContext?.activity;
     const userId = auth?.user?.uid;
@@ -44,9 +49,11 @@ export default function JournalScreen() {
         }
     }, [userId, activity]);
 
-    useEffect(() => {
-        fetchAttempts();
-    }, [fetchAttempts]);
+    useFocusEffect(
+        useCallback(() => {
+            fetchAttempts();
+        }, [fetchAttempts])
+    );
 
     if (!activity) return null;
 
@@ -77,11 +84,70 @@ export default function JournalScreen() {
         if (!logs || logs.length === 0) return 0;
         const lastLog = logs[logs.length - 1];
         switch (activity.key) {
-            case 'parachute-drop-challenge': return toNumber(lastLog.data?.vFinal);
-            case 'sound-pollution-hunter': return toNumber(lastLog.data?.db);
-            case 'hand-fan-challenge': return toNumber(lastLog.data?.force);
-            case 'earthquake-resistant-structure': return toNumber(lastLog.data?.observed);
+            case 'parachute-drop-challenge': return toNumber(lastLog.data?.timeToGround);
+            case 'sound-pollution-hunter': return toNumber(lastLog.data?.measuredDb);
+            case 'hand-fan-challenge': return toNumber(lastLog.data?.observedAngle);
+            case 'earthquake-resistant-structure': return toNumber(lastLog.data?.measuredMovement);
             default: return 0;
+        }
+    };
+
+    const openReflectionModal = (attempt: ActivityAttempt) => {
+        setModalAttemptId(attempt.id);
+        setModalReflection(attempt.reflection || '');
+        setModalRating(attempt.rating);
+        setShowReflectionModal(true);
+    };
+
+    const handleReflectionSubmit = async () => {
+        if (!modalAttemptId) return;
+        if (!modalReflection.trim()) {
+            Alert.alert("Reflection Required", "Please write a reflection before submitting.");
+            return;
+        }
+
+        setShowReflectionModal(false);
+        setSubmittingId(modalAttemptId);
+
+        try {
+            const attempt = attempts.find(a => a.id === modalAttemptId);
+            if (!attempt) throw new Error("Attempt not found");
+
+            const existingOfficial = attempts.find(a => a.isLeaderboardSubmission);
+
+            if (existingOfficial) {
+                Alert.alert(
+                    t("journal.confirmReplace"),
+                    t("journal.confirmReplaceMsg"),
+                    [
+                        { text: t("common.cancel"), style: "cancel", onPress: () => setSubmittingId(null) },
+                        {
+                            text: t("journal.replaceSubmission"),
+                            onPress: async () => {
+                                try {
+                                    await replaceSubmission(modalAttemptId);
+                                    await showActivityCompleted(activity.name);
+                                    Alert.alert(t("journal.submissionReplaced"));
+                                    fetchAttempts();
+                                } catch (e: any) {
+                                    Alert.alert(t("journal.submitError"), e.message);
+                                } finally {
+                                    setSubmittingId(null);
+                                }
+                            }
+                        }
+                    ]
+                );
+            } else {
+                await submitToLeaderboard(modalAttemptId);
+                await showActivityCompleted(activity.name);
+                Alert.alert(t("journal.submitSuccess"));
+                fetchAttempts();
+                setSubmittingId(null);
+            }
+        } catch (e: any) {
+            Alert.alert(t("journal.submitError"), e.message);
+            setSubmittingId(null);
         }
     };
 
@@ -109,72 +175,55 @@ export default function JournalScreen() {
         ]);
     };
 
-    const handleSubmitToLeaderboard = async (attempt: ActivityAttempt) => {
-        setSubmittingId(attempt.id);
-        try {
-            // Check if activity already has official submission
-            const existingOfficial = attempts.find(a => a.isLeaderboardSubmission);
-
-            if (existingOfficial) {
-                // Replace submission
-                Alert.alert(
-                    t("journal.confirmReplace"),
-                    t("journal.confirmReplaceMsg"),
-                    [
-                        { text: t("common.cancel"), style: "cancel" },
-                        {
-                            text: t("journal.replaceSubmission"),
-                            onPress: async () => {
-                                try {
-                                    await replaceSubmission(attempt.id);
-                                    await showActivitySubmitted(100);
-                                    Alert.alert(t("journal.submissionReplaced"));
-                                    fetchAttempts();
-                                } catch (e: any) {
-                                    Alert.alert(t("journal.submitError"), e.message);
-                                }
-                            }
-                        }
-                    ]
-                );
-            } else {
-                // First submission
-                await submitToLeaderboard(attempt.id);
-                await showActivitySubmitted(100);
-                Alert.alert(t("journal.submitSuccess"));
-                fetchAttempts();
-            }
-        } catch (e: any) {
-            Alert.alert(t("journal.submitError"), e.message);
-        } finally {
-            setSubmittingId(null);
-        }
-    };
-
-    const handleCreateNewAttempt = () => {
-        router.push("/activityAttempt");
-    };
-
     const officialAttempt = attempts.find(a => a.isLeaderboardSubmission);
     const draftAttempts = attempts.filter(a => !a.isLeaderboardSubmission);
+
+    const isAttemptComplete = (attempt: ActivityAttempt): boolean => {
+        const hasLogs = attempt.logs.length > 0;
+        const hasPredictions = attempt.predictions && Object.values(attempt.predictions).some(v => v?.trim() !== "");
+        const hasDiscussion = attempt.discussionAnswers && Object.values(attempt.discussionAnswers).some(v => v?.trim() !== "");
+        return !!(hasLogs && hasPredictions && hasDiscussion);
+    };
+
+    const renderAttemptSummary = (attempt: ActivityAttempt) => {
+        return (
+            <View style={styles.worksheetSummary}>
+                {attempt.predictions && Object.keys(attempt.predictions).length > 0 && (
+                    <View style={styles.summaryRow}>
+                        <MaterialCommunityIcons name="brain" size={14} color={theme.tertiary} />
+                        <Text style={styles.summaryText}>
+                            Predictions: {Object.values(attempt.predictions).filter(v => v?.trim()).length} answered
+                        </Text>
+                    </View>
+                )}
+                {attempt.discussionAnswers && Object.keys(attempt.discussionAnswers).length > 0 && (
+                    <View style={styles.summaryRow}>
+                        <MaterialCommunityIcons name="comment-text" size={14} color={theme.tertiary} />
+                        <Text style={styles.summaryText}>
+                            Discussion: {Object.values(attempt.discussionAnswers).filter(v => v?.trim()).length} answered
+                        </Text>
+                    </View>
+                )}
+                {attempt.photoUri && (
+                    <View style={styles.summaryRow}>
+                        <MaterialCommunityIcons name="camera" size={14} color={theme.tertiary} />
+                        <Text style={styles.summaryText}>Evidence Photo Attached</Text>
+                    </View>
+                )}
+                {attempt.videoUri && (
+                    <View style={styles.summaryRow}>
+                        <MaterialCommunityIcons name="video" size={14} color={theme.tertiary} />
+                        <Text style={styles.summaryText}>Video Evidence Attached</Text>
+                    </View>
+                )}
+            </View>
+        );
+    };
 
     return (
         <ScrollView style={styles.container} contentContainerStyle={styles.content}>
             <Text style={styles.title}>{t("journal.title")}</Text>
             <Text style={styles.subtitle}>{activity.name}</Text>
-
-            {/* Create New Attempt Button */}
-            <Pressable
-                style={({ pressed }) => [
-                    styles.createBtn,
-                    { backgroundColor: theme.primary },
-                    pressed && { opacity: 0.85 },
-                ]}
-                onPress={handleCreateNewAttempt}
-            >
-                <MaterialCommunityIcons name="plus" size={20} color="#fff" />
-                <Text style={styles.createBtnText}>{t("journal.createNewAttempt")}</Text>
-            </Pressable>
 
             {loading ? (
                 <View style={styles.loadingContainer}>
@@ -206,7 +255,6 @@ export default function JournalScreen() {
                                     </View>
                                 </View>
 
-                                {/* Attempt Summary */}
                                 <View style={styles.attemptSummary}>
                                     <Text style={styles.metricLabel}>
                                         {getMetricLabel()}: <Text style={styles.metricValue}>{getMetricValue(officialAttempt.logs).toFixed(2)}</Text>
@@ -217,38 +265,18 @@ export default function JournalScreen() {
                                             <Text style={styles.locationText}>{officialAttempt.location.formatted}</Text>
                                         </View>
                                     )}
+                                    {renderAttemptSummary(officialAttempt)}
                                     {officialAttempt.reflection ? (
                                         <Text style={styles.reflectionPreview} numberOfLines={2}>
                                             {officialAttempt.reflection}
                                         </Text>
                                     ) : null}
-                                </View>
-
-                                {/* Actions */}
-                                <View style={styles.attemptActions}>
-                                    <Pressable
-                                        style={[styles.actionBtn, styles.viewBtn]}
-                                        onPress={() => Alert.alert("View", "Attempt details coming soon")}
-                                    >
-                                        <MaterialCommunityIcons name="eye" size={16} color={theme.primary} />
-                                        <Text style={[styles.actionText, { color: theme.primary }]}>{t("journal.viewAttempt")}</Text>
-                                    </Pressable>
-                                    <Pressable
-                                        style={[styles.actionBtn, styles.replaceBtn]}
-                                        onPress={() => {
-                                            Alert.alert(
-                                                t("journal.replaceSubmission"),
-                                                t("journal.confirmReplaceMsg"),
-                                                [
-                                                    { text: t("common.cancel"), style: "cancel" },
-                                                    { text: t("journal.replaceSubmission"), onPress: () => {} }
-                                                ]
-                                            );
-                                        }}
-                                    >
-                                        <MaterialCommunityIcons name="swap-horizontal" size={16} color={theme.secondary} />
-                                        <Text style={[styles.actionText, { color: theme.secondary }]}>{t("journal.replaceSubmission")}</Text>
-                                    </Pressable>
+                                    {officialAttempt.rating ? (
+                                        <View style={styles.ratingRow}>
+                                            <MaterialCommunityIcons name="star" size={14} color="#FFD700" />
+                                            <Text style={styles.summaryText}>Rating: {officialAttempt.rating}/5</Text>
+                                        </View>
+                                    ) : null}
                                 </View>
                             </View>
                         </View>
@@ -269,7 +297,6 @@ export default function JournalScreen() {
                                         </View>
                                     </View>
 
-                                    {/* Attempt Summary */}
                                     <View style={styles.attemptSummary}>
                                         <Text style={styles.metricLabel}>
                                             {getMetricLabel()}: <Text style={styles.metricValue}>{getMetricValue(attempt.logs).toFixed(2)}</Text>
@@ -280,6 +307,7 @@ export default function JournalScreen() {
                                                 <Text style={styles.locationText}>{attempt.location.formatted}</Text>
                                             </View>
                                         )}
+                                        {renderAttemptSummary(attempt)}
                                         {attempt.reflection ? (
                                             <Text style={styles.reflectionPreview} numberOfLines={2}>
                                                 {attempt.reflection}
@@ -305,7 +333,13 @@ export default function JournalScreen() {
                                         </Pressable>
                                         <Pressable
                                             style={[styles.actionBtn, styles.submitBtn]}
-                                            onPress={() => handleSubmitToLeaderboard(attempt)}
+                                            onPress={() => {
+                                                if (!isAttemptComplete(attempt)) {
+                                                    Alert.alert("Incomplete", "Complete all experiment actions, predictions, and discussion before submitting.");
+                                                    return;
+                                                }
+                                                openReflectionModal(attempt);
+                                            }}
                                             disabled={submittingId === attempt.id}
                                         >
                                             {submittingId === attempt.id ? (
@@ -322,6 +356,60 @@ export default function JournalScreen() {
                     )}
                 </>
             )}
+
+            {/* Reflection Modal */}
+            <Modal
+                visible={showReflectionModal}
+                transparent
+                animationType="slide"
+                onRequestClose={() => setShowReflectionModal(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalTitle}>Submit to Leaderboard</Text>
+                        <Text style={styles.modalSubtitle}>Add your reflection and rating before submitting.</Text>
+
+                        <Text style={styles.fieldLabel}>Reflection</Text>
+                        <TextInput
+                            style={styles.modalTextInput}
+                            value={modalReflection}
+                            onChangeText={setModalReflection}
+                            placeholder="What did you learn from this activity?"
+                            placeholderTextColor={theme.textMuted}
+                            multiline
+                        />
+
+                        <Text style={styles.fieldLabel}>Rating</Text>
+                        <View style={styles.modalStars}>
+                            {[1, 2, 3, 4, 5].map((star) => (
+                                <Pressable key={star} onPress={() => setModalRating(star)}>
+                                    <MaterialCommunityIcons
+                                        name={modalRating && star <= modalRating ? "star" : "star-outline"}
+                                        size={36}
+                                        color={modalRating && star <= modalRating ? "#FFD700" : theme.textMuted}
+                                    />
+                                </Pressable>
+                            ))}
+                        </View>
+
+                        <View style={styles.modalActions}>
+                            <Pressable
+                                style={[styles.modalBtn, { backgroundColor: theme.surfaceContainer }]}
+                                onPress={() => setShowReflectionModal(false)}
+                            >
+                                <Text style={[styles.modalBtnText, { color: theme.secondary }]}>Cancel</Text>
+                            </Pressable>
+                            <Pressable
+                                style={[styles.modalBtn, { backgroundColor: theme.secondary }]}
+                                onPress={handleReflectionSubmit}
+                            >
+                                <MaterialCommunityIcons name="trophy" size={18} color="#fff" />
+                                <Text style={[styles.modalBtnText, { color: "#fff" }]}>Submit</Text>
+                            </Pressable>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
         </ScrollView>
     );
 }
@@ -331,16 +419,6 @@ const createStyles = (theme: ThemeColors) => StyleSheet.create({
     content: { padding: 24, paddingBottom: 40 },
     title: { fontSize: 24, fontFamily: "PoppinsBold", color: theme.secondary, marginBottom: 4 },
     subtitle: { fontSize: 14, fontFamily: "InterRegular", color: theme.textMuted, marginBottom: 20 },
-    createBtn: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 8,
-        padding: 14,
-        borderRadius: 10,
-        marginBottom: 24,
-    },
-    createBtnText: { color: "#fff", fontFamily: "InterBold", fontSize: 14 },
     loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center", paddingVertical: 40 },
     emptyState: { alignItems: "center", paddingVertical: 40, gap: 12 },
     emptyText: { color: theme.textMuted, fontSize: 16, fontFamily: "PoppinsBold" },
@@ -400,6 +478,12 @@ const createStyles = (theme: ThemeColors) => StyleSheet.create({
         marginTop: 8,
         fontStyle: "italic",
     },
+    ratingRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 6,
+        marginTop: 8,
+    },
     locationRow: {
         flexDirection: "row",
         alignItems: "center",
@@ -410,6 +494,23 @@ const createStyles = (theme: ThemeColors) => StyleSheet.create({
         fontSize: 12,
         fontFamily: "InterRegular",
         color: theme.primary,
+    },
+    worksheetSummary: {
+        marginTop: 8,
+        padding: 8,
+        backgroundColor: theme.tertiary + "10",
+        borderRadius: 6,
+        gap: 4,
+    },
+    summaryRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 6,
+    },
+    summaryText: {
+        fontSize: 11,
+        fontFamily: "InterRegular",
+        color: theme.textMuted,
     },
     attemptActions: {
         flexDirection: "row",
@@ -427,6 +528,53 @@ const createStyles = (theme: ThemeColors) => StyleSheet.create({
     viewBtn: { backgroundColor: theme.primary + "15" },
     deleteBtn: { backgroundColor: theme.danger + "15" },
     submitBtn: { backgroundColor: theme.secondary },
-    replaceBtn: { backgroundColor: theme.secondary + "15" },
     actionText: { fontSize: 12, fontFamily: "InterBold" },
+    // Modal styles
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: "rgba(0,0,0,0.6)",
+        justifyContent: "flex-end",
+    },
+    modalContent: {
+        backgroundColor: theme.card,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        padding: 24,
+        paddingBottom: 40,
+    },
+    modalTitle: { fontSize: 20, fontFamily: "PoppinsBold", color: theme.secondary, marginBottom: 4 },
+    modalSubtitle: { fontSize: 13, fontFamily: "InterRegular", color: theme.textMuted, marginBottom: 24 },
+    fieldLabel: { fontSize: 14, fontFamily: "InterMedium", color: theme.secondary, marginBottom: 8, marginTop: 8 },
+    modalTextInput: {
+        borderWidth: 1,
+        borderColor: theme.borderColor,
+        borderRadius: 8,
+        padding: 12,
+        fontFamily: "Inter",
+        fontSize: 14,
+        color: theme.secondary,
+        backgroundColor: theme.surfaceContainer,
+        minHeight: 100,
+        textAlignVertical: "top",
+        marginBottom: 16,
+    },
+    modalStars: {
+        flexDirection: "row",
+        gap: 8,
+        marginBottom: 24,
+    },
+    modalActions: {
+        flexDirection: "row",
+        gap: 12,
+    },
+    modalBtn: {
+        flex: 1,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 8,
+        padding: 14,
+        borderRadius: 10,
+    },
+    modalBtnText: { fontFamily: "InterBold", fontSize: 14 },
 });
