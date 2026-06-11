@@ -3,7 +3,7 @@ import InputGroup from "@/components/inputGroup";
 import { TeamMember } from "@/constants/types";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
-import { saveUserProfile, updateTeamMembers, verifyStoredProfile } from "@/utils/database";
+import { saveUserProfile, updateTeamMembers } from "@/utils/database";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -110,7 +110,6 @@ export default function SignupScreen(){
             }));
 
             await updateTeamMembers(userId, formattedMembers);
-            await verifyStoredProfile(userId);
 
             console.log("Team members saved locally to SQLite successfully!");
             router.push("/(tabs)");
