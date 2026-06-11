@@ -245,10 +245,10 @@ export interface ActivityAttempt {
     formatted: string;
   } | null;
   worksheetData?: WorksheetData;
-  photoUri?: string;        // For Fan Challenge evidence photo
   videoUri?: string;        // For Parachute video evidence
   predictions?: Record<string, string>;
   discussionAnswers?: Record<string, string>;
+  timerDurationMs?: number;  // 20-min challenge elapsed ms for leaderboard eligibility
   createdAt: any; // Timestamp
   updatedAt: any; // Timestamp
 }

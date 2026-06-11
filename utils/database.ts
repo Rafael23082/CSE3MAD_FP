@@ -1,5 +1,7 @@
 import * as SQLite from 'expo-sqlite';
 import { Alert } from "react-native";
+import { db as firestoreDb } from "@/firebase";
+import { doc, setDoc } from "firebase/firestore";
 
 let db: SQLite.SQLiteDatabase | null = null;
 let dbPromise: Promise<SQLite.SQLiteDatabase> | null = null;
@@ -206,6 +208,7 @@ export async function markLogSynced(id: number): Promise<void> {
 export async function saveUserProfile(uid: string, profile: { displayName: string; email: string; teamMembers?: Record<string, unknown>[] }): Promise<void> {
   const database = await getDb();
   
+  // Save to SQLite
   await database.runAsync(
     `INSERT OR REPLACE INTO users (uid, displayName, email, teamMembers, createdAt) 
      VALUES (?, ?, ?, COALESCE((SELECT teamMembers FROM users WHERE uid = ?), ?), COALESCE((SELECT createdAt FROM users WHERE uid = ?), ?))`,
@@ -217,6 +220,17 @@ export async function saveUserProfile(uid: string, profile: { displayName: strin
       uid, new Date().toISOString()
     ]
   );
+
+  // Save to Firestore so leaderboard can read displayName
+  try {
+    await setDoc(doc(firestoreDb, "users", uid), {
+      displayName: profile.displayName,
+      email: profile.email,
+      createdAt: new Date().toISOString(),
+    });
+  } catch (e) {
+    console.warn("Firestore user profile save failed:", e);
+  }
 }
 
 export async function updateTeamMembers(uid: string, teamMembers: Record<string, unknown>[]): Promise<void> {

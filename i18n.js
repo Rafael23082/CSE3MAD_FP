@@ -53,7 +53,12 @@ const resources = {
         save: "Save",
         openCamera: "Open Camera",
         closeCamera: "Close Camera",
-        recordVideo: "Record Video"
+        recordVideo: "Record Video",
+        recordVideoEvidence: "Record Video Evidence",
+        stopRecording: "Stop Recording",
+        saveVideo: "Save Video",
+        retry: "Retry",
+        removeVideo: "Remove"
       },
       landing: {
         slogan: "Experiment. Measure. Improve."
@@ -450,7 +455,9 @@ const resources = {
         confirmReplaceMsg: "This will replace your current official submission. Continue?",
         noData: "No experiment data yet",
         noDataSubtext: "Go to the Experiment tab and log your first trial!",
-        saving: "Saving..."
+        saving: "Saving...",
+        drafts: "Drafts",
+        videoAttached: "Video Evidence Attached"
       },
       worksheet: {
         title: "Worksheet",
@@ -498,6 +505,10 @@ const resources = {
       },
       countdown: {
         getReady: "Get Ready"
+      },
+      common: {
+        cancel: "Cancel",
+        delete: "Delete"
       },
       about: {
         appName: "App Name:",
@@ -652,7 +663,10 @@ const resources = {
         newTrial: "New Trial",
         designPresets: "Design Presets",
         structuralIterations: "Structural Iterations",
-        logTrialPlaceholder: "No trials logged yet. Complete a challenge and tap \"Log Trial\" to record your results."
+        logTrialPlaceholder: "No trials logged yet. Complete a challenge and tap \"Log Trial\" to record your results.",
+        videoEvidence: "Video Evidence",
+        videoAttached: "Video Attached",
+        noVideoRecorded: "No video recorded"
       },
       settings: {
         batteryLevel: "Battery Level"
@@ -708,7 +722,12 @@ const resources = {
         save: "保存",
         openCamera: "カメラを開く",
         closeCamera: "クローズアップカメラ",
-        recordVideo: "ビデオを録画"
+        recordVideo: "ビデオを録画",
+        recordVideoEvidence: "ビデオ証拠を録画",
+        stopRecording: "録画停止",
+        saveVideo: "ビデオを保存",
+        retry: "再試行",
+        removeVideo: "削除"
       },
       landing: {
         slogan: "試行。測定。改善。"
@@ -1012,7 +1031,9 @@ const resources = {
         confirmReplaceMsg: "現在の公式提出を変更します。続行しますか？",
         noData: "実験データがまだありません",
         noDataSubtext: "実験タブに移動して最初の試験を記録してください！",
-        saving: "保存中..."
+        saving: "保存中...",
+        drafts: "下書き",
+        videoAttached: "ビデオ証拠が添付されました"
       },
       errorMessages: {
         invalidCredential: "メールアドレスまたはパスワードが正しくありません",
@@ -1033,6 +1054,10 @@ const resources = {
       },
       countdown: {
         getReady: "準備をしよう"
+      },
+      common: {
+        cancel: "キャンセル",
+        delete: "削除"
       },
       about: {
         appName: "アプリ名：",
@@ -1183,7 +1208,10 @@ const resources = {
         newTrial: "新しい試行",
         designPresets: "デザインプリセット",
         structuralIterations: "構造の反復試行",
-        logTrialPlaceholder: "まだ試行は記録されていません。チャレンジを完了し、「試行を記録」をタップして結果を保存してください。"
+        logTrialPlaceholder: "まだ試行は記録されていません。チャレンジを完了し、「試行を記録」をタップして結果を保存してください。",
+        videoEvidence: "ビデオ証拠",
+        videoAttached: "ビデオが添付されました",
+        noVideoRecorded: "ビデオが記録されていません"
       },
       settings: {
         batteryLevel: "バッテリー残量"

@@ -40,7 +40,7 @@ export default function ActivityGroup({activityKey, activityName, description, i
                 }]}
                 onPress={() => {
                     setActivity(activities[activityKey]);
-                    router.push("/activityDetails")
+                    router.push("/activityAttempt")
                 }}
             >
                 <Image source={imagePath} style={styles.image} resizeMode="cover" />

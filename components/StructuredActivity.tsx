@@ -1,4 +1,5 @@
 import { ACTION_CONFIGS } from "@/constants/data";
+import AngleMeasureOverlay from "@/components/AngleMeasureOverlay";
 import { ActivityContext } from "@/context/ActivityContext";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
@@ -9,11 +10,41 @@ import { AudioModule, getRecordingPermissionsAsync, RecordingPresets, requestRec
 import * as Haptics from 'expo-haptics';
 import { Accelerometer } from 'expo-sensors';
 import { Subscription } from "expo-sensors/build/Pedometer";
+import { CameraView, useCameraPermissions } from 'expo-camera';
+import { useVideoPlayer, VideoView } from 'expo-video';
 import { use, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Svg, { Circle } from "react-native-svg";
+import Svg, { Circle, Line, Rect } from "react-native-svg";
+
+type Sample = { x: number; y: number; z: number; magnitude: number; ts: number };
+
+type AnalysisResult = {
+  maxTiltDeg: number;
+  avgTiltDeg: number;
+  peakAccelG: number;
+  avgAccelG: number;
+  durationSec: number;
+  sampleCount: number;
+};
+
+function analyzeSamples(samples: Sample[]): AnalysisResult {
+  if (samples.length < 2) return { maxTiltDeg: 0, avgTiltDeg: 0, peakAccelG: 0, avgAccelG: 0, durationSec: 0, sampleCount: 0 };
+  const horizontals = samples.map(s => Math.sqrt(s.x * s.x + s.y * s.y));
+  const maxH = Math.max(...horizontals);
+  const avgH = horizontals.reduce((a, b) => a + b, 0) / horizontals.length;
+  const tilts = horizontals.map(h => Math.atan(h) * (180 / Math.PI));
+  return {
+    maxTiltDeg: Math.atan(maxH) * (180 / Math.PI),
+    avgTiltDeg: tilts.reduce((a, b) => a + b, 0) / tilts.length,
+    peakAccelG: maxH,
+    avgAccelG: avgH,
+    durationSec: (samples[samples.length - 1].ts - samples[0].ts) / 1000,
+    sampleCount: samples.length,
+  };
+}
 
 export default function StructuredActivity({ activityKey }: { activityKey: string }) {
   const { t } = useTranslation();
@@ -28,10 +59,9 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
   const hasSoundSensor = activityKey === "sound-pollution-hunter";
   const hasVibrationSensor = activityKey === "earthquake-resistant-structure";
   const hasMovementSensor = activityKey === "stretch-speed-and-gracefulness";
-  const hasTimer = activityKey === "parachute-drop-challenge";
   const isReactionChallenge = activityKey === "reaction-board-challenge";
   const isBreathingChallenge = activityKey === "breathing-pace-trainer";
-  
+  const hasVideo = activityKey === "parachute-drop-challenge";
   const findFirstIncomplete = () => {
     for (let i = 0; i < configs.length; i++) {
       if (!isActionComplete?.(configs[i].id)) return i;
@@ -68,14 +98,14 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
   const [subscription, setSubscription] = useState<any>(null);
   const [peakAccel, setPeakAccel] = useState(0);
   const [liveAccel, setLiveAccel] = useState(0);
-  const magnitudeHistory = useRef<number[]>([]);
+  const samplesRef = useRef<Sample[]>([]);
+  const [liveSamples, setLiveSamples] = useState<Sample[]>([]);
+  const [countdown, setCountdown] = useState(10);
+  const [analysisResults, setAnalysisResults] = useState<Record<string, AnalysisResult>>({});
   const vibrationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Parachute timer state
-  const [timeValue, setTimeValue] = useState(0);
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const startRef = useRef(0);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const startTimeRef = useRef(0);
+  const GRAPH_WINDOW = 120;
 
   // Humarn Performance Lab Vibrations State
   const [isRecordingMovement, setIsRecordingMovement] = useState(false);
@@ -114,31 +144,78 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
 
   const meterIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Fan angle measurement overlay
+  const [angleOverlayVisible, setAngleOverlayVisible] = useState(false);
+
+  // Parachute video evidence
+  const [actionVideoUris, setActionVideoUris] = useState<Record<string, string>>({});
+  const [videoMode, setVideoMode] = useState<'idle' | 'recording' | 'preview'>('idle');
+  const [currentRecordingUri, setCurrentRecordingUri] = useState<string | null>(null);
+  const requestCameraPermission = useCameraPermissions()[1];
+  const cameraRef = useRef<CameraView>(null);
+  const previewPlayer = useVideoPlayer(currentRecordingUri ? { uri: currentRecordingUri } : null, player => {
+    player.loop = true;
+  });
+
+  // Video recording timing for auto-fill Time to Ground
+  const recordingStartRef = useRef(0);
+  const lastRecordingDurationRef = useRef(0);
+
+  // 20-minute activity timer (Parachute only)
+  const timerStartedRef = useRef(false);
+  const [timerStart, setTimerStart] = useState<number | null>(null);
+  const [timeRemaining, setTimeRemaining] = useState(20 * 60 * 1000);
+
+  const formatTimer = (ms: number) => {
+    const totalSec = Math.ceil(ms / 1000);
+    const min = Math.floor(totalSec / 60);
+    const sec = totalSec % 60;
+    return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+  };
+
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
       if (meterIntervalRef.current) clearInterval(meterIntervalRef.current);
       if (vibrationTimerRef.current) clearTimeout(vibrationTimerRef.current);
+      if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
       if (subscription) subscription.remove();
       const r = recorderRef.current;
       if (r) { r.stop().catch(() => {}); r.release(); }
     };
   }, []);
 
-  // Timer effect
+  // Video recording: start after CameraView mounts
+  const videoCancelledRef = useRef(false);
   useEffect(() => {
-    if (isTimerRunning) {
-      intervalRef.current = setInterval(() => {
-        setTimeValue((Date.now() - startRef.current) / 1000);
-      }, 30);
-    } else if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [isTimerRunning]);
+    if (videoMode !== 'recording' || !cameraRef.current) return;
+    videoCancelledRef.current = false;
+    recordingStartRef.current = Date.now();
+    cameraRef.current.recordAsync({ maxDuration: 60 })
+      .then(result => {
+        if (videoCancelledRef.current || !result?.uri) return;
+        lastRecordingDurationRef.current = (Date.now() - recordingStartRef.current) / 1000;
+        setCurrentRecordingUri(result.uri);
+        setVideoMode('preview');
+      })
+      .catch(err => {
+        if (videoCancelledRef.current) return;
+        console.error('Failed to record video:', err);
+        setVideoMode('idle');
+      });
+    return () => { videoCancelledRef.current = true; };
+  }, [videoMode]);
+
+  // 20-minute timer countdown
+  useEffect(() => {
+    if (!timerStart) return;
+    const interval = setInterval(() => {
+      setTimeRemaining(Math.max(0, 20 * 60 * 1000 - (Date.now() - timerStart)));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [timerStart]);
+
+
 
   const startSoundMeter = async () => {
     try {
@@ -195,15 +272,33 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
     setIsVibrating(true);
     setPeakAccel(0);
     setLiveAccel(0);
-    magnitudeHistory.current = [];
-    Accelerometer.setUpdateInterval(100);
+    setCountdown(10);
+    samplesRef.current = [];
+    setLiveSamples([]);
+    startTimeRef.current = Date.now();
+    Accelerometer.setUpdateInterval(50);
     const sub = Accelerometer.addListener(({ x, y, z }) => {
-      const magnitude = Math.sqrt(x * x + y * y + z * z);
-      setLiveAccel(magnitude);
-      magnitudeHistory.current.push(magnitude);
-      if (magnitude > peakAccel) setPeakAccel(magnitude);
+      const sample: Sample = {
+        x, y, z,
+        magnitude: Math.sqrt(x * x + y * y + z * z),
+        ts: Date.now(),
+      };
+      samplesRef.current.push(sample);
+      if (samplesRef.current.length % 2 === 0) {
+        setLiveSamples([...samplesRef.current]);
+      }
+      setLiveAccel(sample.magnitude);
+      setPeakAccel(prev => Math.max(prev, sample.magnitude));
     });
     setSubscription(sub);
+
+    // Auto-stop after 10 seconds with countdown
+    countdownIntervalRef.current = setInterval(() => {
+      const elapsed = (Date.now() - startTimeRef.current) / 1000;
+      const remaining = Math.max(0, 10 - elapsed);
+      setCountdown(Math.ceil(remaining));
+      if (remaining <= 0) stopVibrationTest();
+    }, 250);
 
     const runCycle = async () => {
       try {
@@ -219,11 +314,16 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
   const stopVibrationTest = () => {
     setIsVibrating(false);
     if (vibrationTimerRef.current) clearTimeout(vibrationTimerRef.current);
+    if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
     if (subscription) subscription.remove();
     setSubscription(null);
+    setCountdown(10);
 
-    const avg = magnitudeHistory.current.length > 0
-      ? magnitudeHistory.current.reduce((a, b) => a + b, 0) / magnitudeHistory.current.length
+    const samples = samplesRef.current;
+    setLiveSamples([...samples]);
+
+    const avg = samples.length > 0
+      ? samples.reduce((a, b) => a + b.magnitude, 0) / samples.length
       : 0;
     const swayCm = parseFloat(((avg - 1) * 10).toFixed(1));
     setFormValues(prev => ({ ...prev, measuredMovement: String(swayCm) }));
@@ -485,25 +585,42 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
       setBreathingRecordingState("idle");
   };
 
-  const toggleTimer = () => {
-    if (!isTimerRunning) {
-      startRef.current = Date.now() - (timeValue * 1000);
+  const handleStartRecording = async () => {
+    const { granted } = await requestCameraPermission();
+    if (!granted) {
+      Alert.alert("Permission Required", "Camera permission is needed to record video.");
+      return;
     }
-    setIsTimerRunning(prev => !prev);
+    setVideoMode('recording');
   };
 
-  const resetTimer = () => {
-    setIsTimerRunning(false);
-    setTimeValue(0);
-    setFormValues(prev => ({ ...prev, timeToGround: "0" }));
+  const handleStopRecording = () => {
+    cameraRef.current?.stopRecording();
   };
 
-  // Capture timer value into form
-  useEffect(() => {
-    if (!isTimerRunning && timeValue > 0) {
-      setFormValues(prev => ({ ...prev, timeToGround: timeValue.toFixed(2) }));
+  const saveVideo = () => {
+    if (!currentRecordingUri) return;
+    const duration = lastRecordingDurationRef.current;
+    setActionVideoUris(prev => ({ ...prev, [config.id]: currentRecordingUri }));
+    if (duration > 0) {
+      setFormValues(prev => ({ ...prev, timeToGround: duration.toFixed(2) }));
     }
-  }, [isTimerRunning, timeValue]);
+    setCurrentRecordingUri(null);
+    setVideoMode('idle');
+  };
+
+  const retryRecording = () => {
+    setCurrentRecordingUri(null);
+    setVideoMode('idle');
+  };
+
+  const startChallenge = async () => {
+    if (timerStartedRef.current) return;
+    timerStartedRef.current = true;
+    const now = Date.now();
+    await AsyncStorage.setItem('parachute_timer_start', now.toString());
+    setTimerStart(now);
+  };
 
   const config = configs[currentStep];
   if (!config) return null;
@@ -526,6 +643,10 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
   };
 
   const handleSubmit = () => {
+    if (hasVideo && !actionVideoUris[config.id]) {
+      Alert.alert("Video Required", "Please record video evidence before submitting this action.");
+      return;
+    }
     const missing = config.inputs.filter(input => {
       const val = formValues[input.id];
       return !val || val.trim() === "";
@@ -542,6 +663,10 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
       numericValues[input.id] = input.type === "number" ? parseFloat(val) || 0 : val;
     });
 
+    if (actionVideoUris[config.id]) {
+      numericValues.videoUri = actionVideoUris[config.id];
+    }
+
     setSubmitting(true);
     submitAction?.(config.id, numericValues);
     setFormValues({});
@@ -557,6 +682,8 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
     if (step <= currentStep + 1 || isActionComplete?.(configs[step]?.id)) {
       setCurrentStep(step);
       setFormValues({});
+      setCurrentRecordingUri(null);
+      setVideoMode('idle');
     }
   };
 
@@ -565,6 +692,33 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
 
   return (
     <View style={styles.container}>
+      {/* 20-Minute Timer (Parachute only) */}
+      {hasVideo && (
+        timerStart ? (
+          <View style={[styles.timerBanner, timeRemaining <= 0 && styles.timerBannerExpired]}>
+            <MaterialCommunityIcons name="timer-outline" size={20} color={timeRemaining <= 60000 ? theme.danger : theme.secondary} />
+            <Text style={[styles.timerText, timeRemaining <= 60000 && { color: theme.danger }]}>
+              {formatTimer(timeRemaining)}
+            </Text>
+            {timeRemaining <= 0 && (
+              <Text style={styles.timerExpiredText}>Leaderboard Ineligible</Text>
+            )}
+          </View>
+        ) : (
+          <View style={styles.challengePrompt}>
+            <MaterialCommunityIcons name="timer-outline" size={24} color={theme.secondary} />
+            <Text style={styles.challengeTitle}>20 Minute Challenge</Text>
+            <Text style={styles.challengeSubtitle}>Start the timer when your team is ready</Text>
+            <Pressable
+              style={[styles.sensorButton, { backgroundColor: theme.secondary, marginTop: 4 }]}
+              onPress={startChallenge}
+            >
+              <MaterialCommunityIcons name="play" size={20} color="#fff" />
+              <Text style={styles.sensorButtonText}>Start Challenge</Text>
+            </Pressable>
+          </View>
+        )
+      )}
       {/* Step Indicator */}
       <View style={styles.stepIndicator}>
         {configs.map((c, i) => {
@@ -605,6 +759,41 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
         <View style={styles.allComplete}>
           <MaterialCommunityIcons name="check-circle" size={48} color={theme.tertiary} />
           <Text style={styles.allCompleteText}>All actions completed!</Text>
+          {/* Comparison table for earthquake */}
+          {hasVibrationSensor && configs.some(c => analysisResults[c.id]) && (
+            <View style={styles.tableCard}>
+              <Text style={styles.sectionTitle}>Results Comparison</Text>
+              <View style={styles.tableRow}>
+                <Text style={[styles.tableCell, styles.tableHeader, { flex: 2 }]}>Design</Text>
+                <Text style={[styles.tableCell, styles.tableHeader]}>Max Tilt</Text>
+                <Text style={[styles.tableCell, styles.tableHeader]}>Avg Tilt</Text>
+                <Text style={[styles.tableCell, styles.tableHeader]}>Peak (g)</Text>
+              </View>
+              {configs.map((c, i) => {
+                const result = analysisResults[c.id];
+                if (!result) return null;
+                const ranked = configs
+                  .filter(cc => analysisResults[cc.id])
+                  .sort((a, b) => analysisResults[a.id].avgTiltDeg - analysisResults[b.id].avgTiltDeg);
+                const isBest = ranked.length > 0 && ranked[0].id === c.id;
+                return (
+                  <View key={c.id} style={[styles.tableRow, isBest && styles.bestRow]}>
+                    <Text style={[styles.tableCell, styles.tableCellText, { flex: 2 }]}>
+                      {isBest ? "★ " : ""}{c.label}
+                    </Text>
+                    <Text style={[styles.tableCell, styles.tableCellText]}>{result.maxTiltDeg.toFixed(1)}°</Text>
+                    <Text style={[styles.tableCell, styles.tableCellText]}>{result.avgTiltDeg.toFixed(1)}°</Text>
+                    <Text style={[styles.tableCell, styles.tableCellText]}>{result.peakAccelG.toFixed(3)}</Text>
+                  </View>
+                );
+              })}
+              {configs.filter(c => analysisResults[c.id]).length > 0 && (
+                <Text style={styles.bestDesignText}>
+                  Best: {(configs.filter(c => analysisResults[c.id]).sort((a, b) => analysisResults[a.id].avgTiltDeg - analysisResults[b.id].avgTiltDeg)[0]?.label)} — lowest avg tilt
+                </Text>
+              )}
+            </View>
+          )}
         </View>
       ) : (
         <>
@@ -644,6 +833,60 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
           {hasVibrationSensor && (
             <View style={styles.sensorSection}>
               <Text style={styles.sensorTitle}>Vibration Test</Text>
+
+              {/* Live SVG graph */}
+              <View style={styles.graphContainer}>
+                {liveSamples.length < 2 ? (
+                  <View style={styles.graphPlaceholder}>
+                    <Text style={styles.graphPlaceholderText}>
+                      {liveSamples.length === 0
+                        ? "Tap Record to start capturing vibration data"
+                        : "Collecting samples…"}
+                    </Text>
+                  </View>
+                ) : (
+                  <>
+                    <View style={styles.graphHeader}>
+                      <Text style={styles.graphLabel}>Live Vibration</Text>
+                      <Text style={styles.graphValue}>
+                        {(Math.atan(Math.sqrt(
+                          liveSamples[liveSamples.length - 1].x ** 2 +
+                          liveSamples[liveSamples.length - 1].y ** 2
+                        )) * (180 / Math.PI)).toFixed(1)}°
+                      </Text>
+                    </View>
+                    <Svg width={280} height={140}>
+                      <Rect x={0} y={0} width={280} height={140} fill={theme.card} rx={6} />
+                      <Line x1={0} y1={70} x2={280} y2={70} stroke={theme.borderColor} strokeWidth={1} strokeDasharray="4,4" />
+                      {liveSamples.slice(-GRAPH_WINDOW).map((s, i, arr) => {
+                        if (i === 0) return null;
+                        const horizontal = Math.sqrt(s.x ** 2 + s.y ** 2);
+                        const signed = s.x >= 0 ? horizontal : -horizontal;
+                        const prevH = Math.sqrt(arr[i - 1].x ** 2 + arr[i - 1].y ** 2);
+                        const prevSigned = arr[i - 1].x >= 0 ? prevH : -prevH;
+                        const maxScale = 0.5;
+                        const x1 = ((i - 1) / (arr.length - 1)) * 280;
+                        const y1 = 70 - (prevSigned / maxScale) * 70;
+                        const x2 = (i / (arr.length - 1)) * 280;
+                        const y2 = 70 - (signed / maxScale) * 70;
+                        return (
+                          <Line
+                            key={`${s.ts}-${i}`}
+                            x1={Math.max(0, Math.min(280, x1))}
+                            y1={Math.max(2, Math.min(138, y1))}
+                            x2={Math.max(0, Math.min(280, x2))}
+                            y2={Math.max(2, Math.min(138, y2))}
+                            stroke={theme.danger}
+                            strokeWidth={2}
+                            strokeLinecap="round"
+                          />
+                        );
+                      })}
+                    </Svg>
+                  </>
+                )}
+              </View>
+
               <View style={styles.sensorReading}>
                 <Text style={[styles.sensorValue, { color: liveAccel > 3 ? theme.danger : theme.tertiary }]}>
                   {liveAccel.toFixed(1)}
@@ -659,9 +902,31 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
               >
                 <MaterialCommunityIcons name={isVibrating ? "stop" : "vibrate"} size={20} color="#fff" />
                 <Text style={styles.sensorButtonText}>
-                  {isVibrating ? "Stop" : "Run Vibration Test"}
+                  {isVibrating ? `Stop (${countdown}s)` : "Run Vibration Test"}
                 </Text>
               </Pressable>
+
+              {/* Analysis result card */}
+              {analysisResults[config.id] && !isVibrating && (
+                <View style={styles.resultGrid}>
+                  <View style={styles.resultItem}>
+                    <Text style={styles.resultValue}>{analysisResults[config.id].maxTiltDeg.toFixed(1)}°</Text>
+                    <Text style={styles.resultLabel}>Max Tilt</Text>
+                  </View>
+                  <View style={styles.resultItem}>
+                    <Text style={styles.resultValue}>{analysisResults[config.id].avgTiltDeg.toFixed(1)}°</Text>
+                    <Text style={styles.resultLabel}>Avg Tilt</Text>
+                  </View>
+                  <View style={styles.resultItem}>
+                    <Text style={styles.resultValue}>{analysisResults[config.id].peakAccelG.toFixed(3)}g</Text>
+                    <Text style={styles.resultLabel}>Peak Accel</Text>
+                  </View>
+                  <View style={styles.resultItem}>
+                    <Text style={styles.resultValue}>{analysisResults[config.id].durationSec.toFixed(1)}s</Text>
+                    <Text style={styles.resultLabel}>Duration</Text>
+                  </View>
+                </View>
+              )}
             </View>
           )}
 
@@ -786,42 +1051,117 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
             </View>
           )}
 
-          {hasTimer && (
+          {/* Video Evidence Section (Parachute only) */}
+          {hasVideo && (
             <View style={styles.sensorSection}>
-              <Text style={styles.sensorTitle}>Timer</Text>
-              <Text style={[styles.sensorValue, { color: theme.primary }]}>
-                {timeValue.toFixed(2)}
-              </Text>
-              <Text style={styles.sensorUnit}>seconds</Text>
-              <View style={styles.timerRow}>
-                <Pressable style={[styles.timerBtn, { backgroundColor: theme.surfaceContainer }]} onPress={resetTimer}>
-                  <Text style={[styles.timerBtnText, { color: theme.textMuted }]}>Reset</Text>
-                </Pressable>
+              <Text style={styles.sensorTitle}>{t("attempt.videoEvidence")}</Text>
+              {isActionComplete?.(config.id) ? (
+                actionSubmissions?.[config.id]?.videoUri ? (
+                  <View style={styles.videoAttachedRow}>
+                    <MaterialCommunityIcons name="check-circle" size={20} color={theme.tertiary} />
+                    <Text style={[styles.videoAttachedText, { color: theme.tertiary }]}>{t("attempt.videoAttached")}</Text>
+                  </View>
+                ) : (
+                  <Text style={[styles.autoFillHint, { textAlign: "center" }]}>{t("attempt.noVideoRecorded")}</Text>
+                )
+              ) : (<>
+                {videoMode === 'idle' && !actionVideoUris[config.id] && (
                 <Pressable
-                  style={[styles.timerBtn, { flex: 2, backgroundColor: isTimerRunning ? theme.danger : theme.primary }]}
-                  onPress={toggleTimer}
+                  style={[styles.sensorButton, { backgroundColor: theme.primary }]}
+                  onPress={handleStartRecording}
                 >
-                  <Text style={styles.timerBtnText}>{isTimerRunning ? "Stop" : "Start"}</Text>
+                  <MaterialCommunityIcons name="video" size={20} color="#fff" />
+                  <Text style={styles.sensorButtonText}>{t("buttons.recordVideoEvidence")}</Text>
                 </Pressable>
-              </View>
+              )}
+              {videoMode === 'idle' && actionVideoUris[config.id] && (
+                <View style={styles.videoAttachedRow}>
+                  <MaterialCommunityIcons name="check-circle" size={20} color={theme.tertiary} />
+                  <Text style={[styles.videoAttachedText, { color: theme.tertiary }]}>{t("attempt.videoAttached")}</Text>
+                  <Pressable
+                    style={[styles.sensorButton, { backgroundColor: theme.surfaceContainer }]}
+                    onPress={() => {
+                      setActionVideoUris(prev => {
+                        const next = { ...prev };
+                        delete next[config.id];
+                        return next;
+                      });
+                    }}
+                  >
+                    <Text style={[styles.sensorButtonText, { color: theme.textMuted }]}>{t("buttons.removeVideo")}</Text>
+                  </Pressable>
+                </View>
+              )}
+              {videoMode === 'recording' && (
+                <View style={styles.videoRecorderContainer}>
+                  <CameraView
+                    ref={cameraRef}
+                    style={styles.cameraPreview}
+                    facing="back"
+                    mode="video"
+                  />
+                  <Pressable
+                    style={[styles.sensorButton, { backgroundColor: theme.danger, marginTop: 12 }]}
+                    onPress={handleStopRecording}
+                  >
+                    <MaterialCommunityIcons name="stop" size={20} color="#fff" />
+                    <Text style={styles.sensorButtonText}>{t("buttons.stopRecording")}</Text>
+                  </Pressable>
+                </View>
+              )}
+              {videoMode === 'preview' && currentRecordingUri && (
+                <View style={styles.videoPreviewContainer}>
+                  <VideoView
+                    player={previewPlayer}
+                    style={styles.videoPreview}
+                    nativeControls
+                    contentFit="contain"
+                  />
+                  <View style={styles.videoPreviewButtons}>
+                    <Pressable
+                      style={[styles.videoPreviewBtn, { backgroundColor: theme.tertiary }]}
+                      onPress={saveVideo}
+                    >
+                      <MaterialCommunityIcons name="content-save" size={18} color="#fff" />
+                      <Text style={styles.videoPreviewBtnText}>{t("buttons.saveVideo")}</Text>
+                    </Pressable>
+                    <Pressable
+                      style={[styles.videoPreviewBtn, { backgroundColor: theme.danger }]}
+                      onPress={retryRecording}
+                    >
+                      <MaterialCommunityIcons name="refresh" size={18} color="#fff" />
+                      <Text style={styles.videoPreviewBtnText}>{t("buttons.retry")}</Text>
+                    </Pressable>
+                  </View>
+                </View>
+              )}
+              </>)}
             </View>
           )}
 
           {/* Fan live calculation */}
-          {activityKey === "hand-fan-challenge" && formValues.observedAngle && (
-            <View style={styles.calcRow}>
-              <View style={styles.calcCard}>
-                <Text style={styles.calcLabel}>Angle (rad)</Text>
-                <Text style={styles.calcValue}>
-                  {degreesToRadians(parseFloat(formValues.observedAngle) || 0).toFixed(3)}
-                </Text>
-              </View>
-              <View style={styles.calcCard}>
-                <Text style={styles.calcLabel}>Force (N)</Text>
-                <Text style={styles.calcValue}>
-                  {calculateFanForce(0.2, parseFloat(formValues.observedAngle) || 0).toFixed(3)}
-                </Text>
-              </View>
+          {activityKey === "hand-fan-challenge" && (
+            <View style={styles.calcSection}>
+              <Text style={styles.calcSectionTitle}>F ≈ k · θ</Text>
+              <Text style={styles.calcHint}>k = stiffness (paper 1, cardboard 3), θ = bend angle</Text>
+              {formValues.observedAngle ? (
+                <View style={styles.calcRow}>
+                  <View style={styles.calcCard}>
+                    <Text style={styles.calcLabel}>Angle (rad)</Text>
+                    <Text style={styles.calcValue}>
+                      {degreesToRadians(parseFloat(formValues.observedAngle) || 0).toFixed(3)}
+                    </Text>
+                  </View>
+                  <View style={styles.calcCard}>
+                    <Text style={styles.calcLabel}>Force (k·θ)</Text>
+                    <Text style={styles.calcValue}>
+                      {calculateFanForce(0.2, parseFloat(formValues.observedAngle) || 0).toFixed(3)}
+                    </Text>
+                  </View>
+                </View>
+              ) : (
+                <Text style={styles.autoFillHint}>Enter an observed angle to calculate force</Text>
+              )}
             </View>
           )}
 
@@ -830,7 +1170,7 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
             {config.inputs.map((input) => {
               const isAutoFill = (input.id === "measuredDb" && hasSoundSensor) ||
                 (input.id === "measuredMovement" && hasVibrationSensor) ||
-                (input.id === "timeToGround" && hasTimer);
+                (input.id === "timeToGround" && hasVideo);
               return (
                 <View key={input.id} style={styles.fieldContainer}>
                   <Text style={styles.fieldLabel}>
@@ -867,6 +1207,15 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
                       )}
                     </View>
                   )}
+                  {activityKey === "hand-fan-challenge" && input.id === "observedAngle" && !isActionComplete?.(config.id) && (
+                    <Pressable
+                      style={[styles.measureBtn, { borderColor: theme.secondary }]}
+                      onPress={() => setAngleOverlayVisible(true)}
+                    >
+                      <MaterialCommunityIcons name="camera" size={16} color={theme.secondary} />
+                      <Text style={[styles.measureBtnText, { color: theme.secondary }]}>Measure Bend Angle</Text>
+                    </Pressable>
+                  )}
                 </View>
               );
             })}
@@ -893,7 +1242,7 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
                 styles.nextBtn,
                 pressed && { opacity: 0.85 },
               ]}
-              onPress={() => { setCurrentStep(currentStep + 1); setFormValues({}); }}
+              onPress={() => { setCurrentStep(currentStep + 1); setFormValues({}); setCurrentRecordingUri(null); setVideoMode('idle'); }}
             >
               <Text style={styles.nextBtnText}>Next Action</Text>
               <MaterialCommunityIcons name="arrow-right" size={20} color={theme.secondary} />
@@ -901,6 +1250,15 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
           )}
         </>
       )}
+
+      <AngleMeasureOverlay
+        visible={angleOverlayVisible}
+        onSave={(angle) => {
+          handleInputChange("observedAngle", String(angle));
+          setAngleOverlayVisible(false);
+        }}
+        onCancel={() => setAngleOverlayVisible(false)}
+      />
     </View>
   );
 }
@@ -908,6 +1266,48 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
 const createStyles = (theme: ThemeColors) => StyleSheet.create({
   container: { paddingVertical: 8 },
   errorText: { fontFamily: "InterRegular", fontSize: 14, color: theme.danger, textAlign: "center" },
+  timerBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    marginBottom: 12,
+    borderRadius: 12,
+    backgroundColor: theme.surfaceContainer,
+  },
+  timerBannerExpired: {
+    backgroundColor: theme.danger + "20",
+    borderWidth: 1,
+    borderColor: theme.danger,
+  },
+  timerText: { fontFamily: "PoppinsBold", fontSize: 20, color: theme.secondary },
+  measureBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    marginTop: 4,
+  },
+  measureBtnText: { fontFamily: "InterSemiBold", fontSize: 13 },
+  timerExpiredText: { fontFamily: "InterRegular", fontSize: 12, color: theme.danger, marginLeft: 4 },
+  challengePrompt: {
+    alignItems: "center",
+    paddingVertical: 16,
+    marginBottom: 12,
+    borderRadius: 12,
+    backgroundColor: theme.surfaceContainer,
+    borderWidth: 1,
+    borderColor: theme.borderColor,
+    gap: 8,
+  },
+  challengeTitle: { fontFamily: "PoppinsBold", fontSize: 16, color: theme.secondary },
+  challengeSubtitle: { fontFamily: "InterRegular", fontSize: 12, color: theme.textMuted },
   stepIndicator: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -957,6 +1357,16 @@ const createStyles = (theme: ThemeColors) => StyleSheet.create({
   sensorValue: { fontSize: 48, fontFamily: "InterBold" },
   sensorUnit: { fontSize: 18, color: theme.textMuted, fontFamily: "InterRegular" },
   sensorMeta: { fontFamily: "InterRegular", fontSize: 12, color: theme.textMuted, marginBottom: 8 },
+  graphContainer: { width: "100%", marginBottom: 12 },
+  graphPlaceholder: { height: 140, alignItems: "center", justifyContent: "center", backgroundColor: theme.card, borderRadius: 6, paddingHorizontal: 20 },
+  graphPlaceholderText: { fontFamily: "InterRegular", fontSize: 12, color: theme.textMuted, textAlign: "center" },
+  graphHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 6 },
+  graphLabel: { fontFamily: "InterBold", fontSize: 11, color: theme.textMuted },
+  graphValue: { fontFamily: "InterBold", fontSize: 18, color: theme.danger },
+  resultGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 12, width: "100%" },
+  resultItem: { flex: 1, minWidth: "40%", backgroundColor: theme.card, borderRadius: 8, padding: 10, alignItems: "center" },
+  resultValue: { fontFamily: "InterBold", fontSize: 18, color: theme.secondary },
+  resultLabel: { fontFamily: "InterRegular", fontSize: 10, color: theme.textMuted, textTransform: "uppercase", marginTop: 2 },
   sensorButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -967,9 +1377,6 @@ const createStyles = (theme: ThemeColors) => StyleSheet.create({
     marginTop: 4,
   },
   sensorButtonText: { color: "#fff", fontFamily: "InterBold", fontSize: 13 },
-  timerRow: { flexDirection: "row", gap: 12, marginTop: 8, width: "100%" },
-  timerBtn: { flex: 1, padding: 12, borderRadius: 8, alignItems: "center" },
-  timerBtnText: { color: "#fff", fontFamily: "InterBold", fontSize: 14 },
   calcRow: { flexDirection: "row", gap: 12, marginBottom: 16 },
   calcCard: {
     flex: 1,
@@ -981,6 +1388,9 @@ const createStyles = (theme: ThemeColors) => StyleSheet.create({
   },
   calcLabel: { fontFamily: "InterRegular", fontSize: 11, color: theme.textMuted, marginBottom: 4 },
   calcValue: { fontFamily: "PoppinsBold", fontSize: 16, color: theme.primary },
+  calcSection: { backgroundColor: theme.surfaceContainer, borderRadius: 12, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: theme.borderColor },
+  calcSectionTitle: { fontFamily: "PoppinsBold", fontSize: 16, color: theme.primary, textAlign: "center" },
+  calcHint: { fontFamily: "InterRegular", fontSize: 11, color: theme.textMuted, textAlign: "center", marginBottom: 12 },
   formSection: { gap: 16, marginBottom: 20 },
   fieldContainer: { gap: 6 },
   fieldLabel: { fontFamily: "InterMedium", fontSize: 13, color: theme.secondary },
@@ -1031,43 +1441,33 @@ const createStyles = (theme: ThemeColors) => StyleSheet.create({
   nextBtnText: { fontFamily: "InterBold", fontSize: 14, color: theme.secondary },
   allComplete: { alignItems: "center", paddingVertical: 24, gap: 12 },
   allCompleteText: { fontFamily: "PoppinsBold", fontSize: 16, color: theme.tertiary },
-  cardContainer: {
-    marginBottom: 16
-  },
+  cardContainer: { marginBottom: 16 },
   reactionBoxContainer: {
-      borderRadius: 20,
-      backgroundColor: theme.card,
-      height: 320,
-      display: "flex",
-      alignItems: "center",
-      flexDirection: "row",
-      position: "relative",
-      marginBottom: 16
+    borderRadius: 20, backgroundColor: theme.card, height: 320,
+    display: "flex", alignItems: "center", flexDirection: "row",
+    position: "relative", marginBottom: 16,
   },
-  placeholderText: {
-      fontFamily: "PoppinsRegular",
-      fontSize: 14,
-      color: theme.secondary,
-      textAlign: "center",
-      width: "100%",
-      paddingHorizontal: 24
+  placeholderText: { fontFamily: "PoppinsRegular", fontSize: 14, color: theme.secondary, textAlign: "center", width: "100%", paddingHorizontal: 24 },
+  button: { backgroundColor: theme.primary, width: 80, height: 80, borderRadius: 10, justifyContent: "center", alignItems: "center", display: "flex", position: "absolute" },
+  buttonText: { color: "#FFFFFF", fontFamily: "InterSemiBold", width: "100%", textAlign: "center", lineHeight: 18, fontSize: 16 },
+  sectionTitle: { fontFamily: "PoppinsBold", fontSize: 14, color: theme.secondary, marginBottom: 8, textAlign: "center" },
+  tableCard: { backgroundColor: theme.surfaceContainer, borderRadius: 12, padding: 16, marginTop: 16, borderWidth: 1, borderColor: theme.borderColor, width: "100%" },
+  tableRow: { flexDirection: "row", borderBottomWidth: 1, borderBottomColor: theme.borderColor, paddingVertical: 8 },
+  bestRow: { backgroundColor: theme.tertiary + "15", borderRadius: 6, paddingHorizontal: 4 },
+  tableCell: { flex: 1, paddingHorizontal: 4 },
+  tableHeader: { fontFamily: "InterBold", fontSize: 10, color: theme.textMuted, textTransform: "uppercase" },
+  tableCellText: { fontFamily: "InterMedium", fontSize: 12, color: theme.secondary },
+  bestDesignText: { fontFamily: "InterBold", fontSize: 12, color: theme.tertiary, marginTop: 8, textAlign: "center" },
+  videoAttachedRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+  videoAttachedText: { fontFamily: "InterBold", fontSize: 14 },
+  videoRecorderContainer: { width: "100%", alignItems: "center" },
+  cameraPreview: { width: "100%", height: 250, borderRadius: 8, overflow: "hidden" },
+  videoPreviewContainer: { width: "100%", alignItems: "center" },
+  videoPreview: { width: "100%", height: 250, borderRadius: 8, overflow: "hidden" },
+  videoPreviewButtons: { flexDirection: "row", gap: 12, marginTop: 12 },
+  videoPreviewBtn: {
+    flexDirection: "row", alignItems: "center", gap: 6,
+    paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8,
   },
-  button: {
-      backgroundColor: theme.primary,
-      width: 80,
-      height: 80,
-      borderRadius: 10,
-      justifyContent: "center",
-      alignItems: "center",
-      display: "flex",
-      position: "absolute",
-  },
-  buttonText: {
-      color: "#FFFFFF",
-      fontFamily: "InterSemiBold",
-      width: "100%",
-      textAlign: "center",
-      lineHeight: 18,
-      fontSize: 16
-  },
+  videoPreviewBtnText: { color: "#fff", fontFamily: "InterBold", fontSize: 13 },
 });

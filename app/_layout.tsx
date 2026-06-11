@@ -2,6 +2,7 @@ import { ActivityProvider } from '@/context/ActivityContext';
 import { AuthProvider } from '@/context/AuthContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { registerBackgroundTask, registerSyncOnForeground } from '@/utils/backgroundSync';
+import { configureNotifications, requestNotificationPermissions } from '@/utils/notifications';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import { Stack } from 'expo-router';
@@ -25,6 +26,8 @@ export default function RootLayout() {
   useEffect(() => {
     initI18n();
     registerBackgroundTask();
+    configureNotifications();
+    requestNotificationPermissions().catch(() => {});
 
     const cleanupSync = registerSyncOnForeground();
     return () => {
@@ -45,11 +48,10 @@ export default function RootLayout() {
                 <Stack.Screen name="home" options={{ headerShown: false }} />
                 <Stack.Screen name="login" options={{ headerShown: false }} />
                 <Stack.Screen name="signup" options={{ headerShown: false }} />
-                <Stack.Screen name="activityDetails" options={{ headerShown: false }} />
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                 <Stack.Screen name="activityAttempt" options={{ headerShown: false }} />
                 <Stack.Screen name="activityResults" options={{ headerShown: false }} />
-                <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+                <Stack.Screen name="attemptDetail" options={{ presentation: 'modal', title: 'Attempt Details' }} />
                 <Stack.Screen name="sensor-debug" options={{ headerShown: false }} />
               </Stack>
               <StatusBar style="auto" />

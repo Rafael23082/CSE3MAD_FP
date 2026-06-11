@@ -69,10 +69,10 @@ export async function createAttempt(
   rating: number | null = null,
   location?: ActivityLocation,
   worksheetData?: WorksheetData,
-  photoUri?: string,
   videoUri?: string,
   predictions?: Record<string, string>,
-  discussionAnswers?: Record<string, string>
+  discussionAnswers?: Record<string, string>,
+  timerDurationMs?: number
 ): Promise<string> {
   const now = new Date();
 
@@ -87,10 +87,10 @@ export async function createAttempt(
     submittedToLeaderboardAt: null,
     location: location ?? null,
     worksheetData: worksheetData ?? null,
-    photoUri: photoUri ?? null,
     videoUri: videoUri ?? null,
     predictions: predictions ?? null,
     discussionAnswers: discussionAnswers ?? null,
+    timerDurationMs: timerDurationMs ?? null,
     createdAt: Timestamp.fromDate(now),
     updatedAt: Timestamp.fromDate(now),
   });

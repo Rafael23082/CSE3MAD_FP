@@ -12,9 +12,10 @@ import {
 import { showActivityCompleted } from '@/utils/notifications';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 import React, { use, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Alert, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Linking, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 export default function JournalScreen() {
     const { t } = useTranslation();
@@ -33,6 +34,7 @@ export default function JournalScreen() {
     const [modalReflection, setModalReflection] = useState('');
     const [modalRating, setModalRating] = useState<number | null>(null);
 
+    const router = useRouter();
     const activity = activityContext?.activity;
     const userId = auth?.user?.uid;
 
@@ -185,10 +187,72 @@ export default function JournalScreen() {
         return !!(hasLogs && hasPredictions && hasDiscussion);
     };
 
+    const getActivityKey = (): string => {
+        return activity?.key || "";
+    };
+
+    const renderPredictionComparison = (attempt: ActivityAttempt) => {
+        const actKey = getActivityKey();
+        if (actKey !== "sound-pollution-hunter") return null;
+        if (!attempt.predictions?.loudestAction || !attempt.logs?.length) return null;
+
+        const predicted = attempt.predictions.loudestAction;
+        const actionLabels = ["Dropping Books", "Stomping Feet", "Clapping Hands"];
+        const actionLogs = attempt.logs.filter(l => actionLabels.includes(String(l.data?.actionId === "action-1" ? "Dropping Books" : l.data?.actionId === "action-2" ? "Stomping Feet" : l.data?.actionId === "action-3" ? "Clapping Hands" : "")));
+        const dBReadings: { action: string; dB: number }[] = [];
+        for (const log of attempt.logs) {
+            const actionId = log.data?.actionId;
+            const dB = log.data?.measuredDb;
+            if (actionId && typeof dB === "number") {
+                const label = actionId === "action-1" ? "Dropping Books" : actionId === "action-2" ? "Stomping Feet" : actionId === "action-3" ? "Clapping Hands" : String(actionId);
+                dBReadings.push({ action: label, dB });
+            }
+        }
+
+        if (dBReadings.length === 0) return null;
+
+        const loudest = [...dBReadings].sort((a, b) => b.dB - a.dB)[0];
+        const wasCorrect = predicted.toLowerCase().trim() === loudest.action.toLowerCase().trim();
+
+        return (
+            <View style={styles.predictionComparison}>
+                <View style={styles.summaryRow}>
+                    <MaterialCommunityIcons name="brain" size={14} color={theme.tertiary} />
+                    <Text style={styles.summaryText}>
+                        Predicted loudest: <Text style={{ fontFamily: "InterBold", color: theme.secondary }}>{predicted}</Text>
+                    </Text>
+                </View>
+                {dBReadings.map((r, i) => (
+                    <View key={i} style={styles.summaryRow}>
+                        <MaterialCommunityIcons
+                            name={r.action === loudest.action ? "volume-high" : "volume-medium"}
+                            size={14}
+                            color={r.action === loudest.action ? theme.danger : theme.textMuted}
+                        />
+                        <Text style={styles.summaryText}>
+                            {r.action}: <Text style={{ fontFamily: "InterBold" }}>{r.dB} dB</Text>
+                        </Text>
+                    </View>
+                ))}
+                <View style={[styles.summaryRow, { marginTop: 4 }]}>
+                    <MaterialCommunityIcons
+                        name={wasCorrect ? "check-circle" : "close-circle"}
+                        size={14}
+                        color={wasCorrect ? theme.tertiary : theme.danger}
+                    />
+                    <Text style={styles.summaryText}>
+                        {wasCorrect ? "Prediction was correct!" : `Actual loudest: ${loudest.action} (${loudest.dB} dB)`}
+                    </Text>
+                </View>
+            </View>
+        );
+    };
+
     const renderAttemptSummary = (attempt: ActivityAttempt) => {
         return (
             <View style={styles.worksheetSummary}>
-                {attempt.predictions && Object.keys(attempt.predictions).length > 0 && (
+                {renderPredictionComparison(attempt)}
+                {attempt.predictions && Object.keys(attempt.predictions).length > 0 && getActivityKey() !== "sound-pollution-hunter" && (
                     <View style={styles.summaryRow}>
                         <MaterialCommunityIcons name="brain" size={14} color={theme.tertiary} />
                         <Text style={styles.summaryText}>
@@ -204,16 +268,10 @@ export default function JournalScreen() {
                         </Text>
                     </View>
                 )}
-                {attempt.photoUri && (
-                    <View style={styles.summaryRow}>
-                        <MaterialCommunityIcons name="camera" size={14} color={theme.tertiary} />
-                        <Text style={styles.summaryText}>Evidence Photo Attached</Text>
-                    </View>
-                )}
-                {attempt.videoUri && (
+                {attempt.logs.some(log => !!log.data?.videoUri) && (
                     <View style={styles.summaryRow}>
                         <MaterialCommunityIcons name="video" size={14} color={theme.tertiary} />
-                        <Text style={styles.summaryText}>Video Evidence Attached</Text>
+                        <Text style={styles.summaryText}>{t("journal.videoAttached")}</Text>
                     </View>
                 )}
             </View>
@@ -259,12 +317,20 @@ export default function JournalScreen() {
                                     <Text style={styles.metricLabel}>
                                         {getMetricLabel()}: <Text style={styles.metricValue}>{getMetricValue(officialAttempt.logs).toFixed(2)}</Text>
                                     </Text>
-                                    {officialAttempt.location && (
-                                        <View style={styles.locationRow}>
-                                            <MaterialCommunityIcons name="map-marker" size={14} color={theme.primary} />
-                                            <Text style={styles.locationText}>{officialAttempt.location.formatted}</Text>
-                                        </View>
-                                    )}
+{officialAttempt.location ? (
+    <Pressable style={styles.locationRow} onPress={() => {
+        const url = `https://maps.google.com/?q=${officialAttempt.location!.latitude},${officialAttempt.location!.longitude}`;
+        Linking.openURL(url).catch(() => {});
+    }}>
+        <MaterialCommunityIcons name="map-marker" size={14} color={theme.primary} />
+        <Text style={styles.locationText}>{officialAttempt.location.latitude.toFixed(6)}, {officialAttempt.location.longitude.toFixed(6)}</Text>
+    </Pressable>
+) : (
+    <View style={styles.locationRow}>
+        <MaterialCommunityIcons name="map-marker-off" size={14} color={theme.textMuted} />
+        <Text style={[styles.locationText, { color: theme.textMuted }]}>Location Not Available</Text>
+    </View>
+)}
                                     {renderAttemptSummary(officialAttempt)}
                                     {officialAttempt.reflection ? (
                                         <Text style={styles.reflectionPreview} numberOfLines={2}>
@@ -301,12 +367,20 @@ export default function JournalScreen() {
                                         <Text style={styles.metricLabel}>
                                             {getMetricLabel()}: <Text style={styles.metricValue}>{getMetricValue(attempt.logs).toFixed(2)}</Text>
                                         </Text>
-                                        {attempt.location && (
-                                            <View style={styles.locationRow}>
-                                                <MaterialCommunityIcons name="map-marker" size={14} color={theme.primary} />
-                                                <Text style={styles.locationText}>{attempt.location.formatted}</Text>
-                                            </View>
-                                        )}
+{attempt.location ? (
+    <Pressable style={styles.locationRow} onPress={() => {
+        const url = `https://maps.google.com/?q=${attempt.location!.latitude},${attempt.location!.longitude}`;
+        Linking.openURL(url).catch(() => {});
+    }}>
+        <MaterialCommunityIcons name="map-marker" size={14} color={theme.primary} />
+        <Text style={styles.locationText}>{attempt.location.latitude.toFixed(6)}, {attempt.location.longitude.toFixed(6)}</Text>
+    </Pressable>
+) : (
+    <View style={styles.locationRow}>
+        <MaterialCommunityIcons name="map-marker-off" size={14} color={theme.textMuted} />
+        <Text style={[styles.locationText, { color: theme.textMuted }]}>Location Not Available</Text>
+    </View>
+)}
                                         {renderAttemptSummary(attempt)}
                                         {attempt.reflection ? (
                                             <Text style={styles.reflectionPreview} numberOfLines={2}>
@@ -319,7 +393,9 @@ export default function JournalScreen() {
                                     <View style={styles.attemptActions}>
                                         <Pressable
                                             style={[styles.actionBtn, styles.viewBtn]}
-                                            onPress={() => Alert.alert("View", "Attempt details coming soon")}
+                                            onPress={() => {
+                                                router.push({ pathname: "/attemptDetail", params: { attempt: JSON.stringify(attempt), activityKey: activity?.key || "" } });
+                                            }}
                                         >
                                             <MaterialCommunityIcons name="eye" size={16} color={theme.primary} />
                                             <Text style={[styles.actionText, { color: theme.primary }]}>{t("journal.viewAttempt")}</Text>
@@ -336,6 +412,10 @@ export default function JournalScreen() {
                                             onPress={() => {
                                                 if (!isAttemptComplete(attempt)) {
                                                     Alert.alert("Incomplete", "Complete all experiment actions, predictions, and discussion before submitting.");
+                                                    return;
+                                                }
+                                                if (attempt.timerDurationMs && attempt.timerDurationMs > 20 * 60 * 1000) {
+                                                    Alert.alert("Time Exceeded", "This attempt took longer than 20 minutes and is not eligible for leaderboard submission. It remains saved in your journal.");
                                                     return;
                                                 }
                                                 openReflectionModal(attempt);
@@ -500,6 +580,10 @@ const createStyles = (theme: ThemeColors) => StyleSheet.create({
         padding: 8,
         backgroundColor: theme.tertiary + "10",
         borderRadius: 6,
+        gap: 4,
+    },
+    predictionComparison: {
+        marginBottom: 8,
         gap: 4,
     },
     summaryRow: {

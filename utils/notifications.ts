@@ -1,39 +1,60 @@
-import { Alert, Platform, ToastAndroid } from 'react-native';
+import Constants from 'expo-constants';
+import { Alert, Platform } from 'react-native';
+import * as Notifications from 'expo-notifications';
 
-function showToast(title: string, body: string) {
-  if (Platform.OS === 'android') {
-    ToastAndroid.show(`${title}: ${body}`, ToastAndroid.SHORT);
-  } else {
+const isExpoGo = Constants.executionEnvironment === 'storeClient';
+
+function scheduleNotification(title: string, body: string) {
+  if (isExpoGo) {
     Alert.alert(title, body);
+    return;
+  }
+  Notifications.scheduleNotificationAsync({
+    content: { title, body },
+    trigger: null,
+  }).catch(() => {});
+}
+
+export function configureNotifications() {
+  if (isExpoGo) return;
+
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+      shouldShowBanner: true,
+      shouldShowList: true,
+    }),
+  });
+
+  if (Platform.OS === 'android') {
+    Notifications.setNotificationChannelAsync('activity-complete', {
+      name: 'Activity Complete',
+      importance: Notifications.AndroidImportance.HIGH,
+    });
   }
 }
 
-export function configureNotifications() {}
-
 export async function requestNotificationPermissions(): Promise<boolean> {
-  return true;
+  if (isExpoGo) return false;
+  const { status } = await Notifications.requestPermissionsAsync();
+  return status === 'granted';
 }
 
 export function showActivitySaved(): void {
-  showToast('Activity Saved', 'Your experiment data has been recorded.');
+  scheduleNotification('Activity Saved', 'Your experiment data has been recorded.');
 }
 
 export function showActivitySubmitted(points: number): void {
-  showToast('Activity Submitted', `You earned ${points} points!`);
+  scheduleNotification('Activity Submitted', `You earned ${points} points!`);
 }
 
-export function showActivityCompleted(activityName: string): void {
-  showToast('Activity Completed', `Your team completed ${activityName}!`);
+export async function showActivityCompleted(activityName: string): Promise<void> {
+  scheduleNotification('Congratulations!', `You have finished ${activityName}`);
 }
 
-export function showLowBatteryWarning(level: number): void {
-  showToast('Low Battery', `Your battery is at ${level}%.`);
-}
-
-/**
- * Show background sync completed notification
- */
 export async function showSyncCompleted(count: number): Promise<void> {
   if (count === 0) return;
-  showToast('Sync Completed', `${count} experiment(s) synced to cloud.`);
+  scheduleNotification('Sync Completed', `${count} experiment(s) synced to cloud.`);
 }

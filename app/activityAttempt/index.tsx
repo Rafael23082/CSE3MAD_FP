@@ -4,10 +4,12 @@ import { AuthContext } from "@/context/AuthContext";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { createAttempt } from "@/utils/activityAttempts";
+import { captureLocation } from "@/utils/location";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { use, useState } from "react";
 import { useTranslation } from "react-i18next";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -54,34 +56,34 @@ const DISCUSSION_QUESTIONS: Record<string, { id: string; question: string }[]> =
     };
 
 const PREDICTION_FIELDS: Record<string, { id: string; label: string; type: "radio" | "text" | "dropdown"; options?: string[] }[]> = {
-    "parachute-drop-challenge": [
-        { id: "bestDesign", label: "Which parachute design do you think will stay in the air the longest?", type: "radio", options: ["Design 1", "Design 2", "Design 3"] },
-        { id: "bestDesignReason", label: "Why do you think this design will perform best?", type: "text" },
-    ],
-    "sound-pollution-hunter": [
-        { id: "loudestAction", label: "Which action do you think will produce the loudest sound?", type: "dropdown", options: ["Drop Book", "Talking", "Conversation", "Walking", "Stomping Feet", "Closing Door"] },
-        { id: "loudestReason", label: "Why?", type: "text" },
-    ],
-    "hand-fan-challenge": [
-        { id: "bestDistance", label: "Which fan distance will create the largest movement?", type: "radio", options: ["15 cm", "30 cm", "45 cm"] },
-        { id: "bestDistanceReason", label: "Why?", type: "text" },
-    ],
-    "earthquake-resistant-structure": [
-        { id: "mostStable", label: "Which structure do you think will be most stable?", type: "text" },
-        { id: "mostStableReason", label: "Why?", type: "text" },
-    ],
-    "stretch-speed-and-gracefulness": [
-        { id: "mostStable", label: "Which movement do you think will be most stable?", type: "text" },
-        { id: "mostStableReason", label: "Why?", type: "text" },
-    ],
-    "reaction-board-challenge": [
-        { id: "reactionTimeDifferencePrediction", label: "How much do you think will be the difference between your dominant and non-dominant hand reaction time (ms)?", type: "text" },
-        { id: "reactionTimeDifferenceReason", label: "Why?", type: "text" },
-    ],
-    "breathing-pace-trainer": [
-        { id: "mostBpm", label: "Which activitiy do you think will result in the hights BPM?", type: "text" },
-        { id: "mostBpmReason", label: "Why?", type: "text" },
-    ],
+  "parachute-drop-challenge": [
+    { id: "bestDesign", label: "Which parachute design do you think will stay in the air the longest?", type: "radio", options: ["Design 1", "Design 2", "Design 3"] },
+    { id: "bestDesignReason", label: "Why do you think this design will perform best?", type: "text" },
+  ],
+  "sound-pollution-hunter": [
+    { id: "loudestAction", label: "Which action do you think will produce the loudest sound?", type: "dropdown", options: ["Dropping Books", "Stomping Feet", "Clapping Hands"] },
+    { id: "loudestReason", label: "Explain Why", type: "text" },
+  ],
+  "hand-fan-challenge": [
+    { id: "bestDistance", label: "Which fan distance will create the largest movement?", type: "radio", options: ["15 cm", "30 cm", "45 cm"] },
+    { id: "bestDistanceReason", label: "Why?", type: "text" },
+  ],
+  "earthquake-resistant-structure": [
+    { id: "mostStable", label: "Which structure do you think will be most stable?", type: "text" },
+    { id: "mostStableReason", label: "Why?", type: "text" },
+  ],
+  "stretch-speed-and-gracefulness": [
+    { id: "mostStable", label: "Which movement do you think will be most stable?", type: "text" },
+    { id: "mostStableReason", label: "Why?", type: "text" },
+  ],
+  "reaction-board-challenge": [
+    { id: "reactionTimeDifferencePrediction", label: "How much do you think will be the difference between your dominant and non-dominant hand reaction time (ms)?", type: "text" },
+    { id: "reactionTimeDifferenceReason", label: "Why?", type: "text" },
+  ],
+  "breathing-pace-trainer": [
+    { id: "mostBpm", label: "Which activitiy do you think will result in the hights BPM?", type: "text" },
+    { id: "mostBpmReason", label: "Why?", type: "text" },
+  ],
 };
 
 export default function ActivityAttemptMainScreen(){
@@ -157,6 +159,16 @@ export default function ActivityAttemptMainScreen(){
         return;
       }
 
+      // Read 20-min challenge timer duration (parachute only)
+      let timerDurationMs: number | undefined;
+      const storedStart = await AsyncStorage.getItem('parachute_timer_start');
+      if (storedStart) {
+        timerDurationMs = Date.now() - parseInt(storedStart, 10);
+      }
+
+      // Capture GPS location at submission time
+      const submissionLocation = (await captureLocation()) ?? undefined;
+
       const allLogs = Object.entries(activityContext.actionSubmissions).map(([actionId, values]) => ({
         activityKey: activity.key,
         data: { actionId, ...values },
@@ -169,13 +181,16 @@ export default function ActivityAttemptMainScreen(){
         allLogs,
         currentReflection,
         currentRating,
-        undefined,
-        undefined,
+        submissionLocation,
         undefined,
         undefined,
         currentPredictions,
-        currentDiscussionAnswers
+        currentDiscussionAnswers,
+        timerDurationMs
       );
+
+      // Clear timer for next attempt
+      await AsyncStorage.removeItem('parachute_timer_start');
 
       Alert.alert("Saved", "Your attempt has been saved successfully.", [
         { text: "OK", onPress: () => {

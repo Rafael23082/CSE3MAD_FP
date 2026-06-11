@@ -13,8 +13,8 @@ export const ACTION_CONFIGS: Record<string, ActionConfig[]> = {
       subtitle: "Test a small parachute design",
       inputs: [
         { id: "timeToGround", label: "Time to Ground (s)", type: "number", placeholder: "0.00" },
-        { id: "timeUntilStop", label: "Time Until Stop Moving (s)", type: "number", placeholder: "0.00" },
-        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what happened..." },
+        { id: "landingAccuracy", label: "Landing Accuracy (m)", type: "number", placeholder: "0.0" },
+        { id: "observation", label: "Observation Notes", type: "text", placeholder: "Describe what happened..." },
       ],
     },
     {
@@ -23,8 +23,8 @@ export const ACTION_CONFIGS: Record<string, ActionConfig[]> = {
       subtitle: "Test a medium parachute design",
       inputs: [
         { id: "timeToGround", label: "Time to Ground (s)", type: "number", placeholder: "0.00" },
-        { id: "timeUntilStop", label: "Time Until Stop Moving (s)", type: "number", placeholder: "0.00" },
-        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what happened..." },
+        { id: "landingAccuracy", label: "Landing Accuracy (m)", type: "number", placeholder: "0.0" },
+        { id: "observation", label: "Observation Notes", type: "text", placeholder: "Describe what happened..." },
       ],
     },
     {
@@ -33,40 +33,37 @@ export const ACTION_CONFIGS: Record<string, ActionConfig[]> = {
       subtitle: "Test a large parachute design",
       inputs: [
         { id: "timeToGround", label: "Time to Ground (s)", type: "number", placeholder: "0.00" },
-        { id: "timeUntilStop", label: "Time Until Stop Moving (s)", type: "number", placeholder: "0.00" },
-        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what happened..." },
+        { id: "landingAccuracy", label: "Landing Accuracy (m)", type: "number", placeholder: "0.0" },
+        { id: "observation", label: "Observation Notes", type: "text", placeholder: "Describe what happened..." },
       ],
     },
   ],
   "sound-pollution-hunter": [
     {
       id: "action-1",
-      label: "Dropping Book",
-      subtitle: "Measure sound level when dropping a book",
+      label: "Dropping Books",
+      subtitle: "Measure sound level when dropping books",
       inputs: [
-        { id: "prediction", label: "Prediction", type: "text", placeholder: "Louder or Softer than talking?" },
         { id: "measuredDb", label: "Measured dB", type: "number", placeholder: "Use sound meter" },
-        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what you observed..." },
+        { id: "observation", label: "Observation Notes", type: "text", placeholder: "Describe what you observed..." },
       ],
     },
     {
       id: "action-2",
-      label: "Talking",
-      subtitle: "Measure sound level of conversation",
+      label: "Stomping Feet",
+      subtitle: "Measure sound level of stomping feet",
       inputs: [
-        { id: "prediction", label: "Prediction", type: "text", placeholder: "Louder or Softer than book drop?" },
         { id: "measuredDb", label: "Measured dB", type: "number", placeholder: "Use sound meter" },
-        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what you observed..." },
+        { id: "observation", label: "Observation Notes", type: "text", placeholder: "Describe what you observed..." },
       ],
     },
     {
       id: "action-3",
-      label: "Walking",
-      subtitle: "Measure sound level of walking",
+      label: "Clapping Hands",
+      subtitle: "Measure sound level of clapping hands",
       inputs: [
-        { id: "prediction", label: "Prediction", type: "text", placeholder: "Louder or Softer than talking?" },
         { id: "measuredDb", label: "Measured dB", type: "number", placeholder: "Use sound meter" },
-        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what you observed..." },
+        { id: "observation", label: "Observation Notes", type: "text", placeholder: "Describe what you observed..." },
       ],
     },
   ],
@@ -76,9 +73,10 @@ export const ACTION_CONFIGS: Record<string, ActionConfig[]> = {
       label: "15cm",
       subtitle: "Fan from 15cm away",
       inputs: [
-        { id: "predictedAngle", label: "Predicted Bend Angle (°)", type: "number", placeholder: "0" },
+        { id: "foldsCount", label: "Number of Folds", type: "number", placeholder: "0" },
+        { id: "materialUsed", label: "Material Used", type: "text", placeholder: "Paper or Cardboard" },
         { id: "observedAngle", label: "Observed Bend Angle (°)", type: "number", placeholder: "0" },
-        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what happened..." },
+        { id: "observation", label: "Observation Notes", type: "text", placeholder: "Describe what happened..." },
       ],
     },
     {
@@ -86,9 +84,10 @@ export const ACTION_CONFIGS: Record<string, ActionConfig[]> = {
       label: "30cm",
       subtitle: "Fan from 30cm away",
       inputs: [
-        { id: "predictedAngle", label: "Predicted Bend Angle (°)", type: "number", placeholder: "0" },
+        { id: "foldsCount", label: "Number of Folds", type: "number", placeholder: "0" },
+        { id: "materialUsed", label: "Material Used", type: "text", placeholder: "Paper or Cardboard" },
         { id: "observedAngle", label: "Observed Bend Angle (°)", type: "number", placeholder: "0" },
-        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what happened..." },
+        { id: "observation", label: "Observation Notes", type: "text", placeholder: "Describe what happened..." },
       ],
     },
     {
@@ -96,9 +95,10 @@ export const ACTION_CONFIGS: Record<string, ActionConfig[]> = {
       label: "45cm",
       subtitle: "Fan from 45cm away",
       inputs: [
-        { id: "predictedAngle", label: "Predicted Bend Angle (°)", type: "number", placeholder: "0" },
+        { id: "foldsCount", label: "Number of Folds", type: "number", placeholder: "0" },
+        { id: "materialUsed", label: "Material Used", type: "text", placeholder: "Paper or Cardboard" },
         { id: "observedAngle", label: "Observed Bend Angle (°)", type: "number", placeholder: "0" },
-        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what happened..." },
+        { id: "observation", label: "Observation Notes", type: "text", placeholder: "Describe what happened..." },
       ],
     },
   ],
@@ -108,9 +108,10 @@ export const ACTION_CONFIGS: Record<string, ActionConfig[]> = {
       label: "Design 1",
       subtitle: "4 folds + 4 pillars",
       inputs: [
+        { id: "designDescription", label: "Design Description", type: "text", placeholder: "e.g. 6 folds and 5 pillars" },
         { id: "predictedMovement", label: "Predicted Movement (cm)", type: "number", placeholder: "0.0" },
         { id: "measuredMovement", label: "Measured Movement (cm)", type: "number", placeholder: "Use vibration test" },
-        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what happened..." },
+        { id: "observation", label: "Observation Notes", type: "text", placeholder: "Describe what happened..." },
       ],
     },
     {
@@ -118,9 +119,10 @@ export const ACTION_CONFIGS: Record<string, ActionConfig[]> = {
       label: "Design 2",
       subtitle: "10 folds + 4 pillars",
       inputs: [
+        { id: "designDescription", label: "Design Description", type: "text", placeholder: "e.g. 6 folds and 5 pillars" },
         { id: "predictedMovement", label: "Predicted Movement (cm)", type: "number", placeholder: "0.0" },
         { id: "measuredMovement", label: "Measured Movement (cm)", type: "number", placeholder: "Use vibration test" },
-        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what happened..." },
+        { id: "observation", label: "Observation Notes", type: "text", placeholder: "Describe what happened..." },
       ],
     },
     {
@@ -128,9 +130,10 @@ export const ACTION_CONFIGS: Record<string, ActionConfig[]> = {
       label: "Design 3",
       subtitle: "3 folds + 6 pillars",
       inputs: [
+        { id: "designDescription", label: "Design Description", type: "text", placeholder: "e.g. 6 folds and 5 pillars" },
         { id: "predictedMovement", label: "Predicted Movement (cm)", type: "number", placeholder: "0.0" },
         { id: "measuredMovement", label: "Measured Movement (cm)", type: "number", placeholder: "Use vibration test" },
-        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what happened..." },
+        { id: "observation", label: "Observation Notes", type: "text", placeholder: "Describe what happened..." },
       ],
     },
   ],
@@ -330,7 +333,7 @@ export const ACTIVITIES: Record<string, ActivityMetadata> = {
     category: 'Engineering & Earth Science',
     subTitle: 'Design and test architectural structures that withstand simulated earthquake vibrations.',
     curriculumCode: ['ACSSU096', 'ACTDEP036'],
-    overview: 'Students design anti-vibration layers using folded paper, cardboard platforms, and custom pillars, then record seismic vector movement using the phone accelerometer to evaluate structural resilience.',
+    overview: 'Students design anti-vibration layers using folded paper, cardboard platforms, and custom pillars, then record seismic vector movement using the phone accelerometer to evaluate structural resilience. Example designs: Design 1 (4 folds + 4 pillars), Design 2 (10 folds + 4 pillars), Design 3 (3 folds + 6 pillars). These are starting points — you may create your own designs.',
     equipment: [
       { name: 'Cardboard & Paper', icon: 'category' },
       { name: 'Scissors & Sticky tape', icon: 'content_cut' },
@@ -338,7 +341,7 @@ export const ACTIVITIES: Record<string, ActivityMetadata> = {
       { name: 'Mobile phone with accelerometer', icon: 'smartphone' }
     ],
     procedure: [
-      { stepNumber: 1, title: 'Build anti-vibration layer', description: 'Fold paper or cardboard into pleated structures representing damping joints.' },
+      { stepNumber: 1, title: 'Choose or design a structure', description: 'Start with an example (4 folds + 4 pillars, 10 folds + 4 pillars, or 3 folds + 6 pillars) or create your own. Record your design description.' },
       { stepNumber: 2, title: 'Place elevated platform', description: 'Secure a flat cardboard deck on top of your damping structures.' },
       { stepNumber: 3, title: 'Setup phone and trigger sensor', description: 'Place the phone in the center and activate vibration measurement on the STEMM App.' },
       { stepNumber: 4, title: 'Vibrate & Record', description: 'Generate horizontal movement on the testing table, and monitor live vector changes.' },
