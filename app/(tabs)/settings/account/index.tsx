@@ -124,6 +124,7 @@ export default function AccountSettingsScreen() {
       </View>
 
       <SettingsOption text={t("account.changePassword")} action={()=>{router.push("/(tabs)/settings/account/changePassword")}} paddingTop={false} />
+      <SettingsOption text={t("team.members")} action={()=>{router.push("/(tabs)/settings/account/members")}} paddingTop={true} />
       <Pressable
         style={styles.option}
         onPress={handleLogout}

@@ -297,3 +297,16 @@ export async function updateDisplayName(uid: string, displayName: string): Promi
     [displayName, uid]
   );
 }
+
+export const fetchTeam = async (uid: string) => {
+  const database = await getDb();
+  const user = await database.getFirstAsync<{ teamMembers: string }>(
+    "SELECT teamMembers FROM users WHERE uid = ?", 
+    [uid]
+  );
+  
+  if (user?.teamMembers) {
+    const parsed = JSON.parse(user.teamMembers);
+    return parsed
+  }
+};
