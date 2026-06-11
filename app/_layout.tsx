@@ -10,9 +10,6 @@ import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import { initI18n } from "../i18n";
-import { configureNotifications, requestNotificationPermissions } from '../utils/notifications';
-
-configureNotifications();
 
 export default function RootLayout() {
   useFonts({
@@ -27,7 +24,6 @@ export default function RootLayout() {
 
   useEffect(() => {
     initI18n();
-    requestNotificationPermissions();
     registerBackgroundTask();
 
     const cleanupSync = registerSyncOnForeground();
@@ -50,7 +46,6 @@ export default function RootLayout() {
                 <Stack.Screen name="login" options={{ headerShown: false }} />
                 <Stack.Screen name="signup" options={{ headerShown: false }} />
                 <Stack.Screen name="activityDetails" options={{ headerShown: false }} />
-                <Stack.Screen name="teamInitialization" options={{ headerShown: false }} />
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                 <Stack.Screen name="activityAttempt" options={{ headerShown: false }} />
                 <Stack.Screen name="activityResults" options={{ headerShown: false }} />

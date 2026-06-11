@@ -1,133 +1,340 @@
-import BreathingAttemptScreen from "@/components/breathingAttempt";
-import EarthquakeAttemptScreen from "@/components/earthquakeAttempt";
-import FanAttemptScreen from "@/components/fanAttempt";
-import HumanPerformanceLabAttemptScreen from "@/components/humanPerformanceLabAttempt";
-import ParachuteAttemptScreen from "@/components/parachuteAttempt";
-import ReactionBoardAttemptScreen from "@/components/reactionBoardAttempt";
-import SoundAttemptScreen from "@/components/soundAttempt";
+import StructuredActivity from "@/components/StructuredActivity";
 import { ActivityContext } from "@/context/ActivityContext";
 import { AuthContext } from "@/context/AuthContext";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { createAttempt } from "@/utils/activityAttempts";
-import { captureLocation } from "@/utils/location";
-import { showActivitySaved } from "@/utils/notifications";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { use, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+const DISCUSSION_QUESTIONS: Record<string, { id: string; question: string }[]> = {
+  "parachute-drop-challenge": [
+    { id: "predictionsCorrect", question: "Were your predictions correct?" },
+    { id: "bestDesign", question: "Which parachute design worked best?" },
+    { id: "effectiveDesign", question: "What made that design effective?" },
+    { id: "improvements", question: "What would you improve next time?" },
+  ],
+  "sound-pollution-hunter": [
+    { id: "loudestAction", question: "Which action was loudest?" },
+    { id: "quietestAction", question: "Which action was quietest?" },
+    { id: "surprise", question: "What surprised you?" },
+    { id: "noiseReduction", question: "How can noise pollution be reduced?" },
+  ],
+  "hand-fan-challenge": [
+    { id: "largestMovement", question: "Which distance produced the largest movement?" },
+    { id: "distanceEffect", question: "How did distance affect airflow?" },
+    { id: "improvements", question: "What would you improve?" },
+  ],
+  "earthquake-resistant-structure": [
+    { id: "mostStable", question: "Which structure was most stable?" },
+    { id: "mostMovement", question: "Which moved the most?" },
+    { id: "designFeature", question: "What design feature improved stability?" },
+    { id: "changes", question: "What would you change next time?" },
+  ],
+};
+
+const PREDICTION_FIELDS: Record<string, { id: string; label: string; type: "radio" | "text" | "dropdown"; options?: string[] }[]> = {
+  "parachute-drop-challenge": [
+    { id: "bestDesign", label: "Which parachute design do you think will stay in the air the longest?", type: "radio", options: ["Design 1", "Design 2", "Design 3"] },
+    { id: "bestDesignReason", label: "Why do you think this design will perform best?", type: "text" },
+  ],
+  "sound-pollution-hunter": [
+    { id: "loudestAction", label: "Which action do you think will produce the loudest sound?", type: "dropdown", options: ["Drop Book", "Talking", "Conversation", "Walking", "Stomping Feet", "Closing Door"] },
+    { id: "loudestReason", label: "Why?", type: "text" },
+  ],
+  "hand-fan-challenge": [
+    { id: "bestDistance", label: "Which fan distance will create the largest movement?", type: "radio", options: ["15 cm", "30 cm", "45 cm"] },
+    { id: "bestDistanceReason", label: "Why?", type: "text" },
+  ],
+  "earthquake-resistant-structure": [
+    { id: "mostStable", label: "Which structure do you think will be most stable?", type: "text" },
+    { id: "mostStableReason", label: "Why?", type: "text" },
+  ],
+};
 
 export default function ActivityAttemptMainScreen(){
   const { t } = useTranslation();
   const { theme } = useTheme();
   const styles = createStyles(theme);
   const activityContext = use(ActivityContext);
-  const auth = use(AuthContext);
+  const authContext = use(AuthContext);
   const router = useRouter();
-  const [saving, setSaving] = useState(false);
+  const insets = useSafeAreaInsets();
 
-  if (!activityContext) return null;
+  const {
+    activity,
+    predictions, setPredictions,
+    discussionAnswers, setDiscussionAnswers,
+    reflection, setReflection,
+    rating, setRating,
+    completedActions,
+    clearActivityState
+  } = activityContext || {};
 
-  const {activity, experimentLogs} = activityContext;
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleSaveAttempt = async () => {
-      if (!activity || !auth?.user?.uid) return;
+  if (!activityContext || !activity) return null;
 
-      // Get current logs for this activity
-      const currentLogs = experimentLogs.filter(log => log.activityKey === activity.key);
+  const predictionFields = PREDICTION_FIELDS[activity.key] || [];
+  const discussionQuestions = DISCUSSION_QUESTIONS[activity.key] || [];
+  const currentPredictions = predictions || {};
+  const currentDiscussionAnswers = discussionAnswers || {};
+  const currentReflection = reflection || "";
+  const currentRating = rating;
+  const currentCompletedActions = completedActions || [];
 
-      if (currentLogs.length === 0) {
-          Alert.alert(t("journal.noData"), t("journal.noDataSubtext"));
-          return;
-      }
-
-      setSaving(true);
-      try {
-          const location = await captureLocation();
-
-          await createAttempt(
-              auth.user.uid,
-              activity.key,
-              currentLogs.map(log => ({
-                  activityKey: log.activityKey,
-                  timestamp: log.timestamp,
-                  data: { ...(log.data ?? {}) },
-              })),
-              "",
-              null,
-              location ?? undefined
-          );
-
-          await showActivitySaved();
-
-          Alert.alert(
-              t("journal.attemptSaved"),
-              "",
-              [
-                  {
-                      text: t("journal.viewJournal"),
-                      onPress: () => router.push("/activityAttempt/journal")
-                  },
-                  {
-                      text: t("common.ok"),
-                      style: "cancel"
-                  }
-              ]
-          );
-      } catch (e) {
-          console.error("Failed to save attempt:", e);
-          Alert.alert(t("journal.submitError"));
-      } finally {
-          setSaving(false);
-      }
+  const handlePredictionChange = (id: string, value: string) => {
+    setPredictions?.((prev: Record<string, string>) => ({ ...prev, [id]: value }));
   };
 
-  const renderScreen = () => {
-      switch (activity?.key){
-          case "breathing-pace-trainer":
-              return <BreathingAttemptScreen />;
-          case "reaction-board-challenge":
-              return <ReactionBoardAttemptScreen />;
-          case "stretch-speed-and-gracefulness":
-              return <HumanPerformanceLabAttemptScreen />;
-          case "parachute-drop-challenge":
-              return <ParachuteAttemptScreen />;
-          case "sound-pollution-hunter":
-              return <SoundAttemptScreen />;
-          case "hand-fan-challenge":
-              return <FanAttemptScreen />;
-          case "earthquake-resistant-structure":
-              return <EarthquakeAttemptScreen />;
-          default:
-              return <Text>{t("common.notImplemented")}</Text>;
+  const handleDiscussionChange = (id: string, value: string) => {
+    setDiscussionAnswers?.((prev: Record<string, string>) => ({ ...prev, [id]: value }));
+  };
+
+  const isComplete = (): boolean => {
+    if (currentCompletedActions.length < 3) return false;
+
+    const hasPredictions = predictionFields.every(field => {
+      const value = currentPredictions[field.id];
+      return value && value.trim() !== "";
+    });
+    if (!hasPredictions) return false;
+
+    const hasDiscussion = discussionQuestions.every(q => {
+      const value = currentDiscussionAnswers[q.id];
+      return value && value.trim() !== "";
+    });
+    if (!hasDiscussion) return false;
+
+    if (!currentReflection.trim()) return false;
+
+    return true;
+  };
+
+  const handleSave = async () => {
+    if (!isComplete()) {
+      Alert.alert("Incomplete", "Please complete all sections before saving.");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const user = authContext?.user;
+      if (!user) {
+        Alert.alert("Error", "You must be logged in to save.");
+        return;
       }
+
+      const allLogs = Object.entries(activityContext.actionSubmissions).map(([actionId, values]) => ({
+        activityKey: activity.key,
+        data: { actionId, ...values },
+        timestamp: Date.now(),
+      }));
+
+      await createAttempt(
+        user.uid,
+        activity.key,
+        allLogs,
+        currentReflection,
+        currentRating,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        currentPredictions,
+        currentDiscussionAnswers
+      );
+
+      Alert.alert("Saved", "Your attempt has been saved successfully.", [
+        { text: "OK", onPress: () => {
+          clearActivityState?.();
+          router.push({ pathname: "/activityAttempt/journal", params: { refresh: Date.now().toString() } });
+        }}
+      ]);
+    } catch (error) {
+      console.error("Save failed:", error);
+      Alert.alert("Error", "Failed to save attempt. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
       <View style={styles.container}>
-          <View style={styles.screenContainer}>
-              {renderScreen()}
-          </View>
+          <ScrollView
+            contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 100 }]}
+            showsVerticalScrollIndicator={false}
+          >
+              {/* 1. Predictions Section */}
+              <View style={styles.section}>
+                  <Text style={styles.sectionTitle}>Predictions</Text>
+                  {predictionFields.map((field) => (
+                      <View key={field.id} style={styles.fieldContainer}>
+                          <Text style={styles.fieldLabel}>{field.label}</Text>
+                          {field.type === "radio" && field.options && (
+                              <View style={styles.radioGroup}>
+                                  {field.options.map((option) => (
+                                      <Pressable
+                                          key={option}
+                                          style={[
+                                              styles.radioOption,
+                                              currentPredictions[field.id] === option && styles.radioOptionSelected
+                                          ]}
+                                          onPress={() => handlePredictionChange(field.id, option)}
+                                      >
+                                          <View style={[
+                                              styles.radioCircle,
+                                              currentPredictions[field.id] === option && styles.radioCircleSelected
+                                          ]} />
+                                          <Text style={styles.radioText}>{option}</Text>
+                                      </Pressable>
+                                  ))}
+                              </View>
+                          )}
+                          {field.type === "text" && (
+                              <TextInput
+                                  style={styles.textInput}
+                                  value={currentPredictions[field.id] || ""}
+                                  onChangeText={(value) => handlePredictionChange(field.id, value)}
+                                  placeholder="Enter your answer"
+                                  placeholderTextColor={theme.textMuted}
+                                  multiline
+                              />
+                          )}
+                          {field.type === "dropdown" && field.options && (
+                              <View style={styles.dropdownContainer}>
+                                  {field.options.map((option) => (
+                                      <Pressable
+                                          key={option}
+                                          style={[
+                                              styles.dropdownOption,
+                                              currentPredictions[field.id] === option && styles.dropdownOptionSelected
+                                          ]}
+                                          onPress={() => handlePredictionChange(field.id, option)}
+                                      >
+                                          <Text style={[
+                                              styles.dropdownText,
+                                              currentPredictions[field.id] === option && styles.dropdownTextSelected
+                                          ]}>{option}</Text>
+                                      </Pressable>
+                                  ))}
+                              </View>
+                          )}
+                      </View>
+                  ))}
+              </View>
 
-          {/* Save Attempt Button */}
-          <View style={styles.saveContainer}>
+              {/* 2. Structured Actions */}
+              <View style={styles.section}>
+                  <Text style={styles.sectionTitle}>Experiment Records</Text>
+                  <StructuredActivity activityKey={activity.key} />
+              </View>
+
+              {/* 3. Discussion Questions Section */}
+              <View style={styles.section}>
+                  <Text style={styles.sectionTitle}>Discussion Questions</Text>
+                  {discussionQuestions.map((q) => (
+                      <View key={q.id} style={styles.fieldContainer}>
+                          <Text style={styles.fieldLabel}>{q.question}</Text>
+                          <TextInput
+                              style={styles.textInput}
+                              value={currentDiscussionAnswers[q.id] || ""}
+                              onChangeText={(value) => handleDiscussionChange(q.id, value)}
+                              placeholder="Enter your answer"
+                              placeholderTextColor={theme.textMuted}
+                              multiline
+                          />
+                      </View>
+                  ))}
+              </View>
+
+              {/* 4. Reflection Section */}
+              <View style={styles.section}>
+                  <Text style={styles.sectionTitle}>Reflection</Text>
+                  <TextInput
+                      style={[styles.textInput, styles.reflectionInput]}
+                      value={currentReflection}
+                      onChangeText={setReflection}
+                      placeholder="What did you learn from this experiment?"
+                      placeholderTextColor={theme.textMuted}
+                      multiline
+                  />
+                  <View style={styles.ratingContainer}>
+                      <Text style={styles.ratingLabel}>Rate your experience:</Text>
+                      <View style={styles.ratingStars}>
+                          {[1, 2, 3, 4, 5].map((star) => (
+                              <Pressable
+                                  key={star}
+                                  onPress={() => setRating?.(star)}
+                              >
+                                  <MaterialCommunityIcons
+                                      name={currentRating && star <= currentRating ? "star" : "star-outline"}
+                                      size={32}
+                                      color={currentRating && star <= currentRating ? "#FFD700" : theme.textMuted}
+                                  />
+                              </Pressable>
+                          ))}
+                      </View>
+                  </View>
+              </View>
+
+              {/* Progress Indicators */}
+              <View style={styles.progressSection}>
+                  <View style={styles.progressRow}>
+                      <MaterialCommunityIcons
+                          name={currentCompletedActions.length >= 3 ? "check-circle" : "circle-outline"}
+                          size={20}
+                          color={currentCompletedActions.length >= 3 ? theme.tertiary : theme.textMuted}
+                      />
+                      <Text style={styles.progressText}>
+                          Actions: {currentCompletedActions.length}/3
+                      </Text>
+                  </View>
+                  <View style={styles.progressRow}>
+                      <MaterialCommunityIcons
+                          name={predictionFields.every(f => currentPredictions[f.id]?.trim()) ? "check-circle" : "circle-outline"}
+                          size={20}
+                          color={predictionFields.every(f => currentPredictions[f.id]?.trim()) ? theme.tertiary : theme.textMuted}
+                      />
+                      <Text style={styles.progressText}>Predictions</Text>
+                  </View>
+                  <View style={styles.progressRow}>
+                      <MaterialCommunityIcons
+                          name={discussionQuestions.every(q => currentDiscussionAnswers[q.id]?.trim()) ? "check-circle" : "circle-outline"}
+                          size={20}
+                          color={discussionQuestions.every(q => currentDiscussionAnswers[q.id]?.trim()) ? theme.tertiary : theme.textMuted}
+                      />
+                      <Text style={styles.progressText}>Discussion</Text>
+                  </View>
+                  <View style={styles.progressRow}>
+                      <MaterialCommunityIcons
+                          name={currentReflection.trim() ? "check-circle" : "circle-outline"}
+                          size={20}
+                          color={currentReflection.trim() ? theme.tertiary : theme.textMuted}
+                      />
+                      <Text style={styles.progressText}>Reflection</Text>
+                  </View>
+              </View>
+          </ScrollView>
+
+          {/* Save Button */}
+          <View style={[styles.saveContainer, { paddingBottom: insets.bottom + 16 }]}>
               <Pressable
                   style={({ pressed }) => [
                       styles.saveBtn,
-                      { backgroundColor: saving ? theme.textMuted : theme.secondary },
-                      pressed && !saving && { opacity: 0.85 },
+                      { backgroundColor: isComplete() ? theme.secondary : theme.textMuted },
+                      pressed && { opacity: 0.85 },
                   ]}
-                  onPress={handleSaveAttempt}
-                  disabled={saving}
+                  onPress={handleSave}
+                  disabled={!isComplete() || isSaving}
               >
-                  {saving ? (
-                      <ActivityIndicator size="small" color="#fff" />
-                  ) : (
-                      <MaterialCommunityIcons name="content-save" size={20} color="#fff" />
-                  )}
+                  <MaterialCommunityIcons name="content-save" size={20} color="#fff" />
                   <Text style={styles.saveBtnText}>
-                      {saving ? t("journal.saving") : t("journal.saveAttempt")}
+                      {isSaving ? "Saving..." : "Save Attempt"}
                   </Text>
               </Pressable>
           </View>
@@ -138,13 +345,139 @@ export default function ActivityAttemptMainScreen(){
 const createStyles = (theme: ThemeColors) => StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: theme.backgroundColor,
     },
-    screenContainer: {
-        flex: 1,
+    scrollContent: {
+        flexGrow: 1,
+    },
+    section: {
+        padding: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: theme.borderColor,
+    },
+    sectionTitle: {
+        fontFamily: "PoppinsBold",
+        fontSize: 18,
+        color: theme.primary,
+        marginBottom: 16,
+    },
+    fieldContainer: {
+        marginBottom: 20,
+    },
+    fieldLabel: {
+        fontFamily: "PoppinsMedium",
+        fontSize: 14,
+        color: theme.secondary,
+        marginBottom: 8,
+    },
+    textInput: {
+        borderWidth: 1,
+        borderColor: theme.borderColor,
+        borderRadius: 8,
+        padding: 12,
+        fontFamily: "Inter",
+        fontSize: 14,
+        color: theme.secondary,
+        backgroundColor: theme.surfaceContainer,
+        minHeight: 48,
+        textAlignVertical: "top",
+    },
+    reflectionInput: {
+        minHeight: 100,
+    },
+    radioGroup: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        gap: 12,
+    },
+    radioOption: {
+        flexDirection: "row",
+        alignItems: "center",
+        padding: 12,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: theme.borderColor,
+        backgroundColor: theme.surfaceContainer,
+        minWidth: 100,
+    },
+    radioOptionSelected: {
+        borderColor: theme.secondary,
+        backgroundColor: theme.secondary + "10",
+    },
+    radioCircle: {
+        width: 16,
+        height: 16,
+        borderRadius: 8,
+        borderWidth: 2,
+        borderColor: theme.borderColor,
+        marginRight: 8,
+    },
+    radioCircleSelected: {
+        borderColor: theme.secondary,
+        backgroundColor: theme.secondary,
+    },
+    radioText: {
+        fontFamily: "Inter",
+        fontSize: 14,
+        color: theme.secondary,
+    },
+    dropdownContainer: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        gap: 8,
+    },
+    dropdownOption: {
+        padding: 10,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: theme.borderColor,
+        backgroundColor: theme.surfaceContainer,
+    },
+    dropdownOptionSelected: {
+        borderColor: theme.secondary,
+        backgroundColor: theme.secondary,
+    },
+    dropdownText: {
+        fontFamily: "Inter",
+        fontSize: 14,
+        color: theme.secondary,
+    },
+    dropdownTextSelected: {
+        color: "#fff",
+    },
+    ratingContainer: {
+        marginTop: 16,
+    },
+    ratingLabel: {
+        fontFamily: "PoppinsMedium",
+        fontSize: 14,
+        color: theme.secondary,
+        marginBottom: 8,
+    },
+    ratingStars: {
+        flexDirection: "row",
+        gap: 8,
+    },
+    progressSection: {
+        padding: 16,
+        gap: 8,
+    },
+    progressRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 8,
+    },
+    progressText: {
+        fontFamily: "Inter",
+        fontSize: 14,
+        color: theme.secondary,
     },
     saveContainer: {
+        position: "absolute",
+        bottom: 0,
+        left: 0,
+        right: 0,
         padding: 16,
-        paddingBottom: 24,
         backgroundColor: theme.backgroundColor,
         borderTopWidth: 1,
         borderTopColor: theme.borderColor,

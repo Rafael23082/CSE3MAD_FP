@@ -1,8 +1,140 @@
-import { ParachuteTrial, SoundReading, FanMaterial, FanDesign, EarthquakeDesign } from './types';
+import { ParachuteTrial, SoundReading, FanMaterial, FanDesign, EarthquakeDesign, ActionConfig } from './types';
 
 export const TOTAL_ACTIVITIES = 7;
 export const POINTS_PER_ACTIVITY = 100;
 export const MAX_POINTS = TOTAL_ACTIVITIES * POINTS_PER_ACTIVITY;
+
+// Structured 3-Action Templates for Activities 1-4
+export const ACTION_CONFIGS: Record<string, ActionConfig[]> = {
+  "parachute-drop-challenge": [
+    {
+      id: "action-1",
+      label: "Small Parachute",
+      subtitle: "Test a small parachute design",
+      inputs: [
+        { id: "timeToGround", label: "Time to Ground (s)", type: "number", placeholder: "0.00" },
+        { id: "timeUntilStop", label: "Time Until Stop Moving (s)", type: "number", placeholder: "0.00" },
+        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what happened..." },
+      ],
+    },
+    {
+      id: "action-2",
+      label: "Medium Parachute",
+      subtitle: "Test a medium parachute design",
+      inputs: [
+        { id: "timeToGround", label: "Time to Ground (s)", type: "number", placeholder: "0.00" },
+        { id: "timeUntilStop", label: "Time Until Stop Moving (s)", type: "number", placeholder: "0.00" },
+        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what happened..." },
+      ],
+    },
+    {
+      id: "action-3",
+      label: "Large Parachute",
+      subtitle: "Test a large parachute design",
+      inputs: [
+        { id: "timeToGround", label: "Time to Ground (s)", type: "number", placeholder: "0.00" },
+        { id: "timeUntilStop", label: "Time Until Stop Moving (s)", type: "number", placeholder: "0.00" },
+        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what happened..." },
+      ],
+    },
+  ],
+  "sound-pollution-hunter": [
+    {
+      id: "action-1",
+      label: "Dropping Book",
+      subtitle: "Measure sound level when dropping a book",
+      inputs: [
+        { id: "prediction", label: "Prediction", type: "text", placeholder: "Louder or Softer than talking?" },
+        { id: "measuredDb", label: "Measured dB", type: "number", placeholder: "Use sound meter" },
+        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what you observed..." },
+      ],
+    },
+    {
+      id: "action-2",
+      label: "Talking",
+      subtitle: "Measure sound level of conversation",
+      inputs: [
+        { id: "prediction", label: "Prediction", type: "text", placeholder: "Louder or Softer than book drop?" },
+        { id: "measuredDb", label: "Measured dB", type: "number", placeholder: "Use sound meter" },
+        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what you observed..." },
+      ],
+    },
+    {
+      id: "action-3",
+      label: "Walking",
+      subtitle: "Measure sound level of walking",
+      inputs: [
+        { id: "prediction", label: "Prediction", type: "text", placeholder: "Louder or Softer than talking?" },
+        { id: "measuredDb", label: "Measured dB", type: "number", placeholder: "Use sound meter" },
+        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what you observed..." },
+      ],
+    },
+  ],
+  "hand-fan-challenge": [
+    {
+      id: "action-1",
+      label: "15cm",
+      subtitle: "Fan from 15cm away",
+      inputs: [
+        { id: "predictedAngle", label: "Predicted Bend Angle (°)", type: "number", placeholder: "0" },
+        { id: "observedAngle", label: "Observed Bend Angle (°)", type: "number", placeholder: "0" },
+        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what happened..." },
+      ],
+    },
+    {
+      id: "action-2",
+      label: "30cm",
+      subtitle: "Fan from 30cm away",
+      inputs: [
+        { id: "predictedAngle", label: "Predicted Bend Angle (°)", type: "number", placeholder: "0" },
+        { id: "observedAngle", label: "Observed Bend Angle (°)", type: "number", placeholder: "0" },
+        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what happened..." },
+      ],
+    },
+    {
+      id: "action-3",
+      label: "45cm",
+      subtitle: "Fan from 45cm away",
+      inputs: [
+        { id: "predictedAngle", label: "Predicted Bend Angle (°)", type: "number", placeholder: "0" },
+        { id: "observedAngle", label: "Observed Bend Angle (°)", type: "number", placeholder: "0" },
+        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what happened..." },
+      ],
+    },
+  ],
+  "earthquake-resistant-structure": [
+    {
+      id: "action-1",
+      label: "Design 1",
+      subtitle: "4 folds + 4 pillars",
+      inputs: [
+        { id: "predictedMovement", label: "Predicted Movement (cm)", type: "number", placeholder: "0.0" },
+        { id: "measuredMovement", label: "Measured Movement (cm)", type: "number", placeholder: "Use vibration test" },
+        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what happened..." },
+      ],
+    },
+    {
+      id: "action-2",
+      label: "Design 2",
+      subtitle: "10 folds + 4 pillars",
+      inputs: [
+        { id: "predictedMovement", label: "Predicted Movement (cm)", type: "number", placeholder: "0.0" },
+        { id: "measuredMovement", label: "Measured Movement (cm)", type: "number", placeholder: "Use vibration test" },
+        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what happened..." },
+      ],
+    },
+    {
+      id: "action-3",
+      label: "Design 3",
+      subtitle: "3 folds + 6 pillars",
+      inputs: [
+        { id: "predictedMovement", label: "Predicted Movement (cm)", type: "number", placeholder: "0.0" },
+        { id: "measuredMovement", label: "Measured Movement (cm)", type: "number", placeholder: "Use vibration test" },
+        { id: "observation", label: "Observation", type: "text", placeholder: "Describe what happened..." },
+      ],
+    },
+  ],
+};
 
 export interface ActivityMetadata {
   id: string;

@@ -1,6 +1,6 @@
 import { db } from "@/firebase";
 import { POINTS_PER_ACTIVITY } from "@/constants/data";
-import { ActivityAttempt, ActivityProgress, ActivityLogEntry } from "@/constants/types";
+import { ActivityAttempt, ActivityProgress, ActivityLogEntry, WorksheetData } from "@/constants/types";
 import { ActivityLocation } from "@/utils/location";
 import {
   collection,
@@ -36,6 +36,7 @@ async function getDatabase() {
       is_leaderboard_submission INTEGER DEFAULT 0,
       submitted_to_leaderboard_at TEXT,
       location_json TEXT,
+      worksheet_json TEXT,
       created_at TEXT NOT NULL,
       sync_status TEXT DEFAULT 'pending'
     );
@@ -66,7 +67,12 @@ export async function createAttempt(
   logs: ActivityLogEntry[],
   reflection: string = "",
   rating: number | null = null,
-  location?: ActivityLocation
+  location?: ActivityLocation,
+  worksheetData?: WorksheetData,
+  photoUri?: string,
+  videoUri?: string,
+  predictions?: Record<string, string>,
+  discussionAnswers?: Record<string, string>
 ): Promise<string> {
   const now = new Date();
 
@@ -80,6 +86,11 @@ export async function createAttempt(
     isLeaderboardSubmission: false,
     submittedToLeaderboardAt: null,
     location: location ?? null,
+    worksheetData: worksheetData ?? null,
+    photoUri: photoUri ?? null,
+    videoUri: videoUri ?? null,
+    predictions: predictions ?? null,
+    discussionAnswers: discussionAnswers ?? null,
     createdAt: Timestamp.fromDate(now),
     updatedAt: Timestamp.fromDate(now),
   });
@@ -92,8 +103,8 @@ export async function createAttempt(
     await database.runAsync(
       `INSERT INTO activity_attempts (
         firestore_id, user_id, activity_key, logs_json, reflection, rating,
-        is_leaderboard_submission, submitted_to_leaderboard_at, location_json, created_at, sync_status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        is_leaderboard_submission, submitted_to_leaderboard_at, location_json, worksheet_json, created_at, sync_status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       firestoreId,
       userId,
       activityKey,
@@ -103,6 +114,7 @@ export async function createAttempt(
       0,
       null,
       location ? JSON.stringify(location) : null,
+      worksheetData ? JSON.stringify(worksheetData) : null,
       now.toISOString(),
       "synced"
     );

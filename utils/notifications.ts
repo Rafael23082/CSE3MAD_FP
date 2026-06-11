@@ -1,101 +1,36 @@
-import * as Notifications from 'expo-notifications';
-import { Platform } from 'react-native';
+import { Alert, Platform, ToastAndroid } from 'react-native';
 
-/**
- * Configure notification behavior
- */
-export function configureNotifications() {
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowAlert: true,
-      shouldPlaySound: true,
-      shouldSetBadge: false,
-      shouldShowBanner: true,
-      shouldShowList: true,
-    }),
-  });
+function showToast(title: string, body: string) {
+  if (Platform.OS === 'android') {
+    ToastAndroid.show(`${title}: ${body}`, ToastAndroid.SHORT);
+  } else {
+    Alert.alert(title, body);
+  }
 }
 
-/**
- * Request notification permissions
- */
+export function configureNotifications() {}
+
 export async function requestNotificationPermissions(): Promise<boolean> {
-  const { status: existingStatus } = await Notifications.getPermissionsAsync();
-  let finalStatus = existingStatus;
-
-  if (existingStatus !== 'granted') {
-    const { status } = await Notifications.requestPermissionsAsync();
-    finalStatus = status;
-  }
-
-  if (finalStatus !== 'granted') {
-    return false;
-  }
-
-  if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync('default', {
-      name: 'Default',
-      importance: Notifications.AndroidImportance.DEFAULT,
-    });
-  }
-
   return true;
 }
 
-/**
- * Show notification when activity attempt is saved
- */
-export async function showActivitySaved(): Promise<void> {
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title: 'Activity Saved',
-      body: 'Your experiment data has been recorded.',
-      sound: true,
-    },
-    trigger: null,
-  });
+export function showActivitySaved(): void {
+  showToast('Activity Saved', 'Your experiment data has been recorded.');
 }
 
-/**
- * Show notification when activity is submitted to leaderboard
- */
-export async function showActivitySubmitted(points: number): Promise<void> {
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title: 'Activity Submitted',
-      body: `You earned ${points} points!`,
-      sound: true,
-    },
-    trigger: null,
-  });
+export function showActivitySubmitted(points: number): void {
+  showToast('Activity Submitted', `You earned ${points} points!`);
 }
 
-/**
- * Show low battery warning notification
- */
-export async function showLowBatteryWarning(level: number): Promise<void> {
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title: 'Low Battery',
-      body: `Your battery is at ${level}%. Consider charging.`,
-      sound: true,
-    },
-    trigger: null,
-  });
+export function showActivityCompleted(activityName: string): void {
+  showToast('Activity Completed', `Your team completed ${activityName}!`);
 }
 
-/**
- * Show background sync completed notification
- */
+export function showLowBatteryWarning(level: number): void {
+  showToast('Low Battery', `Your battery is at ${level}%.`);
+}
+
 export async function showSyncCompleted(count: number): Promise<void> {
   if (count === 0) return;
-
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title: 'Sync Completed',
-      body: `${count} experiment(s) synced to cloud.`,
-      sound: true,
-    },
-    trigger: null,
-  });
+  showToast('Sync Completed', `${count} experiment(s) synced to cloud.`);
 }
