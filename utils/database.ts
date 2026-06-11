@@ -226,6 +226,7 @@ export async function saveUserProfile(uid: string, profile: { displayName: strin
     await setDoc(doc(firestoreDb, "users", uid), {
       displayName: profile.displayName,
       email: profile.email,
+      teamMembers: profile.teamMembers ?? [],
       createdAt: new Date().toISOString(),
     });
   } catch (e) {
@@ -239,6 +240,15 @@ export async function updateTeamMembers(uid: string, teamMembers: Record<string,
     `UPDATE users SET teamMembers = ? WHERE uid = ?`,
     [JSON.stringify(teamMembers), uid]
   );
+
+  try {
+    await setDoc(doc(firestoreDb, "users", uid), {
+      teamMembers,
+      updatedAt: new Date().toISOString(),
+    }, { merge: true });
+  } catch (e) {
+    console.warn("Firestore team members update failed:", e);
+  }
 }
 
 export async function verifyStoredProfile(uid: string) {
@@ -310,6 +320,15 @@ export async function updateDisplayName(uid: string, displayName: string): Promi
      WHERE uid = ?`,
     [displayName, uid]
   );
+
+  try {
+    await setDoc(doc(firestoreDb, "users", uid), {
+      displayName,
+      updatedAt: new Date().toISOString(),
+    }, { merge: true });
+  } catch (e) {
+    console.warn("Firestore display name update failed:", e);
+  }
 }
 
 export const fetchTeam = async (uid: string) => {

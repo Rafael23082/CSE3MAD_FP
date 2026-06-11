@@ -392,15 +392,6 @@ export default function JournalScreen() {
                                     {/* Actions */}
                                     <View style={styles.attemptActions}>
                                         <Pressable
-                                            style={[styles.actionBtn, styles.viewBtn]}
-                                            onPress={() => {
-                                                router.push({ pathname: "/attemptDetail", params: { attempt: JSON.stringify(attempt), activityKey: activity?.key || "" } });
-                                            }}
-                                        >
-                                            <MaterialCommunityIcons name="eye" size={16} color={theme.primary} />
-                                            <Text style={[styles.actionText, { color: theme.primary }]}>{t("journal.viewAttempt")}</Text>
-                                        </Pressable>
-                                        <Pressable
                                             style={[styles.actionBtn, styles.deleteBtn]}
                                             onPress={() => handleDelete(attempt)}
                                         >

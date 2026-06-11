@@ -1,27 +1,25 @@
-import { MemberAvatar } from "@/components/memberAvatar";
 import { TeamMember } from '@/constants/types';
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from '@/theme/colors';
 import { fetchTeam } from '@/utils/database';
-import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-export default function MembersScreen({ userId }: { userId: string }) {
+export default function MembersScreen() {
   const [team, setTeam] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
   const {theme} = useTheme();
   const styles = createStyles(theme);
-  const router = useRouter();
   const {t} = useTranslation();
-    const {user} = useAuth();
+  const {user} = useAuth();
 
   useEffect(() => {
     const loadTeamData = async () => {
       try {
-        const data = await fetchTeam(userId);
+        if (!user?.uid) return;
+        const data = await fetchTeam(user.uid);
         if (data) {
           setTeam(data);
         }
@@ -38,19 +36,15 @@ export default function MembersScreen({ userId }: { userId: string }) {
   if (loading) return <Text>Loading...</Text>;
 
   return (
-    <KeyboardAvoidingView style={styles.flexContainer} behavior="height" keyboardVerticalOffset={80} >
-      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-        <View style={styles.subContainer}>
-            {team.map((member, index) => (
-                <MemberAvatar 
-                    key={index} 
-                    firstName={member.firstName} 
-                    lastName={member.lastName} 
-                />
-            ))}
-        </View> 
-      </ScrollView>
-    </KeyboardAvoidingView>
+    <ScrollView contentContainerStyle={styles.container}>
+      <View style={styles.list}>
+        {team.map((member, index) => (
+          <Text key={index} style={styles.memberText}>
+            {member.firstName}, {member.lastName}
+          </Text>
+        ))}
+      </View>
+    </ScrollView>
   );
 }
 
@@ -61,19 +55,17 @@ const createStyles = (colors: ThemeColors) => {
       flexGrow: 1,
       backgroundColor: colors.backgroundColor,
     },
-    subContainer: {
-      paddingBottom: 24,
-      flexGrow: 1
+    list: {
+      gap: 12,
     },
-    errorMessage: {
-        fontFamily: "InterRegular",
-        marginTop: 16,
-        color: "red",
-        fontSize: 14
+    memberText: {
+      fontFamily: "InterRegular",
+      fontSize: 16,
+      color: colors.secondary,
+      paddingVertical: 8,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.card,
     },
-    flexContainer: {
-      flex: 1
-    }
   });
   return styles;
 }
