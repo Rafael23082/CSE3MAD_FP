@@ -6,6 +6,32 @@ import {
   calculateStabilityScore,
   calculateDampingRatio,
   getDampingLabel,
+  GRAVITY_MPS2,
+  calculateVelocity,
+  calculateAcceleration,
+  calculateWeight,
+  calculateNetForce,
+  calculateDragForce,
+  calculateGForce,
+  calculateReboundVelocity,
+  getGForceRisk,
+  calculateFanForce,
+  getDecibelRisk,
+  amplitudeToDb,
+  calcAverageDb,
+  degreesToRadians,
+  formatPhysicsValue,
+  getParachuteRating,
+  getStabilityRating,
+  calcFinalVelocity,
+  calcAcceleration,
+  calcWeight,
+  calcNetForce,
+  calcDragForce,
+  calcGForceNoBounce,
+  calcGForceBounce,
+  calcReboundVelocity,
+  calcFanForce,
 } from "../physics";
 
 describe("calculateSafetyScore", () => {
@@ -210,5 +236,331 @@ describe("getDampingLabel", () => {
     expect(getDampingLabel(0.8)).toBe("None");
     expect(getDampingLabel(1.0)).toBe("None");
     expect(getDampingLabel(5)).toBe("None");
+  });
+});
+
+// ==========================================
+// Core physics helpers
+// ==========================================
+
+describe("calculateVelocity", () => {
+  it("divides distance by time", () => {
+    expect(calculateVelocity(10, 2)).toBe(5);
+  });
+
+  it("returns 0 for zero distance", () => {
+    expect(calculateVelocity(0, 2)).toBe(0);
+  });
+
+  it("returns 0 for zero time", () => {
+    expect(calculateVelocity(10, 0)).toBe(0);
+  });
+});
+
+describe("calculateAcceleration", () => {
+  it("divides velocity by time", () => {
+    expect(calculateAcceleration(10, 2)).toBe(5);
+  });
+
+  it("returns 0 for zero velocity", () => {
+    expect(calculateAcceleration(0, 2)).toBe(0);
+  });
+
+  it("returns 0 for zero time", () => {
+    expect(calculateAcceleration(10, 0)).toBe(0);
+  });
+});
+
+describe("calculateWeight", () => {
+  it("multiplies mass by gravity", () => {
+    expect(calculateWeight(5)).toBeCloseTo(5 * GRAVITY_MPS2, 5);
+  });
+
+  it("returns 0 for zero mass", () => {
+    expect(calculateWeight(0)).toBe(0);
+  });
+});
+
+describe("calculateNetForce", () => {
+  it("multiplies mass by acceleration", () => {
+    expect(calculateNetForce(5, 2)).toBe(10);
+  });
+
+  it("returns 0 for zero mass", () => {
+    expect(calculateNetForce(0, 2)).toBe(0);
+  });
+
+  it("returns 0 for zero acceleration", () => {
+    expect(calculateNetForce(5, 0)).toBe(0);
+  });
+});
+
+describe("calculateDragForce", () => {
+  it("returns weight minus net force", () => {
+    expect(calculateDragForce(50, 20)).toBe(30);
+  });
+
+  it("returns 0 for zero weight", () => {
+    expect(calculateDragForce(0, 20)).toBe(0);
+  });
+
+  it("clamps net force to 0 before subtracting", () => {
+    expect(calculateDragForce(50, -10)).toBe(50);
+  });
+
+  it("returns 0 if net force > weight", () => {
+    expect(calculateDragForce(10, 20)).toBe(0);
+  });
+});
+
+describe("calculateGForce", () => {
+  it("divides deltaV by contact time by gravity", () => {
+    expect(calculateGForce(49, 0.5)).toBeCloseTo(49 / 0.5 / GRAVITY_MPS2, 5);
+  });
+
+  it("returns 0 for zero deltaV", () => {
+    expect(calculateGForce(0, 0.5)).toBe(0);
+  });
+
+  it("returns 0 for zero contact time", () => {
+    expect(calculateGForce(49, 0)).toBe(0);
+  });
+});
+
+describe("calculateReboundVelocity", () => {
+  it("multiplies gravity by time", () => {
+    expect(calculateReboundVelocity(2)).toBeCloseTo(GRAVITY_MPS2 * 2, 5);
+  });
+
+  it("returns 0 for zero time", () => {
+    expect(calculateReboundVelocity(0)).toBe(0);
+  });
+});
+
+describe("GRAVITY_MPS2", () => {
+  it("is 9.8", () => {
+    expect(GRAVITY_MPS2).toBe(9.8);
+  });
+});
+
+// ==========================================
+// G-Force Risk
+// ==========================================
+
+describe("getGForceRisk", () => {
+  it("returns Safe for gForce <= 5", () => {
+    const result = getGForceRisk(5);
+    expect(result.level).toBe("Safe");
+    expect(result.description).toContain("No injury");
+  });
+
+  it("returns Moderate for gForce between 5 and 10", () => {
+    const result = getGForceRisk(10);
+    expect(result.level).toBe("Moderate");
+    expect(result.description).toContain("bruising");
+  });
+
+  it("returns Serious for gForce between 10 and 30", () => {
+    const result = getGForceRisk(30);
+    expect(result.level).toBe("Serious");
+    expect(result.description).toContain("Serious injuries");
+  });
+
+  it("returns Severe for gForce between 30 and 50", () => {
+    const result = getGForceRisk(50);
+    expect(result.level).toBe("Severe");
+    expect(result.description).toContain("car crashes");
+  });
+
+  it("returns Critical for gForce > 50", () => {
+    const result = getGForceRisk(100);
+    expect(result.level).toBe("Critical");
+    expect(result.description).toContain("Life-threatening");
+  });
+});
+
+// ==========================================
+// Parachute helpers
+// ==========================================
+
+describe("getParachuteRating", () => {
+  it("returns Excellent for percent < 20", () => {
+    expect(getParachuteRating(0)).toBe("Excellent");
+    expect(getParachuteRating(19)).toBe("Excellent");
+  });
+
+  it("returns Good for percent 20..39", () => {
+    expect(getParachuteRating(20)).toBe("Good");
+    expect(getParachuteRating(39)).toBe("Good");
+  });
+
+  it("returns Fair for percent 40..59", () => {
+    expect(getParachuteRating(40)).toBe("Fair");
+    expect(getParachuteRating(59)).toBe("Fair");
+  });
+
+  it("returns Poor for percent >= 60", () => {
+    expect(getParachuteRating(60)).toBe("Poor");
+    expect(getParachuteRating(100)).toBe("Poor");
+  });
+});
+
+// ==========================================
+// Activity helpers
+// ==========================================
+
+describe("calculateFanForce", () => {
+  it("multiplies kValue by angle in radians", () => {
+    const expected = 5 * (90 * Math.PI / 180);
+    expect(calculateFanForce(5, 90)).toBeCloseTo(expected, 5);
+  });
+
+  it("returns 0 for zero kValue", () => {
+    expect(calculateFanForce(0, 90)).toBe(0);
+  });
+
+  it("returns 0 for zero angle", () => {
+    expect(calculateFanForce(5, 0)).toBe(0);
+  });
+});
+
+describe("getDecibelRisk", () => {
+  it("returns Safe for db <= 60", () => {
+    expect(getDecibelRisk(60)).toBe("Safe");
+    expect(getDecibelRisk(30)).toBe("Safe");
+  });
+
+  it("returns Moderate for db 61..85", () => {
+    expect(getDecibelRisk(85)).toBe("Moderate");
+  });
+
+  it("returns Dangerous for db 86..100", () => {
+    expect(getDecibelRisk(100)).toBe("Dangerous");
+  });
+
+  it("returns Critical for db > 100", () => {
+    expect(getDecibelRisk(120)).toBe("Critical");
+  });
+});
+
+describe("amplitudeToDb", () => {
+  it("converts amplitude to dB", () => {
+    expect(amplitudeToDb(1)).toBeCloseTo(0, 5);
+    expect(amplitudeToDb(10)).toBeCloseTo(20, 5);
+  });
+
+  it("returns -Infinity for zero or negative amplitude", () => {
+    expect(amplitudeToDb(0)).toBe(-Infinity);
+    expect(amplitudeToDb(-1)).toBe(-Infinity);
+  });
+});
+
+describe("calcAverageDb", () => {
+  it("calculates average dB from levels", () => {
+    const result = calcAverageDb([1, 10, 100]);
+    // avgAmp = (1+10+100)/3 = 37
+    // dB = 20*log10(37) ≈ 31.36
+    expect(result).toBeCloseTo(31.36, 1);
+  });
+
+  it("returns -Infinity for empty array", () => {
+    expect(calcAverageDb([])).toBe(-Infinity);
+  });
+
+  it("uses absolute values", () => {
+    const result = calcAverageDb([-1, -10, -100]);
+    // avgAmp = (1+10+100)/3 = 37
+    expect(result).toBeCloseTo(31.36, 1);
+  });
+});
+
+describe("degreesToRadians", () => {
+  it("converts degrees to radians", () => {
+    expect(degreesToRadians(180)).toBeCloseTo(Math.PI, 5);
+    expect(degreesToRadians(90)).toBeCloseTo(Math.PI / 2, 5);
+  });
+
+  it("returns 0 for 0 degrees", () => {
+    expect(degreesToRadians(0)).toBe(0);
+  });
+});
+
+describe("formatPhysicsValue", () => {
+  it("formats with default 2 decimals", () => {
+    expect(formatPhysicsValue(3.14159)).toBe("3.14");
+  });
+
+  it("formats with custom decimals", () => {
+    expect(formatPhysicsValue(3.14159, 4)).toBe("3.1416");
+  });
+});
+
+// ==========================================
+// Earthquake stability rating
+// ==========================================
+
+describe("getStabilityRating", () => {
+  it("returns Excellent for score >= 90", () => {
+    expect(getStabilityRating(90)).toBe("Excellent");
+    expect(getStabilityRating(100)).toBe("Excellent");
+  });
+
+  it("returns Good for score 70..89", () => {
+    expect(getStabilityRating(70)).toBe("Good");
+    expect(getStabilityRating(89)).toBe("Good");
+  });
+
+  it("returns Fair for score 50..69", () => {
+    expect(getStabilityRating(50)).toBe("Fair");
+    expect(getStabilityRating(69)).toBe("Fair");
+  });
+
+  it("returns Poor for score < 50", () => {
+    expect(getStabilityRating(0)).toBe("Poor");
+    expect(getStabilityRating(49)).toBe("Poor");
+  });
+});
+
+// ==========================================
+// Backward-compatible aliases
+// ==========================================
+
+describe("backward-compatible aliases", () => {
+  it("calcFinalVelocity delegates to calculateVelocity", () => {
+    expect(calcFinalVelocity(10, 2)).toBe(calculateVelocity(10, 2));
+  });
+
+  it("calcAcceleration delegates to calculateAcceleration", () => {
+    expect(calcAcceleration(10, 2)).toBe(calculateAcceleration(10, 2));
+  });
+
+  it("calcWeight delegates to calculateWeight", () => {
+    expect(calcWeight(5)).toBe(calculateWeight(5));
+  });
+
+  it("calcNetForce delegates to calculateNetForce", () => {
+    expect(calcNetForce(5, 2)).toBe(calculateNetForce(5, 2));
+  });
+
+  it("calcDragForce delegates to calculateDragForce", () => {
+    expect(calcDragForce(50, 20)).toBe(calculateDragForce(50, 20));
+  });
+
+  it("calcGForceNoBounce delegates to calculateGForce", () => {
+    expect(calcGForceNoBounce(49, 0.5)).toBe(calculateGForce(49, 0.5));
+  });
+
+  it("calcGForceBounce sums impact and rebound before delegating", () => {
+    const result = calcGForceBounce(10, 5, 0.5);
+    const expected = calculateGForce(10 + 5, 0.5);
+    expect(result).toBeCloseTo(expected, 10);
+  });
+
+  it("calcReboundVelocity delegates to calculateReboundVelocity", () => {
+    expect(calcReboundVelocity(2)).toBe(calculateReboundVelocity(2));
+  });
+
+  it("calcFanForce delegates to calculateFanForce", () => {
+    expect(calcFanForce(5, 90)).toBe(calculateFanForce(5, 90));
   });
 });

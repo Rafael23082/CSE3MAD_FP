@@ -80,5 +80,8 @@
     "ts-jest": "^29.4.11",
     "typescript": "~5.9.2"
   },
-  "private": true
+  "private": true,
+  "resolutions": {
+    "@expo/config-plugins": "~6.0.0"
+  }
 }
