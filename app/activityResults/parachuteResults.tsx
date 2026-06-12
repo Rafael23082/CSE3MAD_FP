@@ -118,7 +118,7 @@ export default function ParachuteResultsScreen() {
       contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 20 }]}
       contentInsetAdjustmentBehavior="automatic"
     >
-      <Text style={styles.title}>{t("activities.parachuteDropChallenge.name")}</Text>
+      <Text style={styles.title}>{t("Challenge.name")}</Text>
       <Text style={styles.subtitle}>{t("results.attempts")}</Text>
 
       {logs.length === 0 ? (
