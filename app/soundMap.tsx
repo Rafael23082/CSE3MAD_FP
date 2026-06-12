@@ -3,7 +3,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { use, useEffect, useState } from "react";
+import React, { use } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -34,44 +34,6 @@ export default function SoundMapScreen() {
 
   const readingsWithGps = logs.filter(l => l.data?.latitude && l.data?.longitude);
 
-  const initialRegion = readingsWithGps.length > 0
-    ? {
-        latitude: readingsWithGps[0].data.latitude,
-        longitude: readingsWithGps[0].data.longitude,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
-      }
-    : {
-        latitude: -33.8688,
-        longitude: 151.2093,
-        latitudeDelta: 0.05,
-        longitudeDelta: 0.05,
-      };
-
-  // Lazy-load MapView to avoid crashing in Expo Go (no native module)
-  const [MapView, setMapView] = useState<any>(null);
-  const [Marker, setMarker] = useState<any>(null);
-
-  useEffect(() => {
-    let mounted = true;
-    import("react-native-maps")
-      .then((m) => {
-        if (mounted) {
-          setMapView(() => m.default);
-          setMarker(() => m.Marker);
-        }
-      })
-      .catch(() => {
-        if (mounted) {
-          setMapView(null);
-          setMarker(null);
-        }
-      });
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
   return (
     <ScrollView
       style={styles.container}
@@ -89,31 +51,13 @@ export default function SoundMapScreen() {
       ) : (
         <>
           <View style={styles.mapContainer}>
-            {MapView && Marker ? (
-              <MapView style={styles.map} initialRegion={initialRegion}>
-                {readingsWithGps.map((log: any, i: number) => {
-                  const d = log.data;
-                  const db = d.db || 0;
-                  return (
-                    <Marker
-                      key={i}
-                      coordinate={{ latitude: d.latitude, longitude: d.longitude }}
-                      title={`${d.action} - ${db} dB`}
-                      description={`${d.location} | Risk: ${getRiskLabel(db)}`}
-                      pinColor={getDbColor(db)}
-                    />
-                  );
-                })}
-              </MapView>
-            ) : (
-              <View style={styles.mapPlaceholder}>
-                <MaterialCommunityIcons name="map-outline" size={40} color={theme.textMuted} />
-                <Text style={styles.mapPlaceholderText}>{t("soundMap.mapPlaceholder")}</Text>
-                <Text style={styles.mapPlaceholderHint}>
-                  {readingsWithGps.length} GPS reading{readingsWithGps.length === 1 ? "" : "s"} available
-                </Text>
-              </View>
-            )}
+            <View style={styles.mapPlaceholder}>
+              <MaterialCommunityIcons name="map-outline" size={40} color={theme.textMuted} />
+              <Text style={styles.mapPlaceholderText}>{t("soundMap.mapPlaceholder")}</Text>
+              <Text style={styles.mapPlaceholderHint}>
+                {readingsWithGps.length} GPS reading{readingsWithGps.length === 1 ? "" : "s"} available
+              </Text>
+            </View>
           </View>
 
           <View style={styles.legend}>
