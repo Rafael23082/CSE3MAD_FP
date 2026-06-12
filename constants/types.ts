@@ -200,15 +200,15 @@ export interface BreathingJournal {
 
 export interface ActionInput {
   id: string;
-  label: string;
+  labelKey: string;
   type: 'text' | 'number';
-  placeholder?: string;
+  placeholderKey?: string;
 }
 
 export interface ActionConfig {
   id: string;
-  label: string;
-  subtitle?: string;
+  labelKey: string;
+  subtitleKey?: string;
   inputs: ActionInput[];
 }
 

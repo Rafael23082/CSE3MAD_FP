@@ -54,7 +54,7 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
   const { submitAction, isActionComplete, actionSubmissions } = ctx || {};
 
   const configs = ACTION_CONFIGS[activityKey] || [];
-  if (configs.length === 0) return <Text style={styles.errorText}>No actions configured</Text>;
+  if (configs.length === 0) return <Text style={styles.errorText}>{t("attempt.noActionsConfigured")}</Text>;
 
   const hasSoundSensor = activityKey === "sound-pollution-hunter";
   const hasVibrationSensor = activityKey === "earthquake-resistant-structure";
@@ -648,7 +648,7 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
     });
 
     if (missing.length > 0) {
-      Alert.alert("Incomplete", `Please fill in: ${missing.map(i => i.label).join(", ")}`);
+      Alert.alert("Incomplete", `Please fill in: ${missing.map(i => t(i.labelKey)).join(", ")}`);
       return;
     }
 
@@ -696,20 +696,20 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
               {formatTimer(timeRemaining)}
             </Text>
             {timeRemaining <= 0 && (
-              <Text style={styles.timerExpiredText}>Leaderboard Ineligible</Text>
+              <Text style={styles.timerExpiredText}>{t("attempt.leaderboardIneligible")}</Text>
             )}
           </View>
         ) : (
           <View style={styles.challengePrompt}>
             <MaterialCommunityIcons name="timer-outline" size={24} color={theme.secondary} />
-            <Text style={styles.challengeTitle}>20 Minute Challenge</Text>
-            <Text style={styles.challengeSubtitle}>Start the timer when your team is ready</Text>
+            <Text style={styles.challengeTitle}>{t("attempt.minuteChallenge")}</Text>
+            <Text style={styles.challengeSubtitle}>{t("attempt.startTimer")}</Text>
             <Pressable
               style={[styles.sensorButton, { backgroundColor: theme.secondary, marginTop: 4 }]}
               onPress={startChallenge}
             >
               <MaterialCommunityIcons name="play" size={20} color="#fff" />
-              <Text style={styles.sensorButtonText}>Start Challenge</Text>
+              <Text style={styles.sensorButtonText}>{t("buttons.startChallenge")}</Text>
             </Pressable>
           </View>
         )
@@ -743,7 +743,7 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
                 complete && styles.stepLabelComplete,
                 isCurrent && !complete && styles.stepLabelActive,
               ]} numberOfLines={1}>
-                {c.label}
+                {t(c.labelKey)}
               </Text>
             </Pressable>
           );
@@ -753,16 +753,16 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
       {isAllComplete ? (
         <View style={styles.allComplete}>
           <MaterialCommunityIcons name="check-circle" size={48} color={theme.tertiary} />
-          <Text style={styles.allCompleteText}>All actions completed!</Text>
+          <Text style={styles.allCompleteText}>{t("attempt.actionsCompleted")}</Text>
           {/* Comparison table for earthquake */}
           {hasVibrationSensor && configs.some(c => analysisResults[c.id]) && (
             <View style={styles.tableCard}>
-              <Text style={styles.sectionTitle}>Results Comparison</Text>
+              <Text style={styles.sectionTitle}>{t("attempt.resultsComparison")}</Text>
               <View style={styles.tableRow}>
-                <Text style={[styles.tableCell, styles.tableHeader, { flex: 2 }]}>Design</Text>
-                <Text style={[styles.tableCell, styles.tableHeader]}>Max Tilt</Text>
-                <Text style={[styles.tableCell, styles.tableHeader]}>Avg Tilt</Text>
-                <Text style={[styles.tableCell, styles.tableHeader]}>Peak (g)</Text>
+                <Text style={[styles.tableCell, styles.tableHeader, { flex: 2 }]}>{t("attempt.design")}</Text>
+                <Text style={[styles.tableCell, styles.tableHeader]}>{t("attempt.maxTilt")}</Text>
+                <Text style={[styles.tableCell, styles.tableHeader]}>{t("attempt.avgTilt")}</Text>
+                <Text style={[styles.tableCell, styles.tableHeader]}>{t("attempt.peak")} (g)</Text>
               </View>
               {configs.map((c, i) => {
                 const result = analysisResults[c.id];
@@ -774,7 +774,7 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
                 return (
                   <View key={c.id} style={[styles.tableRow, isBest && styles.bestRow]}>
                     <Text style={[styles.tableCell, styles.tableCellText, { flex: 2 }]}>
-                      {isBest ? "★ " : ""}{c.label}
+                      {isBest ? "★ " : ""}{t(c.labelKey)}
                     </Text>
                     <Text style={[styles.tableCell, styles.tableCellText]}>{result.maxTiltDeg.toFixed(1)}°</Text>
                     <Text style={[styles.tableCell, styles.tableCellText]}>{result.avgTiltDeg.toFixed(1)}°</Text>
@@ -784,7 +784,7 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
               })}
               {configs.filter(c => analysisResults[c.id]).length > 0 && (
                 <Text style={styles.bestDesignText}>
-                  Best: {(configs.filter(c => analysisResults[c.id]).sort((a, b) => analysisResults[a.id].avgTiltDeg - analysisResults[b.id].avgTiltDeg)[0]?.label)} — lowest avg tilt
+                  {t("attempt.best")}: {(configs.filter(c => analysisResults[c.id]).sort((a, b) => analysisResults[a.id].avgTiltDeg - analysisResults[b.id].avgTiltDeg)[0]?.labelKey)} — {t("attempt.lowestAvgTilt")}
                 </Text>
               )}
             </View>
@@ -795,18 +795,18 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
           {/* Action Header */}
           <View style={styles.actionHeader}>
             <View style={styles.actionBadge}>
-              <Text style={styles.actionBadgeText}>Action {currentStep + 1}/3</Text>
+              <Text style={styles.actionBadgeText}>{t("attempt.action")} {currentStep + 1}/3</Text>
             </View>
-            <Text style={styles.actionLabel}>{config.label}</Text>
-            {config.subtitle && (
-              <Text style={styles.actionSubtitle}>{config.subtitle}</Text>
+            <Text style={styles.actionLabel}>{t(config.labelKey)}</Text>
+            {config.subtitleKey && (
+              <Text style={styles.actionSubtitle}>{t(config.subtitleKey)}</Text>
             )}
           </View>
 
           {/* Sensor Sections */}
           {hasSoundSensor && (
             <View style={styles.sensorSection}>
-              <Text style={styles.sensorTitle}>Sound Meter</Text>
+              <Text style={styles.sensorTitle}>{t("attempt.soundMeter")}</Text>
               <View style={styles.sensorReading}>
                 <Text style={[styles.sensorValue, { color: liveDb > 85 ? theme.danger : theme.primary }]}>
                   {liveDb}
@@ -819,7 +819,7 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
               >
                 <MaterialCommunityIcons name={recorder ? "stop" : "microphone"} size={20} color="#fff" />
                 <Text style={styles.sensorButtonText}>
-                  {recorder ? "Stop" : "Start Sound Meter"}
+                  {recorder ? t("attempt.stop") : t("attempt.startSoundMeter")}
                 </Text>
               </Pressable>
             </View>
@@ -827,7 +827,7 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
 
           {hasVibrationSensor && (
             <View style={styles.sensorSection}>
-              <Text style={styles.sensorTitle}>Vibration Test</Text>
+              <Text style={styles.sensorTitle}>{t("attempt.vibrationTest")}</Text>
 
               {/* Live SVG graph */}
               <View style={styles.graphContainer}>
@@ -835,14 +835,14 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
                   <View style={styles.graphPlaceholder}>
                     <Text style={styles.graphPlaceholderText}>
                       {liveSamples.length === 0
-                        ? "Tap Record to start capturing vibration data"
-                        : "Collecting samples…"}
+                        ? t("attempt.tapRecord")
+                        : t("attempt.collectingSamples")}
                     </Text>
                   </View>
                 ) : (
                   <>
                     <View style={styles.graphHeader}>
-                      <Text style={styles.graphLabel}>Live Vibration</Text>
+                      <Text style={styles.graphLabel}>{t("attempt.liveVibration")}</Text>
                       <Text style={styles.graphValue}>
                         {(Math.atan(Math.sqrt(
                           liveSamples[liveSamples.length - 1].x ** 2 +
@@ -889,7 +889,7 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
                 <Text style={styles.sensorUnit}>g</Text>
               </View>
               {peakAccel > 0 && (
-                <Text style={styles.sensorMeta}>Peak: {peakAccel.toFixed(2)}g</Text>
+                <Text style={styles.sensorMeta}>{t("attempt.peak")}: {peakAccel.toFixed(2)}g</Text>
               )}
               <Pressable
                 style={[styles.sensorButton, { backgroundColor: isVibrating ? theme.danger : theme.primary }]}
@@ -897,7 +897,7 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
               >
                 <MaterialCommunityIcons name={isVibrating ? "stop" : "vibrate"} size={20} color="#fff" />
                 <Text style={styles.sensorButtonText}>
-                  {isVibrating ? `Stop (${countdown}s)` : "Run Vibration Test"}
+                  {isVibrating ? `${t("attempt.stop")} (${countdown}s)` : t("attempt.runVibrationTest")}
                 </Text>
               </Pressable>
 
@@ -906,19 +906,19 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
                 <View style={styles.resultGrid}>
                   <View style={styles.resultItem}>
                     <Text style={styles.resultValue}>{analysisResults[config.id].maxTiltDeg.toFixed(1)}°</Text>
-                    <Text style={styles.resultLabel}>Max Tilt</Text>
+                    <Text style={styles.resultLabel}>{t("attempt.maxTilt")}</Text>
                   </View>
                   <View style={styles.resultItem}>
                     <Text style={styles.resultValue}>{analysisResults[config.id].avgTiltDeg.toFixed(1)}°</Text>
-                    <Text style={styles.resultLabel}>Avg Tilt</Text>
+                    <Text style={styles.resultLabel}>{t("attempt.avgTilt")}</Text>
                   </View>
                   <View style={styles.resultItem}>
                     <Text style={styles.resultValue}>{analysisResults[config.id].peakAccelG.toFixed(3)}g</Text>
-                    <Text style={styles.resultLabel}>Peak Accel</Text>
+                    <Text style={styles.resultLabel}>{t("attempt.peakAccel")}</Text>
                   </View>
                   <View style={styles.resultItem}>
                     <Text style={styles.resultValue}>{analysisResults[config.id].durationSec.toFixed(1)}s</Text>
-                    <Text style={styles.resultLabel}>Duration</Text>
+                    <Text style={styles.resultLabel}>{t("attempt.duration")}</Text>
                   </View>
                 </View>
               )}
@@ -927,7 +927,7 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
 
           {hasMovementSensor && (
             <View style={styles.sensorSection}>
-              <Text style={styles.sensorTitle}>Movement Test</Text>
+              <Text style={styles.sensorTitle}>{t("attempt.movementTest")}</Text>
               <View style={styles.sensorReading}>
                 <Text style={[styles.sensorValue, { color: theme.tertiary }]}>
                   {vibrations}
@@ -939,7 +939,7 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
               >
                 <MaterialCommunityIcons name={isRecordingMovement ? "stop" : "vibrate"} size={20} color="#fff" />
                 <Text style={styles.sensorButtonText}>
-                  {isRecordingMovement ? "Stop" : "Run Movement Test"}
+                  {isRecordingMovement ? t("attempt.stop") : t("attempt.runMovementTest")}
                 </Text>
               </Pressable>
             </View>
@@ -949,7 +949,7 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
             <>
               <View style={styles.sensorSection}>
                 <Text style={styles.sensorTitle}>
-                  {currentStep === 2 ? "Tracing Sensor" : "Reaction Timer"}
+                  {currentStep === 2 ? t("attempt.tracingSensor") : t("attempt.reactionTimer")}
                 </Text>
                 
                 <View style={styles.sensorReading}>
@@ -974,7 +974,7 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
                 >
                   <MaterialCommunityIcons name="timer-outline" size={20} color="#fff" />
                   <Text style={styles.sensorButtonText}>
-                    {currentStep === 2 ? (reactionChallengeState == "ready" ? "Stop Tracing": "Start Tracing") : (reactionChallengeState == "waiting" ? "Wait For the Signal": (reactionChallengeState == "ready" ? "TAP!": "Start Reaction Test"))}
+                    {currentStep === 2 ? (reactionChallengeState == "ready" ? t("attempt.stopTracing"): t("attempt.startTracing")) : (reactionChallengeState == "waiting" ? t("attempt.waitForSignal"): (reactionChallengeState == "ready" ? t("attempt.tap"): t("attempt.startReactionTest")))}
                   </Text>
                 </Pressable>
               </View>
@@ -1028,7 +1028,7 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
 
           {isBreathingChallenge && (
             <View style={styles.sensorSection}>
-              <Text style={styles.sensorTitle}>Breathing Test</Text>
+              <Text style={styles.sensorTitle}>{t("attempt.breathingTest")}</Text>
               <View style={styles.sensorReading}>
                 <Text style={[styles.sensorValue, { color: theme.tertiary }]}>
                   {bpm}
@@ -1040,7 +1040,7 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
               >
                 <MaterialCommunityIcons name={breathingRecordingState == "recording" ? "stop" : "lungs"} size={20} color="#fff" />
                 <Text style={styles.sensorButtonText}>
-                  {breathingRecordingState == "recording" ? "Stop" : "Run Breathing Test"}
+                  {breathingRecordingState == "recording" ? t("attempt.stop") : t("attempt.runBreathingTest")}
                 </Text>
               </Pressable>
             </View>
@@ -1138,24 +1138,24 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
           {activityKey === "hand-fan-challenge" && (
             <View style={styles.calcSection}>
               <Text style={styles.calcSectionTitle}>F ≈ k · θ</Text>
-              <Text style={styles.calcHint}>k = stiffness (paper 1, cardboard 3), θ = bend angle</Text>
+              <Text style={styles.calcHint}>k = {t("attempt.stiffness")} ({t("attempt.paper")} 1, {t("attempt.cardboard")} 3), θ = {t("attempt.bendAngle")}</Text>
               {formValues.observedAngle ? (
                 <View style={styles.calcRow}>
                   <View style={styles.calcCard}>
-                    <Text style={styles.calcLabel}>Angle (rad)</Text>
+                    <Text style={styles.calcLabel}>{t("attempt.angle")} (rad)</Text>
                     <Text style={styles.calcValue}>
                       {degreesToRadians(parseFloat(formValues.observedAngle) || 0).toFixed(3)}
                     </Text>
                   </View>
                   <View style={styles.calcCard}>
-                    <Text style={styles.calcLabel}>Force (k·θ)</Text>
+                    <Text style={styles.calcLabel}>{t("attempt.force")} (k·θ)</Text>
                     <Text style={styles.calcValue}>
                       {calculateFanForce(0.2, parseFloat(formValues.observedAngle) || 0).toFixed(3)}
                     </Text>
                   </View>
                 </View>
               ) : (
-                <Text style={styles.autoFillHint}>Enter an observed angle to calculate force</Text>
+                <Text style={styles.autoFillHint}>{t("attempt.enterObservedAngle")}</Text>
               )}
             </View>
           )}
@@ -1169,7 +1169,7 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
               return (
                 <View key={input.id} style={styles.fieldContainer}>
                   <Text style={styles.fieldLabel}>
-                    {input.label}
+                    {t(input.labelKey)}
                     {isAutoFill && (
                       <Text style={styles.autoFillHint}> (auto-filled)</Text>
                     )}
@@ -1187,7 +1187,7 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
                         ]}
                         value={formValues[input.id] ?? ""}
                         onChangeText={(val) => handleInputChange(input.id, val)}
-                        placeholder={input.placeholder}
+                        placeholder={t(input.placeholderKey ?? "")}
                         placeholderTextColor={theme.textMuted}
                         keyboardType={input.type === "number" ? "numeric" : "default"}
                         editable={!isActionComplete?.(config.id)}
@@ -1227,7 +1227,7 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
               onPress={handleSubmit}
             >
               <MaterialCommunityIcons name="check-circle" size={20} color="#fff" />
-              <Text style={styles.submitBtnText}>Submit Trial</Text>
+              <Text style={styles.submitBtnText}>{t("attempt.submitTrial")}</Text>
             </Pressable>
           )}
 

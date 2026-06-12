@@ -27,13 +27,12 @@ export default function ActivitiesScreen() {
         {t("activities.selectActivity")}
       </Text>
       <View style={styles.debugCard}>
-        <Text style={styles.debugTitle}>Sensor validation</Text>
+        <Text style={styles.debugTitle}>{t("activities.sensorValidation")}</Text>
         <Text style={styles.debugBody}>
-          Check camera, microphone, GPS, and accelerometer live on a physical
-          Android device.
+          {t("activities.sensorValidationDescription")}
         </Text>
         <Button 
-          text={"Open Sensor Debug Screen"}
+          text={t("buttons.openSensorDebugScreen")}
           action={() => router.push("/sensor-debug" as never)}
         />
       </View>

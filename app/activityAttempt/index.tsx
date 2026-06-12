@@ -6,83 +6,83 @@ import { ThemeColors } from "@/theme/colors";
 import { createAttempt } from "@/utils/activityAttempts";
 import { captureLocation } from "@/utils/location";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from "expo-router";
 import { use, useState } from "react";
 import { useTranslation } from "react-i18next";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const DISCUSSION_QUESTIONS: Record<string, { id: string; question: string }[]> = {
+const DISCUSSION_QUESTIONS: Record<string, { id: string; questionKey: string }[]> = {
     "parachute-drop-challenge": [
-        { id: "predictionsCorrect", question: "Were your predictions correct?" },
-        { id: "bestDesign", question: "Which parachute design worked best?" },
-        { id: "effectiveDesign", question: "What made that design effective?" },
-        { id: "improvements", question: "What would you improve next time?" },
+        { id: "predictionsCorrect", questionKey: "activities.parachuteDropChallenge.discussionQuestion1" },
+        { id: "bestDesign", questionKey: "activities.parachuteDropChallenge.discussionQuestion2" },
+        { id: "effectiveDesign", questionKey: "activities.parachuteDropChallenge.discussionQuestion3" },
+        { id: "improvements", questionKey: "activities.parachuteDropChallenge.discussionQuestion4" },
     ],
     "sound-pollution-hunter": [
-        { id: "loudestAction", question: "Which action was loudest?" },
-        { id: "quietestAction", question: "Which action was quietest?" },
-        { id: "surprise", question: "What surprised you?" },
-        { id: "noiseReduction", question: "How can noise pollution be reduced?" },
+        { id: "loudestAction", questionKey: "activities.soundPollutionHunter.discussionQuestion1" },
+        { id: "quietestAction", questionKey: "activities.soundPollutionHunter.discussionQuestion2" },
+        { id: "surprise", questionKey: "activities.soundPollutionHunter.discussionQuestion3" },
+        { id: "noiseReduction", questionKey: "activities.soundPollutionHunter.discussionQuestion4" },
     ],
     "hand-fan-challenge": [
-        { id: "largestMovement", question: "Which distance produced the largest movement?" },
-        { id: "distanceEffect", question: "How did distance affect airflow?" },
-        { id: "improvements", question: "What would you improve?" },
+        { id: "largestMovement", questionKey: "activities.handFanChallenge.discussionQuestion1" },
+        { id: "distanceEffect", questionKey: "activities.handFanChallenge.discussionQuestion2" },
+        { id: "improvements", questionKey: "activities.handFanChallenge.discussionQuestion3" },
     ],
     "earthquake-resistant-structure": [
-        { id: "mostStable", question: "Which structure was most stable?" },
-        { id: "mostMovement", question: "Which moved the most?" },
-        { id: "designFeature", question: "What design feature improved stability?" },
-        { id: "changes", question: "What would you change next time?" },
+        { id: "mostStable", questionKey: "activities.earthquakeResistantStructure.discussionQuestion1" },
+        { id: "mostMovement", questionKey: "activities.earthquakeResistantStructure.discussionQuestion1" },
+        { id: "designFeature", questionKey: "activities.earthquakeResistantStructure.discussionQuestion1" },
+        { id: "changes", questionKey: "activities.earthquakeResistantStructure.discussionQuestion1" },
     ],
     "stretch-speed-and-gracefulness": [
-        { id: "predictionsCorrect", question: "Were your predictions correct?" },
-        { id: "results", question: "Which movement was the easiest to keep stable?" },
-        { id: "hardestMovement", question: "Which movement was the hardest to keep the vibration low?" },
-        { id: "surprises", question: "Any surprises?" },
+        { id: "predictionsCorrect", questionKey: "activities.stretchSpeedAndGracefulness.discussionQuestion1" },
+        { id: "results", questionKey: "activities.stretchSpeedAndGracefulness.discussionQuestion2" },
+        { id: "hardestMovement", questionKey: "activities.stretchSpeedAndGracefulness.discussionQuestion3" },
+        { id: "surprises", questionKey: "activities.stretchSpeedAndGracefulness.discussionQuestion4" },
     ],
     "reaction-board-challenge": [
-        { id: "predictionsCorrect", question: "Were your predictions correct?" },
-        { id: "harderChallenge", question: "Which of the two category challenges were more challenging?" },
-        { id: "surprises", question: "Any surprises?" },
+        { id: "predictionsCorrect", questionKey: "activities.reactionBoardChallenge.discussionQuestion1" },
+        { id: "harderChallenge", questionKey: "activities.reactionBoardChallenge.discussionQuestion2" },
+        { id: "surprises", questionKey: "activities.reactionBoardChallenge.discussionQuestion3" },
     ],
     "breathing-pace-trainer": [
-        { id: "predictionsCorrect", question: "Were your predictions correct?" },
-        { id: "surprises", question: "Any surprises?" },
-        { id: "activityImpact", question: "How did different levels of physical activity change your breathing rate?" },
+        { id: "predictionsCorrect", questionKey: "activities.breathingPaceTrainer.discussionQuestion1" },
+        { id: "surprises", questionKey: "activities.breathingPaceTrainer.discussionQuestion2" },
+        { id: "activityImpact", questionKey: "activities.breathingPaceTrainer.discussionQuestion3" },
     ],
     };
 
 const PREDICTION_FIELDS: Record<string, { id: string; label: string; type: "radio" | "text" | "dropdown"; options?: string[] }[]> = {
   "parachute-drop-challenge": [
-    { id: "bestDesign", label: "Which parachute design do you think will stay in the air the longest?", type: "radio", options: ["Design 1", "Design 2", "Design 3"] },
-    { id: "bestDesignReason", label: "Why do you think this design will perform best?", type: "text" },
+    { id: "bestDesign", label: "activities.parachuteDropChallenge.prediction1", type: "radio", options: ["Design 1", "Design 2", "Design 3"] },
+    { id: "bestDesignReason", label: "activities.parachuteDropChallenge.prediction2", type: "text" },
   ],
   "sound-pollution-hunter": [
-    { id: "loudestAction", label: "Which action do you think will produce the loudest sound?", type: "dropdown", options: ["Dropping Books", "Stomping Feet", "Clapping Hands"] },
-    { id: "loudestReason", label: "Explain Why", type: "text" },
+    { id: "loudestAction", label: "activities.soundPollutionHunter.prediction1", type: "dropdown", options: ["Dropping Books", "Stomping Feet", "Clapping Hands"] },
+    { id: "loudestReason", label: "activities.soundPollutionHunter.prediction2", type: "text" },
   ],
   "hand-fan-challenge": [
-    { id: "bestDistance", label: "Which fan distance will create the largest movement?", type: "radio", options: ["15 cm", "30 cm", "45 cm"] },
-    { id: "bestDistanceReason", label: "Why?", type: "text" },
+    { id: "bestDistance", label: "activities.handFanChallenge.prediction1", type: "radio", options: ["15 cm", "30 cm", "45 cm"] },
+    { id: "bestDistanceReason", label: "activities.handFanChallenge.prediction2", type: "text" },
   ],
   "earthquake-resistant-structure": [
-    { id: "mostStable", label: "Which structure do you think will be most stable?", type: "text" },
-    { id: "mostStableReason", label: "Why?", type: "text" },
+    { id: "mostStable", label: "activities.earthquakeResistantStructure.prediction1", type: "text" },
+    { id: "mostStableReason", label: "activities.earthquakeResistantStructure.prediction2", type: "text" },
   ],
   "stretch-speed-and-gracefulness": [
-    { id: "mostStable", label: "Which movement do you think will be most stable?", type: "text" },
-    { id: "mostStableReason", label: "Why?", type: "text" },
+    { id: "mostStable", label: "activities.stretchSpeedAndGracefulness.prediction1", type: "text" },
+    { id: "mostStableReason", label: "activities.stretchSpeedAndGracefulness.prediction2", type: "text" },
   ],
   "reaction-board-challenge": [
-    { id: "reactionTimeDifferencePrediction", label: "How much do you think will be the difference between your dominant and non-dominant hand reaction time (ms)?", type: "text" },
-    { id: "reactionTimeDifferenceReason", label: "Why?", type: "text" },
+    { id: "reactionTimeDifferencePrediction", label: "activities.reactionBoardChallenge.prediction1", type: "text" },
+    { id: "reactionTimeDifferenceReason", label: "activities.reactionBoardChallenge.prediction2", type: "text" },
   ],
   "breathing-pace-trainer": [
-    { id: "mostBpm", label: "Which activitiy do you think will result in the hights BPM?", type: "text" },
-    { id: "mostBpmReason", label: "Why?", type: "text" },
+    { id: "mostBpm", label: "activities.breathingPaceTrainer.prediction2", type: "text" },
+    { id: "mostBpmReason", label: "activities.breathingPaceTrainer.prediction2", type: "text" },
   ],
 };
 
@@ -214,10 +214,10 @@ export default function ActivityAttemptMainScreen(){
           >
               {/* 1. Predictions Section */}
               <View style={styles.section}>
-                  <Text style={styles.sectionTitle}>Predictions</Text>
+                  <Text style={styles.sectionTitle}>{t("attempt.predictions")}</Text>
                   {predictionFields.map((field) => (
                       <View key={field.id} style={styles.fieldContainer}>
-                          <Text style={styles.fieldLabel}>{field.label}</Text>
+                          <Text style={styles.fieldLabel}>{t(field.label)}</Text>
                           {field.type === "radio" && field.options && (
                               <View style={styles.radioGroup}>
                                   {field.options.map((option) => (
@@ -233,20 +233,20 @@ export default function ActivityAttemptMainScreen(){
                                               styles.radioCircle,
                                               currentPredictions[field.id] === option && styles.radioCircleSelected
                                           ]} />
-                                          <Text style={styles.radioText}>{option}</Text>
+                                          <Text style={styles.radioText}>{t(option)}</Text>
                                       </Pressable>
                                   ))}
                               </View>
                           )}
                           {field.type === "text" && (
                               <TextInput
-                                  style={styles.textInput}
-                                  value={currentPredictions[field.id] || ""}
-                                  onChangeText={(value) => handlePredictionChange(field.id, value)}
-                                  placeholder="Enter your answer"
-                                  placeholderTextColor={theme.textMuted}
-                                  multiline
-                              />
+                                    style={styles.textInput}
+                                    value={currentPredictions[field.id] || ""}
+                                    onChangeText={(value) => handlePredictionChange(field.id, value)}
+                                    placeholder={t("placeholder.enterYourAnswer")}
+                                    placeholderTextColor={theme.textMuted}
+                                    multiline
+                            />
                           )}
                           {field.type === "dropdown" && field.options && (
                               <View style={styles.dropdownContainer}>
@@ -262,7 +262,7 @@ export default function ActivityAttemptMainScreen(){
                                           <Text style={[
                                               styles.dropdownText,
                                               currentPredictions[field.id] === option && styles.dropdownTextSelected
-                                          ]}>{option}</Text>
+                                          ]}>{t(option)}</Text>
                                       </Pressable>
                                   ))}
                               </View>
@@ -273,31 +273,31 @@ export default function ActivityAttemptMainScreen(){
 
               {/* 2. Structured Actions */}
               <View style={styles.section}>
-                  <Text style={styles.sectionTitle}>Experiment Records</Text>
+                  <Text style={styles.sectionTitle}>{t("attempt.experimentRecords")}</Text>
                   <StructuredActivity activityKey={activity.key} />
               </View>
 
               {/* 3. Discussion Questions Section */}
               <View style={styles.section}>
-                  <Text style={styles.sectionTitle}>Discussion Questions</Text>
+                  <Text style={styles.sectionTitle}>{t("attempt.discussionQuestions")}</Text>
                   {discussionQuestions.map((q) => (
                       <View key={q.id} style={styles.fieldContainer}>
-                          <Text style={styles.fieldLabel}>{q.question}</Text>
-                          <TextInput
+                            <Text style={styles.fieldLabel}>{t(q.questionKey)}</Text>
+                            <TextInput
                               style={styles.textInput}
                               value={currentDiscussionAnswers[q.id] || ""}
                               onChangeText={(value) => handleDiscussionChange(q.id, value)}
-                              placeholder="Enter your answer"
+                              placeholder={t("placeholder.enterYourAnswer")}
                               placeholderTextColor={theme.textMuted}
                               multiline
-                          />
+                            />
                       </View>
                   ))}
               </View>
 
               {/* 4. Reflection Section */}
               <View style={styles.section}>
-                  <Text style={styles.sectionTitle}>Reflection</Text>
+                  <Text style={styles.sectionTitle}>{t("attempt.reflection")}</Text>
                   <TextInput
                       style={[styles.textInput, styles.reflectionInput]}
                       value={currentReflection}
@@ -307,7 +307,7 @@ export default function ActivityAttemptMainScreen(){
                       multiline
                   />
                   <View style={styles.ratingContainer}>
-                      <Text style={styles.ratingLabel}>Rate your experience:</Text>
+                      <Text style={styles.ratingLabel}>{t("attempt.rateYourExperience")}:</Text>
                       <View style={styles.ratingStars}>
                           {[1, 2, 3, 4, 5].map((star) => (
                               <Pressable
@@ -377,7 +377,7 @@ export default function ActivityAttemptMainScreen(){
               >
                   <MaterialCommunityIcons name="content-save" size={20} color="#fff" />
                   <Text style={styles.saveBtnText}>
-                      {isSaving ? "Saving..." : "Save Attempt"}
+                      {isSaving ? t("journal.saving") : t("journal.saveAttempt")}
                   </Text>
               </Pressable>
           </View>

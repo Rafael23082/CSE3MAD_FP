@@ -6,6 +6,9 @@ import { initReactI18next } from "react-i18next";
 const resources = {
   en: {
     translation: {
+      placeholder: {
+        enterYourAnswer: "Enter your answer"
+      },
       tabs: {
         home: "Home",
         activities: "Activities",
@@ -58,7 +61,8 @@ const resources = {
         stopRecording: "Stop Recording",
         saveVideo: "Save Video",
         retry: "Retry",
-        removeVideo: "Remove"
+        removeVideo: "Remove",
+        openSensorDebugScreen: "Open Sensor Debug Screen"
       },
       landing: {
         slogan: "Experiment. Measure. Improve."
@@ -149,6 +153,8 @@ const resources = {
         phase: "Phase",
         activityResults: "Activity Results",
         allActivities: "All Activities",
+        sensorValidation: "Sensor Validation",
+        sensorValidationDescription: "Check camera, microphone, GPS, and accelerometer live on a physical Android device.",
         
         parachuteDropChallenge: {
           name: "Parachute Drop Challenge",
@@ -197,6 +203,31 @@ const resources = {
             serious: "10-30 g: Serious injuries possible (sports collisions)",
             severe: "30-50 g: High risk of severe injury (car crashes)",
             critical: "50+ g: Life-threatening injuries likely"
+          },
+          discussionQuestion1: "Were your predictions correct?",
+          discussionQuestion2: "Which parachute design worked best?",
+          discussionQuestion3: "What made that design effective?",
+          discussionQuestion4: "What would you improve next time?",
+          prediction1: "Which parachute design do you think will stay in the air the longest?",
+          prediction2: "Why do you think this design will perform best?",
+          action1: {
+            label: "Small Parachute",
+            subtitle: "Test a small parachute design",
+          },
+          action2: {
+            label: "Medium Parachute",
+            subtitle: "Test a medium parachute design",
+          },
+          action3: {
+            label: "Large Parachute",
+            subtitle: "Test a large parachute design",
+          },
+          inputs: {
+            timeToGround: "Time to Ground (s)",
+            landingAccuracy: "Landing Accuracy (m)",
+            observationNotes: "Observation Notes",
+            describeWhatHappened: "Describe what happened...",
+            zero: "0.0"
           }
         },
         
@@ -232,7 +263,31 @@ const resources = {
             critical: "120dB+: Immediate damage risk"
           },
           needEarMuffs: "Should you wear ear muffs?",
-          needEarMuffsPlaceholder: "Your thoughts on ear protection"
+          needEarMuffsPlaceholder: "Your thoughts on ear protection",
+          discussionQuestion1: "Which action was loudest?",
+          discussionQuestion2: "Which action was quietest?",
+          discussionQuestion3: "What surprised you?",
+          discussionQuestion4: "How can noise pollution be reduced?",
+          prediction1: "Which action do you think will produce the loudest sound?",
+          prediction2: "Explain Why?",
+          action1: {
+            label: "Dropping Books",
+            subtitle: "Measure sound level when dropping books",
+          },
+          action2: {
+            label: "Stomping Feet",
+            subtitle: "Measure sound level of stomping feet",
+          },
+          action3: {
+            label: "Clapping Hands",
+            subtitle: "Measure sound level of clapping hands",
+          },
+          inputs: {
+            measuredDb: "Measured dB",
+            observationNotes: "Observation Notes",
+            describeWhatHappened: "Describe what happened...",
+            useSoundMeter: "Use sound meter"
+          }
         },
         
         handFanChallenge: {
@@ -272,6 +327,33 @@ const resources = {
             stiffnessEffectPlaceholder: "Your observation",
             distanceEffect: "How does distance affect bending?",
             distanceEffectPlaceholder: "Your observation"
+          },
+          discussionQuestion1: "Which distance produced the largest movement?",
+          discussionQuestion2: "How did distance affect airflow?",
+          discussionQuestion3: "What would you improve?",
+          prediction1: "Which fan distance will create the largest movement?",
+          prediction2: "Why?",
+          action1: {
+            label: "15cm",
+            subtitle: "Fan from 15cm away",
+          },
+          action2: {
+            label: "30cm",
+            subtitle: "Fan from 30cm away",
+          },
+          action3: {
+            label: "45cm",
+            subtitle: "Fan from 45cm away",
+          },
+          inputs: {
+            numberOfFolds: "Number of Folds",
+            materialUsed: "Material Used",
+            observedBendAngle: "Observed Bend Angle (°)",
+            observationNotes: "Observation Notes",
+            zero: "0",
+            measuredDb: "Measured dB",
+            describeWhatHappened: "Describe what happened...",
+            paperOrCardboard: "Paper or Cardboard"
           }
         },
         
@@ -317,7 +399,35 @@ const resources = {
           pillars: "Pillars",
           sway: "Sway",
           peak: "Peak",
-          predicted: "Predicted"
+          predicted: "Predicted",
+          discussionQuestion1: "Which structure was most stable?",
+          discussionQuestion2: "Which moved the most?",
+          discussionQuestion3: "What design feature improved stability?",
+          discussionQuestion4: "What would you change next time?",
+          prediction1: "Which structure do you think will be most stable?",
+          prediction2: "Why?",
+          action1: {
+            label: "Design 1",
+            subtitle: "4 folds + 4 pillars",
+          },
+          action2: {
+            label: "Design 2",
+            subtitle: "10 folds + 4 pillars",
+          },
+          action3: {
+            label: "Design 3",
+            subtitle: "3 folds + 6 pillars",
+          },
+          inputs: {
+            designDescription: "Design Description",
+            predictedMovement: "Predicted Movement (cm)",
+            measuredMovement: "Measured Movement (cm)",
+            observationNotes: "Observation Notes",
+            designDescriptionPlaceholder: "e.g. 6 folds and 5 pillars",
+            zero: "0",
+            useVibrationTest: "Use vibration test",
+            describeWhatHappened: "Describe what happened..."
+          }
         },
         
         stretchSpeedAndGracefulness: {
@@ -343,7 +453,33 @@ const resources = {
           movementMonitorPlaceholder: "Start recording to visualize movement smoothness",
           movementVibrations: "Movement {{index}} Vibrations",
           movementSmoothness: "Movement {{index}} Smoothness",
-          vibrations: "Vibrations"
+          vibrations: "Vibrations",
+          discussionQuestion1: "Which structure was most stable?",
+          discussionQuestion2: "Which moved the most?",
+          discussionQuestion3: "What design feature improved stability?",
+          discussionQuestion4: "What would you change next time?",
+          prediction1: "Which movement do you think will be most stable?",
+          prediction2: "Why?",
+          action1: {
+            label: "Clockwise Movement",
+            subtitle: "Move your phone in a clockwise movement.",
+          },
+          action2: {
+            label: "Horizontal Movement",
+            subtitle: "Move your phone in a horizontal movement.",
+          },
+          action3: {
+            label: "Vertical Movement",
+            subtitle: "Move your phone in a vertical movement.",
+          },
+          inputs: {
+            predictedVibrations: "Predicted Vibrations",
+            zero: "0",
+            measuredVibrations: "Measured Vibrations",
+            useMovementTest: "Use movement test",
+            observation: "Observation",
+            describeWhatHappened: "Describe what happened..."
+          }
         },
         
         reactionBoardChallenge: {
@@ -369,7 +505,32 @@ const resources = {
           accuracyScore: "Accuracy Score",
           tap: "TAP!",
           tracingAccuracy: "Tracing Accuracy",
-          reactionTime: "Reaction Time"
+          reactionTime: "Reaction Time",
+          discussionQuestion1: "Were your predictions correct?",
+          discussionQuestion2: "Which of the two category challenges were more challenging?",
+          discussionQuestion3: "Any surprises?",
+          prediction1: "How much do you think will be the difference between your dominant and non-dominant hand reaction time (ms)?",
+          prediction2: "Why?",
+          action1: {
+            label: "Dominant Hand Tap Challenge",
+            subtitle: "React and tap the hidden button using your dominant hand.",
+          },
+          action2: {
+            label: "Non-Dominant Hand Tap Challenge",
+            subtitle: "React and tap the hidden button using your non-dominant hand.",
+          },
+          action3: {
+            label: "Tracing Challenge",
+            subtitle: "Trace the moving object.",
+          },
+          inputs: {
+            predictedVibrations: "Predicted Vibrations",
+            zero: "0",
+            measuredVibrations: "Measured Vibrations",
+            useMovementTest: "Use movement test",
+            observation: "Observation",
+            describeWhatHappened: "Describe what happened..."
+          }
         },
         
         breathingPaceTrainer: {
@@ -392,7 +553,32 @@ const resources = {
           bpm: "BPM",
           breathingMonitor: "Breathing Monitor",
           breathingMonitorPlaceholder: "Start recording to visualize chest movement",
-          activityBPMCount: "Activity {{index}} BPM"
+          activityBPMCount: "Activity {{index}} BPM",
+          discussionQuestion1: "Were your predictions correct?",
+          discussionQuestion2: "Any surprises?",
+          discussionQuestion3: "How did different levels of physical activity change your breathing rate?",
+          prediction1: "Which activitiy do you think will result in the hights BPM?",
+          prediction2: "Why?",
+          action1: {
+            label: "Rest",
+            subtitle: "Record your BPM during rest.",
+          },
+          action2: {
+            label: "Jogging",
+            subtitle: "Record your BPM after jogging for 1 minute.",
+          },
+          action3: {
+            label: "Star Jumps",
+            subtitle: "Record your BPM after doing 100 star jumps.",
+          },
+          inputs: {
+            predictedBPM: "Preduicted BPM",
+            measuredBPM: "Measured BPM",
+            observation: "Observation",
+            zero: "0",
+            useBreathingTest: "Use breathing test",
+            describeWhatHappened: "Describe what happened..."
+          }
         }
       },
       journal: {
@@ -666,7 +852,54 @@ const resources = {
         logTrialPlaceholder: "No trials logged yet. Complete a challenge and tap \"Log Trial\" to record your results.",
         videoEvidence: "Video Evidence",
         videoAttached: "Video Attached",
-        noVideoRecorded: "No video recorded"
+        noVideoRecorded: "No video recorded",
+        leaderboardIneligible: "Leaderboard Ineligible",
+        minuteChallenge: "20 Minute Challenge",
+        startTimer: "Start the timer when your team is ready",
+        actionsCompleted: "All actions completed!",
+        resultsComparison: "Results Comparison",
+        design: "Design",
+        maxTilt: "Max Tilt",
+        avgTilt: "Avg Tilt",
+        peak: "Peak",
+        best: "Best",
+        lowestAvgTilt: "lowest avg tilt",
+        action: "Action",
+        soundMeter: "Sound Meter",
+        stop: "Stop",
+        startSoundMeter: "Start Sound Meter",
+        vibrationTest: "Vibration Test",
+        tapRecord: "Tap Record to start capturing vibration data",
+        collectingSamples: "Collecting Samples",
+        liveVibration: "Live Vibration",
+        runVibrationTest: "Run Vibration Test",
+        peakAccel: "Peak Accel",
+        duration: "Duration",
+        movementTest: "Movement Test",
+        runMovementTest: "Run Movement Test",
+        tracingSensor: "Tracing Sensor",
+        reactionTimer: "Reaction Timer",
+        stopTracing: "Stop Tracing",
+        startTracing: "Start Tracing",
+        waitForSignal: "Wait For the Signal",
+        tap: "TAP!",
+        startReactionTest: "Start Reaction Test",
+        breathingTest: "Breathing Test",
+        runBreathingTest: "Run Breathing Test",
+        stiffness: "stiffness",
+        paper: "paper",
+        cardboard: "cardboard",
+        bendAngle: "bend angle",
+        angle: "Angle",
+        force: "Force",
+        enterObservedAngle: "Enter an observed angle to calculate force",
+        submitTrial: "Submit Trial",
+        predictions: "Predictions",
+        experimentRecords: "Experiment Records",
+        discussionQuestions: "Discussion Questions",
+        reflection: "Reflection",
+        rateYourExperience: "Rate your experience:",
+        noActionsConfigured: "No actions configured"
       },
       settings: {
         batteryLevel: "Battery Level"
@@ -675,6 +908,9 @@ const resources = {
   },
   ja: {
     translation: {
+      placeholder: {
+        enterYourAnswer: "回答を入力してください"
+      },
       tabs: {
         home: "ホーム",
         activities: "活動",
@@ -727,7 +963,8 @@ const resources = {
         stopRecording: "録画停止",
         saveVideo: "ビデオを保存",
         retry: "再試行",
-        removeVideo: "削除"
+        removeVideo: "削除",
+        openSensorDebugScreen: "センサーデバッグ画面を開く"
       },
       landing: {
         slogan: "試行。測定。改善。"
@@ -818,6 +1055,8 @@ const resources = {
         phase: "段階",
         activityResults: "活動結果",
         allActivities: "すべてのアクティビティ",
+        sensorValidation: "センサー検証",
+        sensorValidationDescription: "実機のAndroid端末でカメラ、マイク、GPS、加速度センサーが正常に動作するかリアルタイムで確認します。",
         
         parachuteDropChallenge: {
           name: "パラシュート投下チャレンジ",
@@ -837,7 +1076,32 @@ const resources = {
             { name: "表", description: "一貫した、正確に測定された落下高さを確保し、公平な試験を行うことができます。" },
             { name: "はさみ", description: "特定の設計要件に合わせてキャノピーとストリングを裁断・成形するために使用されます。" },
             { name: "テープ", description: "部品を固定し、落下高さを印付けします。" }
-          ]
+          ],
+          discussionQuestion1: "予想は正しかったですか？",
+          discussionQuestion2: "どのパラシュートのデザインが最も効果的でしたか？",
+          discussionQuestion3: "そのデザインが効果的だった理由は何ですか？",
+          discussionQuestion4: "次回は何を改善したいですか？",
+          prediction1: "どのパラシュートのデザインが最も長く空中に留まると思いますか？",
+          prediction2: "なぜそのデザインが最も良い結果を出すと思いますか？",
+          action1: {
+            label: "小型パラシュート",
+            subtitle: "小型パラシュートの設計をテストする",
+          },
+          action2: {
+            label: "中型パラシュート",
+            subtitle: "中型パラシュートの設計をテストする",
+          },
+          action3: {
+            label: "大型パラシュート",
+            subtitle: "大型パラシュートの設計をテストする",
+          },
+          inputs: {
+            timeToGround: "着地までの時間 (秒)",
+            landingAccuracy: "着地点の誤差 (m)",
+            observationNotes: "観察メモ",
+            describeWhatHappened: "何が起こったかを記述してください...",
+            zero: "0.0"
+          }
         },
         
         soundPollutionHunter: {
@@ -850,7 +1114,32 @@ const resources = {
           ],
           equipments: [
             { name: "任意のオブジェクト", description: "ノイズを測定するために置く物体。" }
-          ]
+          ],
+          needEarMuffsPlaceholder: "耳の保護についての感想",
+          discussionQuestion1: "どの行動が最も大きな音を出しましたか？",
+          discussionQuestion2: "どの行動が最も静かでしたか？",
+          discussionQuestion3: "何に驚きましたか？",
+          discussionQuestion4: "騒音公害はどのように減らすことができますか？",
+          prediction1: "どの行動が最も大きな音を出すと思いますか？",
+          prediction2: "その理由を説明してください。",
+          action1: {
+            label: "本を落とす",
+            subtitle: "本を落としたときの音量を測定する",
+          },
+          action2: {
+            label: "足踏み",
+            subtitle: "足踏みの音量を測定する",
+          },
+          action3: {
+            label: "手をたたく",
+            subtitle: "手をたたいたときの音量を測定する",
+          },
+          inputs: {
+            measuredDb: "測定されたdB",
+            observationNotes: "観察メモ",
+            describeWhatHappened: "何が起こったか説明してください...",
+            useSoundMeter: "騒音計を使用"
+          }
         },
         
         handFanChallenge: {
@@ -866,7 +1155,58 @@ const resources = {
             { name: "紙および段ボール", description: "ファンと垂直ターゲットの両方を構成する原材料として使用される。" },
             { name: "はさみ", description: "特定の扇形の形状やサイズに合わせて、素材を正確に切断することができます。" },
             { name: "粘着テープ", description: "対象物をテーブルに固定し、倒れることなく曲げられるようにします。" }
-          ]
+          ],
+          selectMaterial: "Target Material",
+          selectDistance: "Distance (cm)",
+          materialStiffness: "Stiffness Coefficient",
+          targetToggle: "Target Type",
+          paper: "Paper",
+          cardboard: "Cardboard",
+          fanDesign: "Fan Design Name",
+          fanDesignPlaceholder: "e.g. Origami Pleated Fold",
+          deflectionAngle: "Deflection Angle (°)",
+          anglePlaceholder: "Enter bend angle",
+          forceResult: "Estimated Force",
+          forceUnit: "N",
+          stiffnessNote: "Higher stiffness = more force required to bend",
+          predictionAngle: "Predicted Angle (°)",
+          predictionAnglePlaceholder: "Your predicted angle",
+          wasRightLabel: "Were you right?",
+          writeUp: {
+            bestDesign: "Which design moved the paper most?",
+            bestDesignPlaceholder: "Your answer",
+            stiffnessEffect: "How does stiffness affect bend angle?",
+            stiffnessEffectPlaceholder: "Your observation",
+            distanceEffect: "How does distance affect bending?",
+            distanceEffectPlaceholder: "Your observation"
+          },
+          discussionQuestion1: "Which distance produced the largest movement?",
+          discussionQuestion2: "How did distance affect airflow?",
+          discussionQuestion3: "What would you improve?",
+          prediction1: "Which fan distance will create the largest movement?",
+          prediction2: "Why?",
+          action1: {
+            label: "15cm",
+            subtitle: "Fan from 15cm away",
+          },
+          action2: {
+            label: "30cm",
+            subtitle: "Fan from 30cm away",
+          },
+          action3: {
+            label: "45cm",
+            subtitle: "Fan from 45cm away",
+          },
+          inputs: {
+            numberOfFolds: "Number of Folds",
+            materialUsed: "Material Used",
+            observedBendAngle: "Observed Bend Angle (°)",
+            observationNotes: "Observation Notes",
+            zero: "0",
+            measuredDb: "Measured dB",
+            describeWhatHappened: "Describe what happened...",
+            paperOrCardboard: "Paper or Cardboard"
+          }
         },
         
         earthquakeResistantStructure: {
@@ -891,6 +1231,34 @@ const resources = {
           sway: "揺れ",
           peak: "最大値",
           predicted: "予測",
+          discussionQuestion1: "どの構造が最も安定していましたか？",
+          discussionQuestion2: "どの構造が最も大きく動きましたか？",
+          discussionQuestion3: "どの設計上の特徴が安定性を向上させましたか？",
+          discussionQuestion4: "次回は何を変更したいですか？",
+          prediction1: "どの構造が最も安定すると予想しますか？",
+          prediction2: "なぜですか？",
+          action1: {
+            label: "Design 1",
+            subtitle: "4 folds + 4 pillars",
+          },
+          action2: {
+            label: "Design 2",
+            subtitle: "10 folds + 4 pillars",
+          },
+          action3: {
+            label: "Design 3",
+            subtitle: "3 folds + 6 pillars",
+          },
+          inputs: {
+            designDescription: "Design Description",
+            predictedMovement: "Predicted Movement (cm)",
+            measuredMovement: "Measured Movement (cm)",
+            observationNotes: "Observation Notes",
+            designDescriptionPlaceholder: "e.g. 6 folds and 5 pillars",
+            zero: "0",
+            useVibrationTest: "Use vibration test",
+            describeWhatHappened: "Describe what happened..."
+          }
         },
         
         stretchSpeedAndGracefulness: {
@@ -916,7 +1284,33 @@ const resources = {
           movementMonitorPlaceholder: "録画を開始して、動きの滑らかさを確認しましょう",
           movementVibrations: "運動 {{index}} 振動",
           movementSmoothness: "動き {{index}} の滑らかさ",
-          vibrations: "振動回数"
+          vibrations: "振動回数",
+          discussionQuestion1: "どの動きが最も安定していましたか？",
+          discussionQuestion2: "どの動きが最も大きく揺れましたか？",
+          discussionQuestion3: "どのような要素が安定性の向上につながりましたか？",
+          discussionQuestion4: "次回は何を変更したいですか？",
+          prediction1: "どの動きが最も安定すると予想しますか？",
+          prediction2: "なぜですか？",
+          action1: {
+            label: "時計回りの動き",
+            subtitle: "スマートフォンを時計回りに動かしてください。",
+          },
+          action2: {
+            label: "水平移動",
+            subtitle: "スマートフォンを水平方向に動かしてください。",
+          },
+          action3: {
+            label: "垂直移動",
+            subtitle: "スマートフォンを垂直方向に動かしてください。",
+          },
+          inputs: {
+            predictedVibrations: "予測振動数",
+            zero: "0",
+            measuredVibrations: "測定振動数",
+            useMovementTest: "動作テストを使用",
+            observation: "観察",
+            describeWhatHappened: "何が起こったか説明してください..."
+          }
         },
         
         reactionBoardChallenge: {
@@ -945,7 +1339,32 @@ const resources = {
           accuracyScore: "精度スコア",
           tap: "タップ！",
           tracingAccuracy: "トレース精度",
-          reactionTime: "反応時間"
+          reactionTime: "反応時間",
+          discussionQuestion1: "予想は正しかったですか？",
+          discussionQuestion2: "2つのカテゴリーのチャレンジのうち、どちらがより難しかったですか？",
+          discussionQuestion3: "何か驚いたことはありましたか？",
+          prediction1: "利き手と非利き手の反応時間の差はどのくらいになると思いますか？（ms）",
+          prediction2: "なぜですか？",
+          action1: {
+            label: "利き手タップチャレンジ",
+            subtitle: "利き手を使って反応し、隠れたボタンをタップしてください。",
+          },
+          action2: {
+            label: "非利き手タップチャレンジ",
+            subtitle: "非利き手を使って反応し、隠れたボタンをタップしてください。",
+          },
+          action3: {
+            label: "トレースチャレンジ",
+            subtitle: "動く物体をなぞってください。",
+          },
+          inputs: {
+            predictedVibrations: "予測値",
+            zero: "0",
+            measuredVibrations: "測定値",
+            useMovementTest: "テスト結果を使用",
+            observation: "観察",
+            describeWhatHappened: "何が起こったか説明してください..."
+          }
         },
         
         breathingPaceTrainer: {
@@ -968,7 +1387,32 @@ const resources = {
           bpm: "BPM",
           breathingMonitor: "呼吸モニター",
           breathingMonitorPlaceholder: "胸の動きを確認するために録画を開始してください",
-          activityBPMCount: "アクティビティ {{index}} BPM"
+          activityBPMCount: "アクティビティ {{index}} BPM",
+          discussionQuestion1: "予想は正しかったですか？",
+          discussionQuestion2: "何か驚いたことはありましたか？",
+          discussionQuestion3: "運動量の違いによって呼吸数はどのように変化しましたか？",
+          prediction1: "どの活動が最も高いBPMになると思いますか？",
+          prediction2: "なぜですか？",
+          action1: {
+            label: "安静時",
+            subtitle: "安静時のBPMを記録してください。",
+          },
+          action2: {
+            label: "ジョギング",
+            subtitle: "1分間ジョギングした後のBPMを記録してください。",
+          },
+          action3: {
+            label: "ジャンピングジャック",
+            subtitle: "100回のジャンピングジャック後のBPMを記録してください。",
+          },
+          inputs: {
+            predictedBPM: "予測BPM",
+            measuredBPM: "測定BPM",
+            observation: "観察",
+            zero: "0",
+            useBreathingTest: "呼吸テストを使用",
+            describeWhatHappened: "何が起こったか説明してください..."
+          }
         }
       },
       journal: {
@@ -1211,7 +1655,54 @@ const resources = {
         logTrialPlaceholder: "まだ試行は記録されていません。チャレンジを完了し、「試行を記録」をタップして結果を保存してください。",
         videoEvidence: "ビデオ証拠",
         videoAttached: "ビデオが添付されました",
-        noVideoRecorded: "ビデオが記録されていません"
+        noVideoRecorded: "録画された動画はありません",
+        leaderboardIneligible: "リーダーボード対象外",
+        minuteChallenge: "20分チャレンジ",
+        startTimer: "チームの準備ができたらタイマーを開始してください",
+        actionsCompleted: "すべてのアクションが完了しました！",
+        resultsComparison: "結果の比較",
+        design: "デザイン",
+        maxTilt: "最大傾き",
+        avgTilt: "平均傾き",
+        peak: "ピーク",
+        best: "最高",
+        lowestAvgTilt: "平均傾きが最も低い",
+        action: "アクション",
+        soundMeter: "騒音計",
+        stop: "停止",
+        startSoundMeter: "騒音計を開始",
+        vibrationTest: "振動テスト",
+        tapRecord: "記録をタップして振動データの収集を開始",
+        collectingSamples: "サンプル収集中",
+        liveVibration: "リアルタイム振動",
+        runVibrationTest: "振動テストを実行",
+        peakAccel: "最大加速度",
+        duration: "継続時間",
+        movementTest: "動作テスト",
+        runMovementTest: "動作テストを実行",
+        tracingSensor: "トレースセンサー",
+        reactionTimer: "反応タイマー",
+        stopTracing: "トレース停止",
+        startTracing: "トレース開始",
+        waitForSignal: "合図を待ってください",
+        tap: "タップ！",
+        startReactionTest: "反応テスト開始",
+        breathingTest: "呼吸テスト",
+        runBreathingTest: "呼吸テストを実行",
+        stiffness: "剛性",
+        paper: "紙",
+        cardboard: "厚紙",
+        bendAngle: "曲げ角度",
+        angle: "角度",
+        force: "力",
+        enterObservedAngle: "観測した角度を入力して力を計算",
+        submitTrial: "試行を送信",
+        predictions: "予想",
+        experimentRecords: "実験記録",
+        discussionQuestions: "考察問題",
+        reflection: "振り返り",
+        rateYourExperience: "体験を評価してください：",
+        noActionsConfigured: "設定されたアクションがありません",
       },
       settings: {
         batteryLevel: "バッテリー残量"
@@ -1220,6 +1711,9 @@ const resources = {
   },
   id: {
     translation: {
+      placeholder: {
+        enterYourAnswer: "Masukkan jawaban Anda"
+      },
       tabs: {
         home: "Beranda",
         activities: "Aktivitas",
@@ -1267,7 +1761,8 @@ const resources = {
         edit: "Ubah",
         save: "Simpan",
         openCamera: "Buka Kamera",
-        closeCamera: "Tutup Kamera"
+        closeCamera: "Tutup Kamera",
+        openSensorDebugScreen: "Buka Layar Debug Sensor"
       },
       landing: {
         slogan: "Eksperimen. Ukur. Tingkatkan."
@@ -1326,17 +1821,19 @@ const resources = {
           "Ambil data menggunakan sensor ponsel dan unggah hasilnya",
           "Sempurnakan desain Anda dan naikkan peringkat"
         ],
-        seeActivityRequirement: "Selesaikan sebuah aktivitas untuk melihatnya di sini.",
+        seeActivityRequirement: "Selesaikan aktivitas untuk melihatnya di sini.",
         progress: "Kemajuan",
-        progressSummary: "Anda telah menyelesaikan {{count}} dari 7 aktivitas",
+        progressSummary: "Menyelesaikan {{count}} dari 7 aktivitas ({{points}} poin)",
         bestActivity: "Aktivitas Terbaik",
         activityCompletion: "Penyelesaian Aktivitas",
-        scoresOverview: "Ikhtisar Skor",
+        scoresOverview: "Ringkasan Skor",
         submissionHistory: "Riwayat Pengiriman",
         noSubmissionsYet: "Belum ada pengiriman",
-        noScoresYet: "Mulai selesaikan aktivitas untuk melihat skor Anda",
-        viewFullProgress: "Lihat Kemajuan Penuh",
-        completedActivities: "Aktivitas Selesai",
+        noScoresYet: "Selesaikan aktivitas untuk melihat skor Anda",
+        viewProgressionBoard: "Lihat Papan Progres",
+        viewFullProgress: "Lihat Kemajuan Lengkap",
+        completedActivities: "Aktivitas yang Diselesaikan",
+        activitiesCompleted: "Aktivitas Selesai",
         latestScore: "Skor Terbaru"
       },
       activities: {
@@ -1349,6 +1846,8 @@ const resources = {
         phase: "Fase",
         activityResults: "Hasil Aktivitas",
         allActivities: "Semua Aktivitas",
+        sensorValidation: "Validasi Sensor",
+        sensorValidationDescription: "Periksa kamera, mikrofon, GPS, dan akselerometer secara langsung pada perangkat Android fisik.",
 
         parachuteDropChallenge: {
           name: "Tantangan Jatuhkan Parasut",
@@ -1397,6 +1896,31 @@ const resources = {
             serious: "10-30 g: Cedera serius mungkin (tabrakan olahraga)",
             severe: "30-50 g: Risiko tinggi cedera parah (kecelakaan mobil)",
             critical: "50+ g: Cedera mengancam jiwa"
+          },
+          discussionQuestion1: "Apakah prediksi Anda benar?",
+          discussionQuestion2: "Desain parasut mana yang bekerja paling baik?",
+          discussionQuestion3: "Apa yang membuat desain tersebut efektif?",
+          discussionQuestion4: "Apa yang akan Anda perbaiki di lain waktu?",
+          prediction1: "Menurut Anda, desain parasut mana yang akan bertahan paling lama di udara?",
+          prediction2: "Mengapa Anda berpikir desain ini akan memberikan hasil terbaik?",
+          action1: {
+            label: "Parasut Kecil",
+            subtitle: "Uji desain parasut kecil",
+          },
+          action2: {
+            label: "Parasut Sedang",
+            subtitle: "Uji desain parasut sedang",
+          },
+          action3: {
+            label: "Parasut Besar",
+            subtitle: "Uji desain parasut besar",
+          },
+          inputs: {
+            timeToGround: "Waktu Mencapai Tanah (detik)",
+            landingAccuracy: "Akurasi Pendaratan (m)",
+            observationNotes: "Catatan Observasi",
+            describeWhatHappened: "Jelaskan apa yang terjadi...",
+            zero: "0.0"
           }
         },
 
@@ -1432,7 +1956,31 @@ const resources = {
             critical: "120dB+: Risiko kerusakan langsung"
           },
           needEarMuffs: "Haruskah Anda memakai pelindung telinga?",
-          needEarMuffsPlaceholder: "Pendapat Anda tentang perlindungan telinga"
+          needEarMuffsPlaceholder: "Pendapat Anda tentang perlindungan telinga",
+          discussionQuestion1: "Tindakan mana yang paling keras?",
+          discussionQuestion2: "Tindakan mana yang paling pelan?",
+          discussionQuestion3: "Apa yang mengejutkan Anda?",
+          discussionQuestion4: "Bagaimana polusi suara dapat dikurangi?",
+          prediction1: "Menurut Anda, tindakan mana yang akan menghasilkan suara paling keras?",
+          prediction2: "Jelaskan alasannya.",
+          action1: {
+            label: "Menjatuhkan Buku",
+            subtitle: "Ukur tingkat suara saat menjatuhkan buku",
+          },
+          action2: {
+            label: "Menghentakkan Kaki",
+            subtitle: "Ukur tingkat suara dari hentakan kaki",
+          },
+          action3: {
+            label: "Bertepuk Tangan",
+            subtitle: "Ukur tingkat suara dari tepukan tangan",
+          },
+          inputs: {
+            measuredDb: "dB Terukur",
+            observationNotes: "Catatan Pengamatan",
+            describeWhatHappened: "Jelaskan apa yang terjadi...",
+            useSoundMeter: "Gunakan pengukur suara"
+          }
         },
 
         handFanChallenge: {
@@ -1472,6 +2020,33 @@ const resources = {
             stiffnessEffectPlaceholder: "Pengamatan Anda",
             distanceEffect: "Bagaimana jarak mempengaruhi lenturan?",
             distanceEffectPlaceholder: "Pengamatan Anda"
+          },
+          discussionQuestion1: "Jarak mana yang menghasilkan gerakan terbesar?",
+          discussionQuestion2: "Bagaimana jarak memengaruhi aliran udara?",
+          discussionQuestion3: "Apa yang akan Anda tingkatkan?",
+          prediction1: "Jarak kipas mana yang akan menghasilkan gerakan terbesar?",
+          prediction2: "Mengapa?",
+          action1: {
+            label: "15cm",
+            subtitle: "Kipas dari jarak 15cm",
+          },
+          action2: {
+            label: "30cm",
+            subtitle: "Kipas dari jarak 30cm",
+          },
+          action3: {
+            label: "45cm",
+            subtitle: "Kipas dari jarak 45cm",
+          },
+          inputs: {
+            numberOfFolds: "Jumlah Lipatan",
+            materialUsed: "Bahan yang Digunakan",
+            observedBendAngle: "Sudut Tekukan yang Diamati (°)",
+            observationNotes: "Catatan Pengamatan",
+            zero: "0",
+            measuredDb: "dB Terukur",
+            describeWhatHappened: "Jelaskan apa yang terjadi...",
+            paperOrCardboard: "Kertas atau Karton"
           }
         },
 
@@ -1518,6 +2093,34 @@ const resources = {
           sway: "Goyangan",
           peak: "Puncak",
           predicted: "Prediksi",
+          discussionQuestion1: "Struktur mana yang paling stabil?",
+          discussionQuestion2: "Struktur mana yang paling banyak bergerak?",
+          discussionQuestion3: "Fitur desain apa yang meningkatkan stabilitas?",
+          discussionQuestion4: "Apa yang akan Anda ubah di lain waktu?",
+          prediction1: "Menurut Anda, struktur mana yang akan paling stabil?",
+          prediction2: "Mengapa?",
+          action1: {
+            label: "Desain 1",
+            subtitle: "4 lipatan + 4 pilar",
+          },
+          action2: {
+            label: "Desain 2",
+            subtitle: "10 lipatan + 4 pilar",
+          },
+          action3: {
+            label: "Desain 3",
+            subtitle: "3 lipatan + 6 pilar",
+          },
+          inputs: {
+            designDescription: "Deskripsi Desain",
+            predictedMovement: "Pergerakan Prediksi (cm)",
+            measuredMovement: "Pergerakan Terukur (cm)",
+            observationNotes: "Catatan Pengamatan",
+            designDescriptionPlaceholder: "contoh: 6 lipatan dan 5 pilar",
+            zero: "0",
+            useVibrationTest: "Gunakan uji getaran",
+            describeWhatHappened: "Jelaskan apa yang terjadi..."
+          }
         },
 
         stretchSpeedAndGracefulness: {
@@ -1543,7 +2146,33 @@ const resources = {
           movementMonitorPlaceholder: "Mulai merekam untuk memvisualisasikan kehalusan gerakan",
           movementVibrations: "Gerakan {{index}} Getaran",
           movementSmoothness: "Gerakan {{index}} Kehalusan",
-          vibrations: "Getaran"
+          vibrations: "Getaran",
+          discussionQuestion1: "Gerakan mana yang paling stabil?",
+          discussionQuestion2: "Gerakan mana yang paling banyak bergerak?",
+          discussionQuestion3: "Faktor apa yang meningkatkan stabilitas?",
+          discussionQuestion4: "Apa yang akan Anda ubah di lain waktu?",
+          prediction1: "Menurut Anda, gerakan mana yang akan paling stabil?",
+          prediction2: "Mengapa?",
+          action1: {
+            label: "Gerakan Searah Jarum Jam",
+            subtitle: "Gerakkan ponsel Anda searah jarum jam.",
+          },
+          action2: {
+            label: "Gerakan Horizontal",
+            subtitle: "Gerakkan ponsel Anda secara horizontal.",
+          },
+          action3: {
+            label: "Gerakan Vertikal",
+            subtitle: "Gerakkan ponsel Anda secara vertikal.",
+          },
+          inputs: {
+            predictedVibrations: "Prediksi Getaran",
+            zero: "0",
+            measuredVibrations: "Getaran Terukur",
+            useMovementTest: "Gunakan uji gerakan",
+            observation: "Pengamatan",
+            describeWhatHappened: "Jelaskan apa yang terjadi..."
+          }
         },
 
         reactionBoardChallenge: {
@@ -1572,7 +2201,32 @@ const resources = {
           accuracyScore: "Skor Akurasi",
           tap: "KETUK!",
           tracingAccuracy: "Akurasi Menelusuri",
-          reactionTime: "Waktu Reaksi"
+          reactionTime: "Waktu Reaksi",
+          discussionQuestion1: "Apakah prediksi Anda benar?",
+          discussionQuestion2: "Dari kedua tantangan kategori tersebut, mana yang lebih menantang?",
+          discussionQuestion3: "Apakah ada hal yang mengejutkan?",
+          prediction1: "Menurut Anda, berapa perbedaan waktu reaksi antara tangan dominan dan non-dominan Anda (ms)?",
+          prediction2: "Mengapa?",
+          action1: {
+            label: "Tantangan Ketukan Tangan Dominan",
+            subtitle: "Bereaksi dan ketuk tombol tersembunyi menggunakan tangan dominan Anda.",
+          },
+          action2: {
+            label: "Tantangan Ketukan Tangan Non-Dominan",
+            subtitle: "Bereaksi dan ketuk tombol tersembunyi menggunakan tangan non-dominan Anda.",
+          },
+          action3: {
+            label: "Tantangan Menelusuri",
+            subtitle: "Ikuti objek yang bergerak.",
+          },
+          inputs: {
+            predictedVibrations: "Prediksi",
+            zero: "0",
+            measuredVibrations: "Hasil Pengukuran",
+            useMovementTest: "Gunakan hasil tes",
+            observation: "Pengamatan",
+            describeWhatHappened: "Jelaskan apa yang terjadi..."
+          }
         },
 
         breathingPaceTrainer: {
@@ -1595,7 +2249,32 @@ const resources = {
           bpm: "BPM",
           breathingMonitor: "Monitor Pernapasan",
           breathingMonitorPlaceholder: "Mulai merekam untuk memvisualisasikan gerakan dada",
-          activityBPMCount: "Aktivitas {{index}} BPM"
+          activityBPMCount: "Aktivitas {{index}} BPM",
+          discussionQuestion1: "Apakah prediksi Anda benar?",
+          discussionQuestion2: "Apakah ada hal yang mengejutkan?",
+          discussionQuestion3: "Bagaimana tingkat aktivitas fisik yang berbeda memengaruhi laju pernapasan Anda?",
+          prediction1: "Menurut Anda, aktivitas mana yang akan menghasilkan BPM tertinggi?",
+          prediction2: "Mengapa?",
+          action1: {
+            label: "Istirahat",
+            subtitle: "Catat BPM Anda saat beristirahat.",
+          },
+          action2: {
+            label: "Jogging",
+            subtitle: "Catat BPM Anda setelah jogging selama 1 menit.",
+          },
+          action3: {
+            label: "Jumping Jack",
+            subtitle: "Catat BPM Anda setelah melakukan 100 kali jumping jack.",
+          },
+          inputs: {
+            predictedBPM: "Prediksi BPM",
+            measuredBPM: "BPM Terukur",
+            observation: "Observasi",
+            zero: "0",
+            useBreathingTest: "Gunakan tes pernapasan",
+            describeWhatHappened: "Jelaskan apa yang terjadi..."
+          }
         }
       },
       journal: {
@@ -1810,7 +2489,55 @@ const resources = {
         newTrial: "Uji Coba Baru",
         designPresets: "Preset Desain",
         structuralIterations: "Iterasi Struktural",
-        logTrialPlaceholder: "Belum ada percobaan yang dicatat. Selesaikan tantangan lalu ketuk \"Catat Percobaan\" untuk menyimpan hasil Anda."
+        logTrialPlaceholder: "Belum ada percobaan yang dicatat. Selesaikan tantangan lalu ketuk \"Catat Percobaan\" untuk menyimpan hasil Anda.",
+        noVideoRecorded: "Tidak ada video yang direkam",
+        leaderboardIneligible: "Tidak Memenuhi Syarat Papan Peringkat",
+        minuteChallenge: "Tantangan 20 Menit",
+        startTimer: "Mulai timer saat tim Anda siap",
+        actionsCompleted: "Semua tindakan telah selesai!",
+        resultsComparison: "Perbandingan Hasil",
+        design: "Desain",
+        maxTilt: "Kemiringan Maksimum",
+        avgTilt: "Kemiringan Rata-rata",
+        peak: "Puncak",
+        best: "Terbaik",
+        lowestAvgTilt: "kemiringan rata-rata terendah",
+        action: "Tindakan",
+        soundMeter: "Pengukur Suara",
+        stop: "Berhenti",
+        startSoundMeter: "Mulai Pengukur Suara",
+        vibrationTest: "Tes Getaran",
+        tapRecord: "Ketuk Rekam untuk mulai menangkap data getaran",
+        collectingSamples: "Mengumpulkan Sampel",
+        liveVibration: "Getaran Langsung",
+        runVibrationTest: "Jalankan Tes Getaran",
+        peakAccel: "Akselerasi Puncak",
+        duration: "Durasi",
+        movementTest: "Tes Gerakan",
+        runMovementTest: "Jalankan Tes Gerakan",
+        tracingSensor: "Sensor Pelacakan",
+        reactionTimer: "Timer Reaksi",
+        stopTracing: "Hentikan Pelacakan",
+        startTracing: "Mulai Pelacakan",
+        waitForSignal: "Tunggu Sinyal",
+        tap: "KETUK!",
+        startReactionTest: "Mulai Tes Reaksi",
+        breathingTest: "Tes Pernapasan",
+        runBreathingTest: "Jalankan Tes Pernapasan",
+        stiffness: "kekakuan",
+        paper: "kertas",
+        cardboard: "karton",
+        bendAngle: "sudut tekuk",
+        angle: "Sudut",
+        force: "Gaya",
+        enterObservedAngle: "Masukkan sudut yang diamati untuk menghitung gaya",
+        submitTrial: "Kirim Percobaan",
+        predictions: "Prediksi",
+        experimentRecords: "Catatan Eksperimen",
+        discussionQuestions: "Pertanyaan Diskusi",
+        reflection: "Refleksi",
+        rateYourExperience: "Nilai pengalaman Anda:",
+        noActionsConfigured: "Tidak ada tindakan yang dikonfigurasi",
       },
       settings: {
         batteryLevel: "Tingkat Baterai"
@@ -1819,6 +2546,9 @@ const resources = {
   },
   zh: {
     translation: {
+      placeholder: {
+        enterYourAnswer: "请输入你的答案"
+      },
       tabs: {
         home: "首页",
         activities: "活动",
@@ -1864,7 +2594,8 @@ const resources = {
         edit: "编辑",
         save: "节省",
         openCamera: "打开摄像头",
-        closeCamera: "近景镜头"
+        closeCamera: "近景镜头",
+        openSensorDebugScreen: "打开传感器调试界面"
       },
       landing: {
         slogan: "实验。测量。改进。"
@@ -1915,17 +2646,19 @@ const resources = {
           "使用手机传感器捕获数据并上传结果",
           "优化设计并登上排行榜"
         ],
-        seeActivityRequirement: "完成活动即可在此处查看。",
+        seeActivityRequirement: "完成活动后将在此处显示。",
         progress: "进度",
-        progressSummary: "您已完成{{count}}个活动（共7个）",
+        progressSummary: "已完成 7 个活动中的 {{count}} 个（{{points}} 分）",
         bestActivity: "最佳活动",
         activityCompletion: "活动完成情况",
         scoresOverview: "分数概览",
-        submissionHistory: "提交历史",
-        noSubmissionsYet: "暂无提交",
-        noScoresYet: "开始完成活动以查看您的分数",
+        submissionHistory: "提交记录",
+        noSubmissionsYet: "暂无提交记录",
+        noScoresYet: "完成活动后即可查看您的分数",
+        viewProgressionBoard: "查看进度榜",
         viewFullProgress: "查看完整进度",
-        completedActivities: "已完成活动",
+        completedActivities: "已完成的活动",
+        activitiesCompleted: "已完成活动",
         latestScore: "最新分数"
       },
       activities: {
@@ -1938,6 +2671,8 @@ const resources = {
         phase: "阶段",
         activityResults: "活动结果",
         allActivities: "所有活动",
+        sensorValidation: "传感器验证",
+        sensorValidationDescription: "在真实 Android 设备上实时检查摄像头、麦克风、GPS 和加速度计。",
 
         parachuteDropChallenge: {
           name: "降落伞投放挑战",
@@ -1986,6 +2721,31 @@ const resources = {
             serious: "10-30 g：可能严重受伤（运动碰撞）",
             severe: "30-50 g：严重受伤高风险（车祸）",
             critical: "50+ g：可能危及生命"
+          },
+          discussionQuestion1: "你的预测正确吗？",
+          discussionQuestion2: "哪种降落伞设计效果最好？",
+          discussionQuestion3: "是什么让这种设计如此有效？",
+          discussionQuestion4: "下次你会改进什么？",
+          prediction1: "你认为哪种降落伞设计会在空中停留最长时间？",
+          prediction2: "你为什么认为这种设计会表现最好？",
+          action1: {
+            label: "小型降落伞",
+            subtitle: "测试小型降落伞设计",
+          },
+          action2: {
+            label: "中型降落伞",
+            subtitle: "测试中型降落伞设计",
+          },
+          action3: {
+            label: "大型降落伞",
+            subtitle: "测试大型降落伞设计",
+          },
+          inputs: {
+            timeToGround: "落地时间（秒）",
+            landingAccuracy: "着陆精度（米）",
+            observationNotes: "观察记录",
+            describeWhatHappened: "请描述发生了什么……",
+            zero: "0.0"
           }
         },
 
@@ -2021,7 +2781,31 @@ const resources = {
             critical: "120dB+：立即损伤风险"
           },
           needEarMuffs: "应该戴耳罩吗？",
-          needEarMuffsPlaceholder: "您对听力保护的看法"
+          needEarMuffsPlaceholder: "您对听力保护的看法",
+          discussionQuestion1: "哪个动作发出的声音最大？",
+          discussionQuestion2: "哪个动作发出的声音最小？",
+          discussionQuestion3: "什么让你感到惊讶？",
+          discussionQuestion4: "如何减少噪音污染？",
+          prediction1: "你认为哪个动作会产生最大的声音？",
+          prediction2: "请解释原因。",
+          action1: {
+            label: "掉落书本",
+            subtitle: "测量书本掉落时的声音强度",
+          },
+          action2: {
+            label: "跺脚",
+            subtitle: "测量跺脚产生的声音强度",
+          },
+          action3: {
+            label: "拍手",
+            subtitle: "测量拍手产生的声音强度",
+          },
+          inputs: {
+            measuredDb: "测量分贝值",
+            observationNotes: "观察记录",
+            describeWhatHappened: "描述发生了什么...",
+            useSoundMeter: "使用分贝仪"
+          }
         },
 
         handFanChallenge: {
@@ -2061,6 +2845,33 @@ const resources = {
             stiffnessEffectPlaceholder: "您的观察",
             distanceEffect: "距离如何影响弯曲？",
             distanceEffectPlaceholder: "您的观察"
+          },
+          discussionQuestion1: "哪个距离产生了最大的移动？",
+          discussionQuestion2: "距离如何影响气流？",
+          discussionQuestion3: "你会改进什么？",
+          prediction1: "哪个扇风距离会产生最大的移动？",
+          prediction2: "为什么？",
+          action1: {
+            label: "15cm",
+            subtitle: "从15厘米处扇风",
+          },
+          action2: {
+            label: "30cm",
+            subtitle: "从30厘米处扇风",
+          },
+          action3: {
+            label: "45cm",
+            subtitle: "从45厘米处扇风",
+          },
+          inputs: {
+            numberOfFolds: "折叠次数",
+            materialUsed: "使用材料",
+            observedBendAngle: "观察到的弯曲角度 (°)",
+            observationNotes: "观察记录",
+            zero: "0",
+            measuredDb: "测量分贝值",
+            describeWhatHappened: "描述发生了什么...",
+            paperOrCardboard: "纸张或纸板"
           }
         },
 
@@ -2107,6 +2918,34 @@ const resources = {
           sway: "摆动",
           peak: "峰值",
           predicted: "预测",
+          discussionQuestion1: "哪个结构最稳定？",
+          discussionQuestion2: "哪个结构晃动得最厉害？",
+          discussionQuestion3: "哪种设计特点提高了稳定性？",
+          discussionQuestion4: "下次你会做哪些改变？",
+          prediction1: "你认为哪个结构会最稳定？",
+          prediction2: "为什么？",
+          action1: {
+            label: "设计 1",
+            subtitle: "4个折叠 + 4根支柱",
+          },
+          action2: {
+            label: "设计 2",
+            subtitle: "10个折叠 + 4根支柱",
+          },
+          action3: {
+            label: "设计 3",
+            subtitle: "3个折叠 + 6根支柱",
+          },
+          inputs: {
+            designDescription: "设计描述",
+            predictedMovement: "预测位移 (cm)",
+            measuredMovement: "测量位移 (cm)",
+            observationNotes: "观察记录",
+            designDescriptionPlaceholder: "例如：6个折叠和5根支柱",
+            zero: "0",
+            useVibrationTest: "使用振动测试",
+            describeWhatHappened: "描述发生了什么..."
+          }
         },
 
         stretchSpeedAndGracefulness: {
@@ -2132,7 +2971,33 @@ const resources = {
           movementMonitorPlaceholder: "开始录制以可视化运动流畅度",
           movementVibrations: "运动 {{index}} 振动",
           movementSmoothness: "运动 {{index}} 流畅度",
-          vibrations: "振动次数"
+          vibrations: "振动次数",
+          discussionQuestion1: "哪个动作最稳定？",
+          discussionQuestion2: "哪个动作晃动得最厉害？",
+          discussionQuestion3: "什么因素提高了稳定性？",
+          discussionQuestion4: "下次你会做哪些改变？",
+          prediction1: "你认为哪个动作会最稳定？",
+          prediction2: "为什么？",
+          action1: {
+            label: "顺时针运动",
+            subtitle: "以顺时针方向移动你的手机。",
+          },
+          action2: {
+            label: "水平运动",
+            subtitle: "水平移动你的手机。",
+          },
+          action3: {
+            label: "垂直运动",
+            subtitle: "垂直移动你的手机。",
+          },
+          inputs: {
+            predictedVibrations: "预测振动次数",
+            zero: "0",
+            measuredVibrations: "测量振动次数",
+            useMovementTest: "使用运动测试",
+            observation: "观察",
+            describeWhatHappened: "描述发生了什么..."
+          }
         },
 
         reactionBoardChallenge: {
@@ -2161,7 +3026,32 @@ const resources = {
           accuracyScore: "准确度评分",
           tap: "点击！",
           tracingAccuracy: "描摹准确率",
-          reactionTime: "反应时间"
+          reactionTime: "反应时间",
+          discussionQuestion1: "你的预测正确吗？",
+          discussionQuestion2: "这两个类别挑战中，哪一个更具挑战性？",
+          discussionQuestion3: "有什么让你感到惊讶的吗？",
+          prediction1: "你认为你的惯用手和非惯用手的反应时间差会是多少（毫秒）？",
+          prediction2: "为什么？",
+          action1: {
+            label: "惯用手点击挑战",
+            subtitle: "使用惯用手快速反应并点击隐藏按钮。",
+          },
+          action2: {
+            label: "非惯用手点击挑战",
+            subtitle: "使用非惯用手快速反应并点击隐藏按钮。",
+          },
+          action3: {
+            label: "轨迹追踪挑战",
+            subtitle: "沿着移动的物体进行追踪。",
+          },
+          inputs: {
+            predictedVibrations: "预测值",
+            zero: "0",
+            measuredVibrations: "测量值",
+            useMovementTest: "使用测试结果",
+            observation: "观察",
+            describeWhatHappened: "描述发生了什么..."
+          }
         },
 
         breathingPaceTrainer: {
@@ -2184,7 +3074,32 @@ const resources = {
           bpm: "次/分钟",
           breathingMonitor: "呼吸监视器",
           breathingMonitorPlaceholder: "开始录制以可视化胸部运动",
-          activityBPMCount: "活动 {{index}} 次/分钟"
+          activityBPMCount: "活动 {{index}} 次/分钟",
+          discussionQuestion1: "你的预测正确吗？",
+          discussionQuestion2: "有什么让你感到惊讶的吗？",
+          discussionQuestion3: "不同程度的身体活动如何影响你的呼吸频率？",
+          prediction1: "你认为哪项活动会产生最高的 BPM？",
+          prediction2: "为什么？",
+          action1: {
+            label: "静息状态",
+            subtitle: "记录静息状态下的 BPM。",
+          },
+          action2: {
+            label: "慢跑",
+            subtitle: "慢跑 1 分钟后记录您的 BPM。",
+          },
+          action3: {
+            label: "开合跳",
+            subtitle: "完成 100 次开合跳后记录您的 BPM。",
+          },
+          inputs: {
+            predictedBPM: "预测 BPM",
+            measuredBPM: "测量 BPM",
+            observation: "观察记录",
+            zero: "0",
+            useBreathingTest: "使用呼吸测试",
+            describeWhatHappened: "描述发生了什么..."
+          }
         }
       },
       journal: {
@@ -2374,7 +3289,55 @@ const resources = {
         newTrial: "新测试",
         designPresets: "设计预设",
         structuralIterations: "结构迭代",
-        logTrialPlaceholder: "尚未记录任何试验。请完成挑战，然后点击“记录试验”以保存您的结果。"
+        logTrialPlaceholder: "尚未记录任何试验。请完成挑战，然后点击“记录试验”以保存您的结果。",
+        noVideoRecorded: "未录制视频",
+        leaderboardIneligible: "无资格进入排行榜",
+        minuteChallenge: "20分钟挑战",
+        startTimer: "当你的团队准备好时开始计时",
+        actionsCompleted: "所有操作已完成！",
+        resultsComparison: "结果比较",
+        design: "设计",
+        maxTilt: "最大倾斜度",
+        avgTilt: "平均倾斜度",
+        peak: "峰值",
+        best: "最佳",
+        lowestAvgTilt: "最低平均倾斜度",
+        action: "操作",
+        soundMeter: "声音计",
+        stop: "停止",
+        startSoundMeter: "启动声音计",
+        vibrationTest: "振动测试",
+        tapRecord: "点击录制开始采集振动数据",
+        collectingSamples: "正在收集样本",
+        liveVibration: "实时振动",
+        runVibrationTest: "运行振动测试",
+        peakAccel: "峰值加速度",
+        duration: "持续时间",
+        movementTest: "运动测试",
+        runMovementTest: "运行运动测试",
+        tracingSensor: "轨迹传感器",
+        reactionTimer: "反应计时器",
+        stopTracing: "停止追踪",
+        startTracing: "开始追踪",
+        waitForSignal: "等待信号",
+        tap: "点击！",
+        startReactionTest: "开始反应测试",
+        breathingTest: "呼吸测试",
+        runBreathingTest: "运行呼吸测试",
+        stiffness: "刚度",
+        paper: "纸张",
+        cardboard: "纸板",
+        bendAngle: "弯曲角度",
+        angle: "角度",
+        force: "力",
+        enterObservedAngle: "输入观察到的角度以计算作用力",
+        submitTrial: "提交测试",
+        predictions: "预测",
+        experimentRecords: "实验记录",
+        discussionQuestions: "讨论问题",
+        reflection: "反思",
+        rateYourExperience: "请为您的体验评分：",
+        noActionsConfigured: "未配置任何操作",
       },
       settings: {
         batteryLevel: "电池电量"
