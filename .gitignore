@@ -44,9 +44,6 @@ app-example
 /ios
 /android
 
-firebase.js
-firestore.indexes.json
-
 # test coverage
 coverage/
 

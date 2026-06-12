@@ -1,0 +1,28 @@
+[
+  {
+    "eventType": "VIEW_CLICKED",
+    "elementDescriptors": [
+      { "text": "Login" }
+    ]
+  },
+  {
+    "eventType": "VIEW_TEXT_CHANGED",
+    "replacementText": "betas1@gmail.com",
+    "elementDescriptors": [
+      { "editableText": "Enter your email" }
+    ]
+  },
+  {
+    "eventType": "VIEW_TEXT_CHANGED",
+    "replacementText": "betas1",
+    "elementDescriptors": [
+      { "editableText": "Enter your password" }
+    ]
+  },
+  {
+    "eventType": "VIEW_CLICKED",
+    "elementDescriptors": [
+      { "text": "Login" }
+    ]
+  }
+]

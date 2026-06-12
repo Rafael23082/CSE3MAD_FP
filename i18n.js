@@ -126,7 +126,7 @@ const resources = {
         ],
         seeActivityRequirement: "Complete an activity to see it here",
         progress: "Progress",
-        progressSummary: "You've completed {{count}} of 7 activities ({{points}} points)",
+        progressSummary: "You've completed {{count}} of 7 activities",
         bestActivity: "Best Activity",
         activityCompletion: "Activity Completion",
         scoresOverview: "Scores Overview",

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "435684681786",
+    "project_id": "cse3mad-fp-2e58f",
+    "storage_bucket": "cse3mad-fp-2e58f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:435684681786:android:7a23297789e9635b26ed03",
+        "android_client_info": {
+          "package_name": "com.matt92stan.cse3madfp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCTNnHO6A5OOsEjXr9zjcE5vSV_RfQNtPc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
