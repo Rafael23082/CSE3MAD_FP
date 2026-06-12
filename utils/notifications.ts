@@ -1,60 +1,85 @@
 import Constants from 'expo-constants';
 import { Alert, Platform } from 'react-native';
-import * as Notifications from 'expo-notifications';
 
 const isExpoGo = Constants.executionEnvironment === 'storeClient';
 
-function scheduleNotification(title: string, body: string) {
-  if (isExpoGo) {
-    Alert.alert(title, body);
-    return;
+let NotificationsModule: typeof import('expo-notifications') | null = null;
+
+async function getNotifications() {
+  if (isExpoGo) return null;
+  if (!NotificationsModule) {
+    NotificationsModule = await import('expo-notifications');
   }
-  Notifications.scheduleNotificationAsync({
-    content: { title, body },
-    trigger: null,
-  }).catch(() => {});
+  return NotificationsModule;
 }
 
-export function configureNotifications() {
-  if (isExpoGo) return;
+export async function registerForPushNotifications(): Promise<string | null> {
+  if (isExpoGo) {
+    console.warn('[notifications] Push notifications not available in Expo Go. Use a development build.');
+    return null;
+  }
 
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowAlert: true,
-      shouldPlaySound: true,
-      shouldSetBadge: false,
-      shouldShowBanner: true,
-      shouldShowList: true,
-    }),
-  });
+  const Notifications = await getNotifications();
+  if (!Notifications) return null;
 
   if (Platform.OS === 'android') {
-    Notifications.setNotificationChannelAsync('activity-complete', {
-      name: 'Activity Complete',
-      importance: Notifications.AndroidImportance.HIGH,
+    await Notifications.setNotificationChannelAsync('default', {
+      name: 'default',
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#FF231F7C',
     });
   }
+
+  const { status: existingStatus } = await Notifications.getPermissionsAsync();
+  let finalStatus = existingStatus;
+
+  if (existingStatus !== 'granted') {
+    const { status } = await Notifications.requestPermissionsAsync();
+    finalStatus = status;
+  }
+
+  if (finalStatus !== 'granted') {
+    Alert.alert('Permission required', 'Push notifications permission was not granted.');
+    return null;
+  }
+
+  const tokenData = await Notifications.getExpoPushTokenAsync({
+    projectId: Constants.expoConfig?.extra?.eas?.projectId,
+  });
+
+  return tokenData.data;
 }
 
-export async function requestNotificationPermissions(): Promise<boolean> {
-  if (isExpoGo) return false;
-  const { status } = await Notifications.requestPermissionsAsync();
-  return status === 'granted';
-}
+export async function scheduleLocalNotification(title: string, body: string, seconds: number = 1) {
+  const Notifications = await getNotifications();
+  if (!Notifications) {
+    console.warn('[notifications] Local notifications not available in Expo Go.');
+    return;
+  }
 
-export function showActivitySaved(): void {
-  scheduleNotification('Activity Saved', 'Your experiment data has been recorded.');
-}
-
-export function showActivitySubmitted(points: number): void {
-  scheduleNotification('Activity Submitted', `You earned ${points} points!`);
+  await Notifications.scheduleNotificationAsync({
+    content: { title, body },
+    trigger: { type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, seconds, repeats: false },
+  });
 }
 
 export async function showActivityCompleted(activityName: string): Promise<void> {
-  scheduleNotification('Congratulations!', `You have finished ${activityName}`);
+  await scheduleLocalNotification('Congratulations!', `You have finished ${activityName}`);
 }
 
-export async function showSyncCompleted(count: number): Promise<void> {
-  if (count === 0) return;
-  scheduleNotification('Sync Completed', `${count} experiment(s) synced to cloud.`);
+export async function addNotificationResponseListener(
+  handler: (response: any) => void
+) {
+  const Notifications = await getNotifications();
+  if (!Notifications) return { remove: () => {} };
+  return Notifications.addNotificationResponseReceivedListener(handler);
+}
+
+export async function addNotificationReceivedListener(
+  handler: (notification: any) => void
+) {
+  const Notifications = await getNotifications();
+  if (!Notifications) return { remove: () => {} };
+  return Notifications.addNotificationReceivedListener(handler);
 }

@@ -1,119 +1,66 @@
-import { AppState } from 'react-native';
-import * as TaskManager from 'expo-task-manager';
-import * as BackgroundFetch from 'expo-background-fetch';
-import { getPendingSyncData, markLogSynced } from './database';
-import { saveSubmission } from './activitySubmissions';
-import { showSyncCompleted } from './notifications';
+import Constants from 'expo-constants';
 
-export const BACKGROUND_SYNC_TASK = 'background-sync-task';
+const isExpoGo = Constants.executionEnvironment === 'storeClient';
 
-export interface SyncResult {
-  synced: number;
-  failed: number;
-  errors: string[];
+const BACKGROUND_TASK_NAME = 'BACKGROUND_SYNC_TASK';
+
+let BackgroundTask: typeof import('expo-background-task') | null = null;
+let TaskManager: typeof import('expo-task-manager') | null = null;
+
+async function loadModules() {
+  if (isExpoGo) return false;
+  if (!BackgroundTask) {
+    BackgroundTask = await import('expo-background-task');
+  }
+  if (!TaskManager) {
+    TaskManager = await import('expo-task-manager');
+  }
+  return true;
 }
 
-let lastSyncTime: Date | null = null;
-
-export async function syncPendingLogs(): Promise<SyncResult> {
-  const result: SyncResult = { synced: 0, failed: 0, errors: [] };
-
-  try {
-    const pendingGroups = await getPendingSyncData();
-
-    for (const group of pendingGroups) {
-      try {
-        await saveSubmission({
-          userId: group.userId,
-          activityKey: group.activityKey,
-          logs: group.logs.map((l) => ({
-            activityKey: group.activityKey,
-            data: l.data,
-            timestamp: l.timestamp,
-          })),
-          reflection: '',
-          submittedAt: new Date(),
-        });
-
-        for (const logId of group.logIds) {
-          await markLogSynced(logId);
-        }
-        result.synced += group.logs.length;
-      } catch (err) {
-        result.failed += group.logs.length;
-        result.errors.push(err instanceof Error ? err.message : String(err));
-      }
-    }
-
-    lastSyncTime = new Date();
-  } catch (err) {
-    result.errors.push(err instanceof Error ? err.message : String(err));
+export async function defineBackgroundTask(callback: () => Promise<void>) {
+  const loaded = await loadModules();
+  if (!loaded || !TaskManager) {
+    console.warn('[backgroundSync] Background tasks not available in Expo Go.');
+    return;
   }
 
-  return result;
-}
-
-/**
- * Background task definition
- */
-TaskManager.defineTask(BACKGROUND_SYNC_TASK, async () => {
-  try {
-    const result = await syncPendingLogs();
-    if (result.synced > 0) {
-      await showSyncCompleted(result.synced);
-    }
-    return result.synced > 0 ? BackgroundFetch.BackgroundFetchResult.NewData : BackgroundFetch.BackgroundFetchResult.NoData;
-  } catch {
-    return BackgroundFetch.BackgroundFetchResult.Failed;
-  }
-});
-
-/**
- * Register background sync task (15-minute interval)
- */
-export async function registerBackgroundTask(): Promise<void> {
-  try {
-    const isRegistered = await TaskManager.isTaskRegisteredAsync(BACKGROUND_SYNC_TASK);
-    if (isRegistered) return;
-
-    await BackgroundFetch.registerTaskAsync(BACKGROUND_SYNC_TASK, {
-      minimumInterval: 15 * 60,
-      stopOnTerminate: false,
-      startOnBoot: true,
-    });
-  } catch {
-    // Background task registration may fail on some devices
-  }
-}
-
-/**
- * Unregister background sync task
- */
-export async function unregisterBackgroundTask(): Promise<void> {
-  try {
-    const isRegistered = await TaskManager.isTaskRegisteredAsync(BACKGROUND_SYNC_TASK);
-    if (isRegistered) {
-      await BackgroundFetch.unregisterTaskAsync(BACKGROUND_SYNC_TASK);
-    }
-  } catch {
-    // Ignore errors
-  }
-}
-
-export function registerSyncOnForeground(): () => void {
-  const subscription = AppState.addEventListener('change', (nextState: string) => {
-    if (nextState === 'active') {
-      syncPendingLogs().catch(() => {});
+  TaskManager.defineTask(BACKGROUND_TASK_NAME, async () => {
+    try {
+      await callback();
+      return BackgroundTask
+        ? BackgroundTask.BackgroundTaskResult.Success
+        : undefined;
+    } catch (error) {
+      console.error('[backgroundSync] Task failed:', error);
+      return BackgroundTask
+        ? BackgroundTask.BackgroundTaskResult.Failed
+        : undefined;
     }
   });
-
-  return () => {
-    subscription.remove();
-  };
 }
 
-export async function getSyncStatus(): Promise<{ pending: number; lastSync: Date | null }> {
-  const data = await getPendingSyncData();
-  const pending = data.reduce((acc, g) => acc + g.logIds.length, 0);
-  return { pending, lastSync: lastSyncTime };
+export async function registerBackgroundSync(intervalMinutes: number = 15) {
+  const loaded = await loadModules();
+  if (!loaded || !BackgroundTask) {
+    console.warn('[backgroundSync] Cannot register background task in Expo Go.');
+    return;
+  }
+
+  const isRegistered = await TaskManager!.isTaskRegisteredAsync(BACKGROUND_TASK_NAME);
+  if (isRegistered) return;
+
+  await BackgroundTask.registerTaskAsync(BACKGROUND_TASK_NAME, {
+    minimumInterval: intervalMinutes,
+  });
+}
+
+export async function unregisterBackgroundSync() {
+  const loaded = await loadModules();
+  if (!loaded || !BackgroundTask) return;
+
+  const isRegistered = await TaskManager!.isTaskRegisteredAsync(BACKGROUND_TASK_NAME);
+  if (isRegistered) {
+    await BackgroundTask.unregisterTaskAsync(BACKGROUND_TASK_NAME);
+  }
 }
