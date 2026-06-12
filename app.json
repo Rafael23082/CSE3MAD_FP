@@ -1,4 +1,8 @@
 {
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-3940256099942544~3347511713",
+    "ios_app_id": "ca-app-pub-3940256099942544~1458002511"
+  },
   "expo": {
     "name": "CSE3MAD_FP",
     "slug": "CSE3MAD_FP",
@@ -65,10 +69,17 @@
       "expo-media-library",
       "expo-notifications",
       "expo-task-manager",
-      "expo-background-fetch",
       "expo-audio",
       "expo-video",
-      "expo-asset"
+      "expo-asset",
+      "expo-background-task",
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-3940256099942544~3347511713",
+          "iosAppId": "ca-app-pub-3940256099942544~1458002511"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
@@ -79,6 +90,7 @@
       "eas": {
         "projectId": "87eacab1-6c2f-4656-8b19-575489b68b55"
       }
-    }
+    },
+    "owner": "matt92stan"
   }
 }

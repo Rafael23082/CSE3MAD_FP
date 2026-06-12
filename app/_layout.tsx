@@ -1,9 +1,8 @@
 import { ActivityProvider } from '@/context/ActivityContext';
 import { AuthProvider } from '@/context/AuthContext';
 import { ThemeProvider } from '@/context/ThemeContext';
-import { registerBackgroundTask, registerSyncOnForeground } from '@/utils/backgroundSync';
-import { configureNotifications, requestNotificationPermissions } from '@/utils/notifications';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import Constants from 'expo-constants';
 import { useFonts } from "expo-font";
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -11,6 +10,8 @@ import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import { initI18n } from "../i18n";
+
+const isExpoGo = Constants.executionEnvironment === 'storeClient';
 
 export default function RootLayout() {
   useFonts({
@@ -24,16 +25,25 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    initI18n();
-    registerBackgroundTask();
-    configureNotifications();
-    requestNotificationPermissions().catch(() => {});
+    async function init() {
+      initI18n();
 
-    const cleanupSync = registerSyncOnForeground();
-    return () => {
-      cleanupSync();
-    };
-  }, [])
+      if (!isExpoGo) {
+        const { registerForPushNotifications } = await import('../utils/notifications');
+        await registerForPushNotifications();
+
+        const { defineBackgroundTask, registerBackgroundSync } = await import('../utils/backgroundSync');
+        await defineBackgroundTask(async () => {
+          // your sync logic here
+        });
+        await registerBackgroundSync();
+      } else {
+        console.log('[app] Running in Expo Go — skipping notifications & background sync.');
+      }
+    }
+
+    init();
+  }, []);
 
   const queryClient = new QueryClient();
 
