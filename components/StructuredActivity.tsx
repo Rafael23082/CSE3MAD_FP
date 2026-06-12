@@ -1,20 +1,20 @@
-import { ACTION_CONFIGS } from "@/constants/data";
 import AngleMeasureOverlay from "@/components/AngleMeasureOverlay";
+import { ACTION_CONFIGS } from "@/constants/data";
 import { ActivityContext } from "@/context/ActivityContext";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { calculateFanForce, degreesToRadians } from "@/utils/physics";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { AudioRecorder } from 'expo-audio';
 import { AudioModule, getRecordingPermissionsAsync, RecordingPresets, requestRecordingPermissionsAsync, setAudioModeAsync } from 'expo-audio';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as Haptics from 'expo-haptics';
 import { Accelerometer } from 'expo-sensors';
 import { Subscription } from "expo-sensors/build/Pedometer";
-import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { use, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Svg, { Circle, Line, Rect } from "react-native-svg";
@@ -135,7 +135,6 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
   const tracingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Reaction Board Challenge Reaction Time and Accuracy State
-  const [centered, setCentered] = useState<number[]>([]);
   const [breaths, setBreaths] = useState(0);
   const [bpm, setBpm] = useState(0);
   const zValues = useRef<number[]>([]);
@@ -520,7 +519,6 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
     zValues.current = [];
     setBreaths(0);
     setBpm(0);
-    setCentered([]);
 
     Accelerometer.setUpdateInterval(100);
 
@@ -567,9 +565,6 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
 
       const smoothed = whittakerEilersSmooth(zValues.current, 8, 6);
       const centeredSignal = centerSignal(smoothed);
-
-      setCentered(centeredSignal);
-
       const breathCount = detectBreaths(centeredSignal);
       const durationSeconds = zValues.current.length * 0.1;
       const calculatedBpm = Math.round((breathCount / durationSeconds) * 60);

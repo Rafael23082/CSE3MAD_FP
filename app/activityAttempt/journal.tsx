@@ -1,13 +1,13 @@
+import { ActivityAttempt, ActivityLogEntry } from '@/constants/types';
 import { ActivityContext } from '@/context/ActivityContext';
 import { AuthContext } from '@/context/AuthContext';
 import { useTheme } from '@/hooks/useTheme';
 import { ThemeColors } from '@/theme/colors';
-import { ActivityAttempt, ActivityLogEntry } from '@/constants/types';
 import {
-    getAttemptsForActivity,
     deleteAttempt,
-    submitToLeaderboard,
+    getAttemptsForActivity,
     replaceSubmission,
+    submitToLeaderboard,
 } from '@/utils/activityAttempts';
 import { showActivityCompleted } from '@/utils/notifications';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -76,6 +76,9 @@ export default function JournalScreen() {
             case 'sound-pollution-hunter': return t('journal.decibelMetric');
             case 'hand-fan-challenge': return t('journal.forceMetric');
             case 'earthquake-resistant-structure': return t('journal.swayMetric');
+            case 'stretch-speed-and-gracefulness': return t('activities.stretchSpeedAndGracefulness.vibrationsDetected');
+            case 'reaction-board-challenge': return t('activities.reactionBoardChallenge.tracingAccuracy');
+            case 'breathing-pace-trainer': return "BPM";
             default: return t('journal.defaultMetric');
         }
     };
@@ -90,6 +93,9 @@ export default function JournalScreen() {
             case 'sound-pollution-hunter': return toNumber(lastLog.data?.measuredDb);
             case 'hand-fan-challenge': return toNumber(lastLog.data?.observedAngle);
             case 'earthquake-resistant-structure': return toNumber(lastLog.data?.measuredMovement);
+            case 'stretch-speed-and-gracefulness': return toNumber(lastLog.data?.measuredVibrations);
+            case 'reaction-board-challenge': return toNumber(lastLog.data?.measureTracingAccuracy ?? lastLog.data?.measuredReactionTime);
+            case 'breathing-pace-trainer': return toNumber(lastLog.data?.measuredBPM);
             default: return 0;
         }
     };
