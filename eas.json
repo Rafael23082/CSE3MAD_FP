@@ -14,7 +14,7 @@
         "buildType": "apk"
       },
       "env": {
-        "API_URL": ""
+        "API_URL": "AIzaSyDipQOWsouhl5bJPBN71d21ozvy_yh2x7s"
       }
     },
     "production": {
