@@ -87,10 +87,6 @@
         "projectId": "87eacab1-6c2f-4656-8b19-575489b68b55"
       }
     },
-    "owner": "matt92stan",
-    "react-native-google-mobile-ads": {
-      "android_app_id": "ca-app-pub-3940256099942544~3347511713",
-      "ios_app_id": "ca-app-pub-3940256099942544~1458002511"
-    }
+    "owner": "matt92stan"
   }
 }
