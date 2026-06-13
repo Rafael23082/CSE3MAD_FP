@@ -18,6 +18,7 @@ import { useTranslation } from "react-i18next";
 import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Svg, { Circle, Line, Rect } from "react-native-svg";
+import CountdownTimer from "./countdownTimer";
 
 type Sample = { x: number; y: number; z: number; magnitude: number; ts: number };
 
@@ -108,11 +109,12 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
   const GRAPH_WINDOW = 120;
 
   // Humarn Performance Lab Vibrations State
-  const [isRecordingMovement, setIsRecordingMovement] = useState(false);
+  const vibrationCountRef = useRef(0);
   const [vibrations, setVibrations] = useState(0);
   const previousMagnitude = useRef(0);
   const movementValues = useRef<number[]>([]);
   const [movementSubscription, setMovementSubscription] = useState<Subscription | null>(null);
+  const [movementRunning, setMovementRunning] = useState(false);
 
   // Reaction Board Challenge Reaction Time and Accuracy State
   const [reactionChallengeState, setReactionChallengeState] = useState<"idle" | "waiting" | "ready">("idle");  
@@ -133,6 +135,7 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
       touching: boolean;
   }[]>([]);
   const tracingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [tracingRunning, setTracingRunning] = useState(false);
 
   // Reaction Board Challenge Reaction Time and Accuracy State
   const [breaths, setBreaths] = useState(0);
@@ -140,8 +143,8 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
   const zValues = useRef<number[]>([]);
   const [breathingRecordingState, setBreathingRecordingState] = useState<"idle" | "recording">("idle");
   const breathingSubscription = useRef<Subscription | null>(null);
-
   const meterIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [breathingRunning, setBreathingRunning] = useState(false);
 
   // Fan angle measurement overlay
   const [angleOverlayVisible, setAngleOverlayVisible] = useState(false);
@@ -180,6 +183,10 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
       if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
       if (subscription) subscription.remove();
       const r = recorderRef.current;
+      if (tracingIntervalRef.current) {
+          clearInterval(tracingIntervalRef.current);
+      }
+      breathingSubscription.current?.remove();
       if (r) { r.stop().catch(() => {}); r.release(); }
     };
   }, []);
@@ -329,39 +336,49 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
   };
 
   const startMovementTest = () => {
-    setIsRecordingMovement(true);
-    setVibrations(0);
-    movementValues.current = [];
-    previousMagnitude.current = 0;
+      setMovementRunning(true);
+      setMovementRunning(true);
+      setVibrations(0);
+      vibrationCountRef.current = 0;
 
-    Accelerometer.setUpdateInterval(100);
-    const sub = Accelerometer.addListener(({ x, y, z }) => {
-      const magnitude = Math.sqrt(x * x + y * y + z * z);
-      
-      const delta = Math.abs(magnitude - previousMagnitude.current);
-      previousMagnitude.current = magnitude;
-      
-      movementValues.current.push(delta);
-      
-      if (delta > 0.25) {
-        setVibrations((prev) => prev + 1);
-      }
-    });
-    setSubscription(sub);
+      movementValues.current = [];
+      previousMagnitude.current = 0;
+
+      Accelerometer.setUpdateInterval(100);
+
+      const sub = Accelerometer.addListener(({ x, y, z }) => {
+          const magnitude = Math.sqrt(x * x + y * y + z * z);
+
+          const delta = Math.abs(
+              magnitude - previousMagnitude.current
+          );
+
+          previousMagnitude.current = magnitude;
+          movementValues.current.push(delta);
+
+          if (delta > 0.25) {
+            vibrationCountRef.current += 1;
+            setVibrations(vibrationCountRef.current);
+          }
+      });
+
+      setSubscription(sub);
   };
 
   const stopMovementTest = () => {
-    setIsRecordingMovement(false);
-    
-    setFormValues(prev => ({
-      ...prev,
-      measuredVibrations: String(vibrations)
-    }));
+      setMovementRunning(false);
 
-    if (subscription) {
-      subscription.remove();
-      setSubscription(null);
-    }
+      setFormValues(prev => ({
+          ...prev,
+          measuredVibrations: String(vibrationCountRef.current)
+      }));
+
+      if (subscription) {
+          subscription.remove();
+          setSubscription(null);
+      }
+
+      setMovementRunning(false);
   };
 
   const panGesture = Gesture.Pan()
@@ -417,11 +434,15 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
       setTracingAccuracy(0);
       setReactionChallengeState("ready");
 
+      setTracingRunning(true);
+
       const radius = 30;
       let x = containerSize.width / 2;
       let y = containerSize.height / 2;
+
       let directionX = 1;
       let directionY = 1;
+
       const speedX = 4;
       const speedY = 3;
 
@@ -429,8 +450,11 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
           x += speedX * directionX;
           y += speedY * directionY;
 
-          if (x >= containerSize.width - radius || x <= radius) directionX *= -1;
-          if (y >= containerSize.height - radius || y <= radius) directionY *= -1;
+          if (x >= containerSize.width - radius || x <= radius)
+              directionX *= -1;
+
+          if (y >= containerSize.height - radius || y <= radius)
+              directionY *= -1;
 
           setCirclePosition({ x, y });
 
@@ -439,7 +463,7 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
               fingerY: fingerPosition.current.y,
               circleX: x,
               circleY: y,
-              touching: isTouching.current
+              touching: isTouching.current,
           });
       }, 16);
   };
@@ -455,7 +479,7 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
 
       setFormValues(prev => ({
         ...prev,
-        measureTracingAccuracy: String(score)
+        measuredTracingAccuracy: String(score)
       }));
 
       setReactionChallengeState("idle");
@@ -516,17 +540,20 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
   }
 
   const startBreathingTest = () => {
-    zValues.current = [];
-    setBreaths(0);
-    setBpm(0);
+      zValues.current = [];
 
-    Accelerometer.setUpdateInterval(100);
+      setBreaths(0);
+      setBpm(0);
 
-    breathingSubscription.current = Accelerometer.addListener(({ z }) => {
-        zValues.current.push(z);
-    });
+      Accelerometer.setUpdateInterval(100);
+
+      breathingSubscription.current =
+          Accelerometer.addListener(({ z }) => {
+              zValues.current.push(z);
+          });
 
       setBreathingRecordingState("recording");
+      setBreathingRunning(true);
   };
 
   function detectBreaths(values: number[]) {
@@ -564,20 +591,27 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
       breathingSubscription.current = null;
 
       const smoothed = whittakerEilersSmooth(zValues.current, 8, 6);
+
       const centeredSignal = centerSignal(smoothed);
+
       const breathCount = detectBreaths(centeredSignal);
+
       const durationSeconds = zValues.current.length * 0.1;
-      const calculatedBpm = Math.round((breathCount / durationSeconds) * 60);
+
+      const calculatedBpm = Math.round(
+          (breathCount / durationSeconds) * 60
+      );
 
       setBreaths(breathCount);
       setBpm(calculatedBpm);
 
       setFormValues(prev => ({
-        ...prev,
-        measuredBPM: String(calculatedBpm)
+          ...prev,
+          measuredBPM: String(calculatedBpm)
       }));
 
       setBreathingRecordingState("idle");
+      setBreathingRunning(false);
   };
 
   const handleStartRecording = async () => {
@@ -926,27 +960,49 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
           )}
 
           {hasMovementSensor && (
-            <View style={styles.sensorSection}>
-              <Text style={styles.sensorTitle}>{t("attempt.movementTest")}</Text>
-              <View style={styles.sensorReading}>
-                <Text style={[styles.sensorValue, { color: theme.tertiary }]}>
-                  {vibrations}
-                </Text>
+            <>
+              <CountdownTimer
+                  duration={10}
+                  running={movementRunning}
+                  onFinish={stopMovementTest}
+              />
+              <View style={styles.sensorSection}>
+                <Text style={styles.sensorTitle}>{t("attempt.movementTest")}</Text>
+                <View style={styles.sensorReading}>
+                  <Text style={[styles.sensorValue, { color: theme.tertiary }]}>
+                    {vibrations}
+                  </Text>
+                </View>
+                <Pressable
+                    style={[styles.sensorButton, {
+                      backgroundColor: movementRunning ? theme.textMuted: theme.primary,
+                    }]}
+                    disabled={movementRunning}
+                    onPress={startMovementTest}
+                >
+                    <MaterialCommunityIcons
+                        name={movementRunning ? "timer-outline" : "vibrate"}
+                        size={20}
+                        color="#fff"
+                    />
+
+                    <Text style={styles.sensorButtonText}>
+                        {movementRunning ? t("buttons.recording") : t("attempt.runMovementTest")}
+                    </Text>
+                </Pressable>
               </View>
-              <Pressable
-                style={[styles.sensorButton, { backgroundColor: isRecordingMovement ? theme.danger : theme.primary }]}
-                onPress={isRecordingMovement ? stopMovementTest : startMovementTest}
-              >
-                <MaterialCommunityIcons name={isRecordingMovement ? "stop" : "vibrate"} size={20} color="#fff" />
-                <Text style={styles.sensorButtonText}>
-                  {isRecordingMovement ? t("attempt.stop") : t("attempt.runMovementTest")}
-                </Text>
-              </Pressable>
-            </View>
+            </>
           )}
 
           {isReactionChallenge && (
             <>
+              {currentStep == 2 && (
+                <CountdownTimer
+                    duration={10}
+                    running={tracingRunning}
+                    onFinish={stopTracingChallenge}
+                />
+              )}
               <View style={styles.sensorSection}>
                 <Text style={styles.sensorTitle}>
                   {currentStep === 2 ? t("attempt.tracingSensor") : t("attempt.reactionTimer")}
@@ -961,21 +1017,27 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
                 </View>
 
                 <Pressable
-                  style={[styles.sensorButton, { backgroundColor: reactionChallengeState === "ready" ? theme.danger: theme.primary }]}
-                  onPress={() => {
-                    if (currentStep == 2){
-                    reactionChallengeState === "ready" 
-                      ? stopTracingChallenge() 
-                      : startTracingChallenge();
-                    }else{
-                      startReactionChallenge();
-                    }
-                  }}
+                    style={[styles.sensorButton, {
+                      backgroundColor: reactionChallengeState == "ready" ? theme.textMuted: theme.primary,
+                    }]}
+                    disabled={tracingRunning}
+                    onPress={() => {
+                      if (currentStep == 2){
+                        startTracingChallenge();
+                      }else{
+                        startReactionChallenge();
+                      }
+                    }}
                 >
-                  <MaterialCommunityIcons name="timer-outline" size={20} color="#fff" />
-                  <Text style={styles.sensorButtonText}>
-                    {currentStep === 2 ? (reactionChallengeState == "ready" ? t("attempt.stopTracing"): t("attempt.startTracing")) : (reactionChallengeState == "waiting" ? t("attempt.waitForSignal"): (reactionChallengeState == "ready" ? t("attempt.tap"): t("attempt.startReactionTest")))}
-                  </Text>
+                    <MaterialCommunityIcons
+                        name={tracingRunning ? "timer-outline" : "vibrate"}
+                        size={20}
+                        color="#fff"
+                    />
+
+                    <Text style={styles.sensorButtonText}>
+                        {currentStep === 2 ? (reactionChallengeState == "ready" ? t("buttons.recording"): t("attempt.startTracing")) : (reactionChallengeState == "waiting" ? t("attempt.waitForSignal"): (reactionChallengeState == "ready" ? t("attempt.tap"): t("attempt.startReactionTest")))}
+                    </Text>
                 </Pressable>
               </View>
               {currentStep === 2 ? (
@@ -1027,23 +1089,38 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
           )}
 
           {isBreathingChallenge && (
-            <View style={styles.sensorSection}>
-              <Text style={styles.sensorTitle}>{t("attempt.breathingTest")}</Text>
-              <View style={styles.sensorReading}>
-                <Text style={[styles.sensorValue, { color: theme.tertiary }]}>
-                  {bpm}
-                </Text>
+            <>
+              <CountdownTimer
+                  duration={30}
+                  running={breathingRunning}
+                  onFinish={stopBreathingTest}
+              />
+              <View style={styles.sensorSection}>
+                <Text style={styles.sensorTitle}>{t("attempt.breathingTest")}</Text>
+                <View style={styles.sensorReading}>
+                  <Text style={[styles.sensorValue, { color: theme.tertiary }]}>
+                    {bpm}
+                  </Text>
+                </View>
+                <Pressable
+                    style={[styles.sensorButton, {
+                      backgroundColor: breathingRunning ? theme.textMuted: theme.primary,
+                    }]}
+                    disabled={breathingRunning}
+                    onPress={startBreathingTest}
+                >
+                    <MaterialCommunityIcons
+                        name={breathingRunning ? "timer-outline" : "lungs"}
+                        size={20}
+                        color="#fff"
+                    />
+
+                    <Text style={styles.sensorButtonText}>
+                        {breathingRecordingState == "recording" ? t("buttons.recording") : t("attempt.runBreathingTest")}
+                    </Text>
+                </Pressable>
               </View>
-              <Pressable
-                style={[styles.sensorButton, { backgroundColor: breathingRecordingState == "recording" ? theme.danger : theme.primary }]}
-                onPress={breathingRecordingState == "recording" ? stopBreathingTest : startBreathingTest}
-              >
-                <MaterialCommunityIcons name={breathingRecordingState == "recording" ? "stop" : "lungs"} size={20} color="#fff" />
-                <Text style={styles.sensorButtonText}>
-                  {breathingRecordingState == "recording" ? t("attempt.stop") : t("attempt.runBreathingTest")}
-                </Text>
-              </Pressable>
-            </View>
+            </>
           )}
 
           {/* Video Evidence Section (Parachute only) */}
@@ -1165,6 +1242,10 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
             {config.inputs.map((input) => {
               const isAutoFill = (input.id === "measuredDb" && hasSoundSensor) ||
                 (input.id === "measuredMovement" && hasVibrationSensor) ||
+                (input.id === "measuredVibrations" && hasMovementSensor) ||
+                (input.id === "measuredReactionTime" && isReactionChallenge) ||
+                (input.id === "measuredTracingAccuracy" && isReactionChallenge) ||
+                (input.id === "measuredBPM" && isBreathingChallenge) ||
                 (input.id === "timeToGround" && hasVideo);
               return (
                 <View key={input.id} style={styles.fieldContainer}>

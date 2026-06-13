@@ -524,12 +524,15 @@ const resources = {
             subtitle: "Trace the moving object.",
           },
           inputs: {
-            predictedVibrations: "Predicted Vibrations",
+            predictedReactionTime: "Predicted Reaction Time",
             zero: "0",
-            measuredVibrations: "Measured Vibrations",
-            useMovementTest: "Use movement test",
+            measuredReactionTime: "Measured Reaction Time",
+            useReactionTest: "Use reaction test",
             observation: "Observation",
-            describeWhatHappened: "Describe what happened..."
+            describeWhatHappened: "Describe what happened...",
+            predictedTracingAccuracy: "Predicted Tracing Accuracy",
+            measuredTracingAccuracy: "Measured Tracing Accuracy",
+            useTracingTest: "Use tracing test"
           }
         },
         
@@ -572,7 +575,7 @@ const resources = {
             subtitle: "Record your BPM after doing 100 star jumps.",
           },
           inputs: {
-            predictedBPM: "Preduicted BPM",
+            predictedBPM: "Predicted BPM",
             measuredBPM: "Measured BPM",
             observation: "Observation",
             zero: "0",
@@ -1358,12 +1361,15 @@ const resources = {
             subtitle: "動く物体をなぞってください。",
           },
           inputs: {
-            predictedVibrations: "予測値",
+            predictedReactionTime: "予測反応時間",
             zero: "0",
-            measuredVibrations: "測定値",
-            useMovementTest: "テスト結果を使用",
+            measuredReactionTime: "測定反応時間",
+            useReactionTest: "反応テストを使用",
             observation: "観察",
-            describeWhatHappened: "何が起こったか説明してください..."
+            describeWhatHappened: "何が起こったか説明してください...",
+            predictedTracingAccuracy: "予測トレース精度",
+            measuredTracingAccuracy: "測定トレース精度",
+            useTracingTest: "トレーステストを使用"
           }
         },
         
@@ -2220,12 +2226,15 @@ const resources = {
             subtitle: "Ikuti objek yang bergerak.",
           },
           inputs: {
-            predictedVibrations: "Prediksi",
+            predictedReactionTime: "Waktu Reaksi Prediksi",
             zero: "0",
-            measuredVibrations: "Hasil Pengukuran",
-            useMovementTest: "Gunakan hasil tes",
-            observation: "Pengamatan",
-            describeWhatHappened: "Jelaskan apa yang terjadi..."
+            measuredReactionTime: "Waktu Reaksi Terukur",
+            useReactionTest: "Gunakan tes reaksi",
+            observation: "Observasi",
+            describeWhatHappened: "Jelaskan apa yang terjadi...",
+            predictedTracingAccuracy: "Akurasi Pelacakan Prediksi",
+            measuredTracingAccuracy: "Akurasi Pelacakan Terukur",
+            useTracingTest: "Gunakan tes pelacakan"
           }
         },
 
@@ -3045,12 +3054,15 @@ const resources = {
             subtitle: "沿着移动的物体进行追踪。",
           },
           inputs: {
-            predictedVibrations: "预测值",
+            predictedReactionTime: "预测反应时间",
             zero: "0",
-            measuredVibrations: "测量值",
-            useMovementTest: "使用测试结果",
+            measuredReactionTime: "测量反应时间",
+            useReactionTest: "使用反应测试",
             observation: "观察",
-            describeWhatHappened: "描述发生了什么..."
+            describeWhatHappened: "请描述发生了什么...",
+            predictedTracingAccuracy: "预测描踪准确度",
+            measuredTracingAccuracy: "测量描踪准确度",
+            useTracingTest: "使用描踪测试"
           }
         },
 
