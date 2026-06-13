@@ -8,7 +8,7 @@ import { captureLocation } from "@/utils/location";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from "expo-router";
-import { use, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -205,6 +205,14 @@ export default function ActivityAttemptMainScreen(){
       setIsSaving(false);
     }
   };
+
+  useEffect(() => {
+    return () => {
+        if (clearActivityState){
+            clearActivityState();
+        }
+    }
+  }, [])
 
   return (
       <View style={styles.container}>
