@@ -1,512 +1,145 @@
-import { ActivityContext } from "@/context/ActivityContext";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { Accelerometer } from 'expo-sensors';
+import { Accelerometer } from "expo-sensors";
 import { Subscription } from "expo-sensors/build/Pedometer";
-import { use, useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Alert, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import Button from "./button";
-import Card from "./card";
-import { LineChart } from "./lineChart";
-import PresetSelector from "./presetSelector";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import CountdownTimer from "./countdownTimer";
 
-export type movementValue = {
-    label: string,
-    value: string
+type HumanPerformanceLabAttemptScreenProps = {
+    setFormValues: React.Dispatch<React.SetStateAction<Record<string, string>>>;
 }
 
-const DESIGN_PRESETS = [
-  { key: "activities.stretchSpeedAndGracefulness.clockwiseMovement" },
-  { key: "activities.stretchSpeedAndGracefulness.verticalMovement" },
-  { key: "activities.stretchSpeedAndGracefulness.horizontalMovement" },
-];
-
-export default function HumanPerformanceLabAttemptScreen(){
+export default function HumanPerformanceLabAttemptScreen({setFormValues}: HumanPerformanceLabAttemptScreenProps){
     const {theme} = useTheme();
     const styles = createStyles(theme);
     const router = useRouter();
     const {t} = useTranslation();
 
-    const activityContext = use(ActivityContext);
-
-    const [recordingState, setRecordingState] = useState<"idle" | "recording" | "completed">("idle");
-    const [{ x, y, z }, setData] = useState({ x: 0, y: 0, z: 0 });
-    const [subscription, setSubscription] = useState<Subscription | null>(null);
-    const movementValues = useRef<number[]>([]);
-    const vibrationHistory = useRef<movementValue[]>([]);
-    const [countdown, setCountdown] = useState<number | null>(null);
+    const vibrationCountRef = useRef(0);
     const [vibrations, setVibrations] = useState(0);
-    const [smoothness, setSmoothness] = useState(100);
-    const [largestMovement, setLargestMovement] = useState(0);
-    const [graphValues, setGraphValues] = useState<number[]>([]);
     const previousMagnitude = useRef(0);
-    const [time, setTime] = useState(20);
-    const [presetKey, setPresetKey] = useState("activities.stretchSpeedAndGracefulness.clockwiseMovement");
-
-    interface humanPerformanceLabEntry {
-        id: number;
-        key: string;
-        smoothnessScore: number,
-        vibrations: number
-    }
-
-    const [designs, setDesigns] = useState<humanPerformanceLabEntry[]>([]);
-
-    const _subscribe = useCallback(() => {
-        Accelerometer.setUpdateInterval(100);
-        setSubscription(
-            Accelerometer.addListener(({x, y, z}) => {
-                setData({x, y, z});
-                const magnitude = Math.sqrt(x*x + y*y + z*z);
-                const delta = Math.abs(magnitude - previousMagnitude.current);
-                previousMagnitude.current = magnitude;
-                movementValues.current.push(delta);
-                if (delta > 0.25){
-                    setVibrations((prev) => prev + 1);
-                }
-                setLargestMovement((prev) => Math.max(prev, delta));
-                setSmoothness((prev) => {
-                    const updated = prev - delta * 1.5;
-                    return Math.max(0, Math.min(100, updated));
-                });
-            })
-        );
-    }, []);
-
-    const _unsubscribe = useCallback(() => {
-        setSubscription(prev => {
-            prev?.remove();
-            return null;
-        });
-    }, []);
+    const movementValues = useRef<number[]>([]);
+    const movementSubscription = useRef<Subscription | null>(null);
+    const [movementRunning, setMovementRunning] = useState(false);
 
     useEffect(() => {
-        if (countdown === null) return;
-
-        if (countdown <= 0) {
-            setCountdown(null);
-
-            movementValues.current = [];
-
-            setVibrations(0);
-            setSmoothness(100);
-            setLargestMovement(0);
-            setGraphValues([]);
-
-            previousMagnitude.current = 0;
-
-            setTime(20);
-
-            setRecordingState("recording");
-
-            return;
-        }
-
-        const timer = setTimeout(() => {
-            setCountdown((prev) => (prev ?? 1) - 1);
-        }, 1000);
-
-        return () => clearTimeout(timer);
-    }, [countdown, _unsubscribe]);
-
-    useEffect(() => {
-        let interval: ReturnType<typeof setInterval>;
-
-        if (recordingState == "recording") {
-
-            _subscribe();
-
-            interval = setInterval(() => {
-                setTime((prev) => {
-
-                    if (isNaN(prev) || prev <= 1) {
-
-                        const smoothed = smoothSignal(movementValues.current);
-                        setGraphValues(smoothed);
-                        setRecordingState("completed");
-                        return 0;
-                    }
-
-                    return prev - 1;
-                });
-            }, 1000)
-
-        } else {
-            _unsubscribe();
-        }
-
         return () => {
-            _unsubscribe();
-            clearInterval(interval);
-        };
-
-    }, [recordingState, _subscribe, _unsubscribe]);
-
-    if (!activityContext) return null;
-
-    const { activity } = activityContext;
-    if (!activity) return null;
-
-    const formatNumber = (s: number) => {
-        const min = Math.floor(s / 60);
-        const sec = s % 60;
-
-        return `${min}:${sec < 10 ? "0" : ""}${sec}`;
-    }
-
-    function smoothSignal(values: number[]) {
-        if (values.length < 3) return values;
-
-        const smoothed: number[] = [];
-
-        for (let i = 0; i < values.length; i++) {
-
-            const prev = values[i - 1] ?? values[i];
-            const current = values[i];
-            const next = values[i + 1] ?? values[i];
-
-            smoothed.push((prev + current + next) / 3);
-        }
-
-        return smoothed;
-    }
-
-    const logDesign = () => {
-        setDesigns(prev => {
-            const index = prev.findIndex(d => d.key === presetKey);
-
-            const newDesign = {
-                id: Date.now() + Math.random(),
-                key: presetKey,
-                smoothnessScore: smoothness ?? undefined,
-                vibrations: vibrations ?? undefined,
-            };
-
-            if (index === -1) {
-                return [...prev, newDesign];
+            if (movementSubscription.current) {
+                movementSubscription.current.remove();
+                movementSubscription.current = null;
             }
+        };
+    }, []);
 
-            return prev.map((design, i) =>
-                i === index ? newDesign : design
-            );
-        });
-
-        setRecordingState("idle");
-        setTime(20);
+    const startMovementTest = () => {
+        setMovementRunning(true);
+        setMovementRunning(true);
         setVibrations(0);
-        setSmoothness(100);
-        setLargestMovement(0);
-        setGraphValues([]);
-        movementValues.current = [];
-}
+        vibrationCountRef.current = 0;
 
-    const handleFinish = () => {
-        if (designs.length < DESIGN_PRESETS.length){
-            Alert.alert(t("errorMessages.unfinishedChallenge"), t("errorMessages.unfinishedChallengeDescription"));
-            return;
-        }
-        
-        const results = designs.map(d => ({
-            label: `${d.key}`,
-            value: `Smoothness Score: ${d.smoothnessScore} | Vibrations Detected: ${d.vibrations}}`
+        movementValues.current = [];
+        previousMagnitude.current = 0;
+
+        Accelerometer.setUpdateInterval(100);
+
+        movementSubscription.current = Accelerometer.addListener(({ x, y, z }) => {
+            const magnitude = Math.sqrt(x * x + y * y + z * z);
+
+            const delta = Math.abs(
+                magnitude - previousMagnitude.current
+            );
+
+            previousMagnitude.current = magnitude;
+            movementValues.current.push(delta);
+
+            if (delta > 0.25) {
+                vibrationCountRef.current += 1;
+                setVibrations(vibrationCountRef.current);
+            }
+        });
+    };
+
+    const stopMovementTest = () => {
+        setMovementRunning(false);
+        setFormValues(prev => ({
+            ...prev,
+            measuredVibrations: String(vibrationCountRef.current)
         }));
 
-        const clockwiseMovement = designs.find(
-            d => d.key === "activities.stretchSpeedAndGracefulness.clockwiseMovement"
-        );
-
-        const verticalMovement = designs.find(
-            d => d.key === "activities.stretchSpeedAndGracefulness.verticalMovement"
-        );
-
-        const horizontalMovement = designs.find(
-            d => d.key === "activities.stretchSpeedAndGracefulness.horizontalMovement"
-        );
-        
-        if (activityContext) {
-            activityContext.addExperimentLog({
-                activityKey: "stretch-speed-and-gracefulness",
-                data: { 
-                    presetKey,
-                    clockwiseMovementSmoothness: clockwiseMovement?.smoothnessScore,
-                    verticalMovementSmoothness: verticalMovement?.smoothnessScore,
-                    horizontalMovementSmoothness: horizontalMovement?.smoothnessScore,
-                    clockwiseMovementVibrations: clockwiseMovement?.vibrations,
-                    verticalMovementVibrations: verticalMovement?.vibrations,
-                    horizontalMovementVibrations: horizontalMovement?.vibrations
-                }
-            });
+        if (movementSubscription) {
+            movementSubscription.current?.remove();
+            movementSubscription.current = null;
         }
 
-        router.push({
-            pathname: "/activityResults",
-            params: { results: JSON.stringify(results), activityKey: "stretch-speed-and-gracefulness" }
-        });
-    }
+        setMovementRunning(false);
+    };
 
     return(
-        <KeyboardAvoidingView style={styles.outerContainer} behavior="height">
-            <ScrollView contentContainerStyle={styles.container}>
-                <View style={styles.subContainer}>
-                    <Text style={styles.head}>{activity.name}</Text>
-                    <View style={styles.headerContainer}>
-                        <Text style={styles.sectionHeader}>{t("activities.attempt")}</Text>
-                        <View style={styles.timerContainer}>
-                            <Text style={[styles.sectionHeader, {
-                                lineHeight: 20
-                            }]}>{formatNumber(time)}</Text>
-                        </View>
-                    </View>
+        <>
+            <CountdownTimer
+                duration={10}
+                running={movementRunning}
+                onFinish={stopMovementTest}
+            />
+            <View style={styles.sensorSection}>
+            <Text style={styles.sensorTitle}>{t("attempt.movementTest")}</Text>
+            <View style={styles.sensorReading}>
+                <Text style={[styles.sensorValue, { color: theme.tertiary }]}>
+                    {vibrations}
+                </Text>
+            </View>
+            <Pressable
+                style={[styles.sensorButton, {
+                    backgroundColor: movementRunning ? theme.textMuted: theme.primary,
+                }]}
+                disabled={movementRunning}
+                onPress={startMovementTest}
+            >
+                <MaterialCommunityIcons
+                    name={movementRunning ? "timer-outline" : "vibrate"}
+                    size={20}
+                    color="#fff"
+                />
 
-                    <PresetSelector 
-                        designPresets={DESIGN_PRESETS}
-                        onSelect={(preset) => {
-                            setPresetKey(preset.key);
-                        }}
-                    />
-                    <TextInput
-                        style={styles.input}
-                        value={t(presetKey)}
-                        onChangeText={setPresetKey}
-                        placeholder={"Enter Preset Name"}
-                        placeholderTextColor={theme.textMuted}
-                        editable={false}
-                    />
-
-                    <Text style={[styles.actionName, {marginTop: 24}]}>{t("activities.stretchSpeedAndGracefulness.recordMovement")}</Text>
-
-                    <View style={styles.cardContainer}>
-                        <Card metric={t("activities.stretchSpeedAndGracefulness.vibrationsDetected")} value={String(vibrations)} maximumWidth={true} />
-                    </View>
-
-                    <View style={styles.cardContainer}>
-                        <Card metric={t("activities.stretchSpeedAndGracefulness.smoothnessScore")} value={`${Math.round(smoothness)}%`} maximumWidth={true} />
-                    </View>
-
-                    <View>
-                        {recordingState === "idle" && (
-                            <Button text={t("buttons.startRecording")} action={() => {
-                                    setCountdown(3);
-                                }}
-                            />
-                        )}
-
-                        {recordingState === "recording" && (
-                            <Button text={t("buttons.recording")} action={() => {}} />
-                        )}
-
-                        {recordingState === "completed" && (
-                            <Button 
-                                text={t("buttons.logTrial")}
-                                action={logDesign}
-                            />
-                        )}
-                    </View>
-
-                    <Text style={styles.actionName}>
-                        {t("activities.stretchSpeedAndGracefulness.movementMonitor")}
-                    </Text>
-
-                    <View style={styles.chartContainer}>
-
-                        {graphValues.length != 0 ? (
-                            <LineChart
-                                lineChartData={graphValues.map((value, index) => ({
-                                    time: index,
-                                    z: value
-                                }))}
-                            />
-                        ): (
-                            <Text style={styles.placeholderText}>
-                                {t("activities.stretchSpeedAndGracefulness.movementMonitorPlaceholder")}
-                            </Text>
-                        )}
-
-                    </View>
-
-                </View>
-
-                <Text style={styles.actionNameLarge}>{t("attempt.structuralIterations")}</Text>
-
-                {DESIGN_PRESETS.map((design, index) => {
-                    const loggedDesign = designs.find((loggedDesign) => loggedDesign.key == design.key);
-                    return(
-                        <View key={index} style={styles.designCard}>
-                            <View style={styles.designHeader}>
-                                <Text style={styles.designName}>{t(design.key)}</Text>
-                            </View>
-                            {loggedDesign ? (
-                                <View>
-                                    <Text style={styles.designConfig}>{t("activities.stretchSpeedAndGracefulness.smoothnessScore")}: {Math.floor(loggedDesign.smoothnessScore * 100) / 100}%</Text>
-                                    <Text style={styles.designConfig}>{t("activities.stretchSpeedAndGracefulness.vibrationsDetected")}: {loggedDesign.vibrations}</Text> 
-                                </View>
-                            ): (
-                                <Text style={styles.designConfig}>No Recorded Attempt Yet.</Text>
-                            )}  
-                        </View>
-                    );
-                })}
-
-            </ScrollView>
-            {countdown !== null && (
-                <View style={styles.overlay}>
-                    <Text style={styles.readyText}>{t("countdown.getReady")}</Text>
-
-                    <Text style={styles.countdownText}>
-                        {countdown}
-                    </Text>
-                </View>
-            )}
-        </KeyboardAvoidingView>
+                <Text style={styles.sensorButtonText}>
+                    {movementRunning ? t("buttons.recording") : t("attempt.runMovementTest")}
+                </Text>
+            </Pressable>
+            </View>
+        </>
     )
 }
 
 const createStyles = (colors: ThemeColors) => {
     const styles = StyleSheet.create({
-        outerContainer: {
-            display: "flex",
-            flexDirection: "column",
-            flex: 1,
-            backgroundColor: colors.backgroundColor,
-        },
-
-        container: {
-            padding: 24,
-            flexGrow: 1
-        },
-
-        head: {
-            fontFamily: "PoppinsBold",
-            fontSize: 22,
-            color: colors.primary,
-            marginBottom: 24
-        },
-
-        sectionHeader: {
-            fontFamily: "PoppinsRegular",
-            fontSize: 20,
-            color: colors.secondary,
-        },
-
-        actionName: {
-            fontFamily: "PoppinsRegular",
-            fontSize: 18,
-            color: colors.secondary,
-            marginVertical: 16,
-            marginTop: 24
-        },
-
-        subContainer: {
-            flexGrow: 1
-        },
-
-        timerContainer: {
-            padding: 8,
-            borderWidth: 1,
-            borderColor: colors.secondary,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-        },
-
-        headerContainer: {
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center"
-        },
-
-        overlay: {
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "rgba(0,0,0,0.5)",
-            zIndex: 999,
-        },
-
-        readyText: {
-            fontSize: 28,
-            fontFamily: "PoppinsRegular",
-            color: colors.secondary,
-            marginBottom: 16,
-        },
-
-        countdownText: {
-            fontSize: 96,
-            fontFamily: "PoppinsBold",
-            color: colors.secondary,
-        },
-
-        cardContainer: {
-            marginBottom: 16
-        },
-
-        chartContainer: {
-            borderRadius: 20,
-            backgroundColor: colors.card,
-            height: 220,
-            display: "flex",
-            alignItems: "center",
-            flexDirection: "row"
-        },
-
-        placeholderText: {
-            fontFamily: "PoppinsRegular",
-            fontSize: 14,
-            color: colors.secondary,
-            textAlign: "center",
-            width: "100%",
-            paddingHorizontal: 24
-        },
-
-        input: {
+        sensorSection: {
             backgroundColor: colors.surfaceContainer,
-            color: colors.secondary, 
-            padding: 12, 
-            borderRadius: 8, 
-            borderWidth: 1, 
-            borderColor: colors.borderColor, 
-            fontSize: 16
-        },
-        actionNameLarge: {
-            fontFamily: "PoppinsRegular",
-            fontSize: 18,
-            color: colors.secondary,
+            borderRadius: 12,
+            padding: 16,
             marginBottom: 16,
-            marginTop: 24
-        },
-        sectionHeaderSmall: { fontFamily: "PoppinsRegular", fontSize: 18, color: colors.secondary, marginBottom: 12 },
-        designCard: { backgroundColor: colors.card, padding: 12, borderRadius: 10, marginBottom: 8, borderWidth: 1, borderColor: colors.borderColor },
-        designHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-        designName: { fontFamily: "PoppinsRegular", fontSize: 14, color: colors.secondary },
-        designAccel: { fontWeight: "bold", fontSize: 13 },
-        designConfig: { fontFamily: "InterRegular", fontSize: 11, color: colors.textMuted, marginTop: 2 },
-        designResult: { fontFamily: "InterRegular", fontSize: 11, color: colors.textMuted, marginTop: 2 },
-        skipText: {
-            textAlign: "center",
-            marginTop: 16,
-            color: colors.secondary,
-            fontFamily: "PoppinsRegular",
-            textDecorationLine: "underline",
-            fontSize: 16
-        },
-        emptyState: {
-            backgroundColor: colors.card,
             borderWidth: 1,
             borderColor: colors.borderColor,
-            borderRadius: 10,
-            padding: 16,
-            fontFamily: "InterRegular",
-            fontSize: 14,
-            color: colors.textMuted,
-            textAlign: "center",
+            alignItems: "center",
         },
+        sensorTitle: { fontFamily: "PoppinsMedium", fontSize: 14, color: colors.textMuted, marginBottom: 12 },
+        sensorReading: { flexDirection: "row", alignItems: "baseline", gap: 4, marginBottom: 4 },
+        sensorValue: { fontSize: 48, fontFamily: "InterBold" },
+        sensorUnit: { fontSize: 18, color: colors.textMuted, fontFamily: "InterRegular" },
+        sensorMeta: { fontFamily: "InterRegular", fontSize: 12, color: colors.textMuted, marginBottom: 8 },
+        sensorButton: {
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 8,
+            paddingHorizontal: 20,
+            paddingVertical: 10,
+            borderRadius: 8,
+            marginTop: 4,
+        },
+        sensorButtonText: { color: "#fff", fontFamily: "InterBold", fontSize: 13 },
     });
 
     return styles;
