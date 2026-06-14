@@ -1,56 +1,35 @@
-import { ActivityContext } from "@/context/ActivityContext";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { use, useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Svg, { Circle } from "react-native-svg";
-import Button from "./button";
-import Card from "./card";
-import PresetSelector from "./presetSelector";
+import CountdownTimer from "./countdownTimer";
 
-type ActivityResults = {
-    label: string,
-    value: string
+type reactionBoardAttemptScreenProps = {
+    currentStep: number,
+    setFormValues: React.Dispatch<React.SetStateAction<Record<string, string>>>;
 }
 
-const DESIGN_PRESETS = [
-  { key: "activities.reactionBoardChallenge.dominantHand" },
-  { key: "activities.reactionBoardChallenge.nonDominantHand" },
-  { key: "activities.reactionBoardChallenge.tracingChallenge" },
-];
-
-export default function ReactionBoardAttemptScreen(){
+export default function ReactionBoardAttemptScreen({currentStep, setFormValues}: reactionBoardAttemptScreenProps){
     const {theme} = useTheme();
     const styles = createStyles(theme);
     const router = useRouter();
     const {t} = useTranslation();
 
-    const activityContext = use(ActivityContext);
-
-    const [challengeState, setChallengeState] = useState<"idle" | "waiting" | "ready" | "finished">("idle");
-    const [reactionTime, setReactionTime] = useState<number | null>(null);
+    const [reactionChallengeState, setReactionChallengeState] = useState<"idle" | "waiting" | "ready">("idle");  
     const [startTime, setStartTime] = useState(0);
-    const [time, setTime] = useState(10);
-    const [accuracy, setAccuracy] = useState(0);
-
+    const [reactionTime, setReactionTime] = useState<number | null>(0);
+    const [tracingAccuracy, setTracingAccuracy] = useState(0);
     const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
-    const buttonSize = useRef(80);
-    const [buttonLocation, setButtonLocation] = useState({ x: 0, y: 0 });
-
+    const [circlePosition, setCirclePosition] = useState({ x: 50, y: 50 });
     const fingerPosition = useRef({ x: 0, y: 0 });
     const isTouching = useRef(false);
-
-    interface reactionEntry {
-        id: number;
-        key: string;
-        reactionTime?: number,
-        tracingAccuracy?: number
-    }
-    const [designs, setDesigns] = useState<reactionEntry[]>([]);
-
+    const buttonSize = useRef(80);
+    const [buttonLocation, setButtonLocation] = useState({ x: 0, y: 0 });
     const trackingSamples = useRef<{
         fingerX: number;
         fingerY: number;
@@ -58,138 +37,8 @@ export default function ReactionBoardAttemptScreen(){
         circleY: number;
         touching: boolean;
     }[]>([]);
-
-    const activityResults = useRef<ActivityResults[]>([]);
-    const [circlePosition, setCirclePosition] = useState({ x: 50, y: 50 });
-    const [presetKey, setPresetKey] = useState("activities.reactionBoardChallenge.dominantHand");
-
-    useEffect(() => {
-        if (presetKey != "activities.reactionBoardChallenge.tracingChallenge") return;
-        if (containerSize.width === 0 || containerSize.height === 0) return;
-        if (challengeState !== "ready") return;
-
-        const radius = 30;
-        let x = containerSize.width / 2;
-        let y = containerSize.height / 2;
-        let directionX = 1;
-        let directionY = 1;
-        const speedX = 4;
-        const speedY = 3;
-
-        const movementInterval = setInterval(() => {
-            x += speedX * directionX;
-            y += speedY * directionY;
-
-            const minX = radius;
-            const maxX = containerSize.width - radius;
-            const minY = radius;
-            const maxY = containerSize.height - radius;
-
-            if (x >= maxX || x <= minX) directionX *= -1;
-            if (y >= maxY || y <= minY) directionY *= -1;
-
-            setCirclePosition({ x, y });
-
-            trackingSamples.current.push({
-                fingerX: fingerPosition.current.x,
-                fingerY: fingerPosition.current.y,
-                circleX: x,
-                circleY: y,
-                touching: isTouching.current
-            });
-        }, 16);
-
-        return () => clearInterval(movementInterval);
-    }, [presetKey, containerSize, challengeState]);
-
-    useEffect(() => {
-        if (presetKey != "activities.reactionBoardChallenge.tracingChallenge") return;
-        if (challengeState !== "ready") return;
-
-        const interval = setInterval(() => {
-            setTime((prev) => {
-                if (prev <= 1) {
-                    clearInterval(interval);
-                    return 0;
-                }
-                return prev - 1;
-            });
-        }, 1000);
-
-        return () => clearInterval(interval);
-    }, [challengeState, presetKey]);
-
-    useEffect(() => {
-        if (presetKey !== "activities.reactionBoardChallenge.tracingChallenge" || time !== 0 || challengeState !== "ready") return;
-
-        const score = calculateAccuracy();
-        setAccuracy(score);
-        setChallengeState("finished");
-    }, [presetKey, time, challengeState, activityContext]);
-
-    if (!activityContext) return null;
-    const { activity } = activityContext;
-    if (!activity) return null;
-
-    const startChallenge = () => {
-        setChallengeState("waiting");
-        setReactionTime(null);
-
-        const randomDelay = 1000 + Math.random() * 3000;
-        setButtonLocation({
-            x: Math.random() * ((containerSize.width - buttonSize.current) - 0) + 0,
-            y: Math.random() * ((containerSize.height - buttonSize.current) - 0) + 0
-        });
-
-        setTimeout(() => {  
-            setChallengeState("ready");
-            setStartTime(performance.now());
-        }, randomDelay);
-    };
-
-    const handleReactionPress = () => {
-        if (challengeState !== "ready") return;
-
-        const endTime = performance.now();
-        const result = endTime - startTime;
-        const rounded = Math.ceil(result * 10) / 10;
-        
-        setReactionTime(rounded);
-        setChallengeState("finished");
-    };
-
-    const calculateAccuracy = () => {
-        if (trackingSamples.current.length === 0) return 0;
-
-        let totalAccuracy = 0;
-        const targetRadius = 15; 
-        const maxPenaltyDistance = 45; 
-
-        trackingSamples.current.forEach((s) => {
-            if (!s.touching) {
-                totalAccuracy += 0; 
-                return;
-            }
-
-            const dx = s.fingerX - s.circleX;
-            const dy = s.fingerY - s.circleY;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-
-            if (distance <= targetRadius) {
-                totalAccuracy += 100;
-            } else {
-                const distanceOutside = distance - targetRadius;
-                const penaltyRatio = Math.min(1, distanceOutside / maxPenaltyDistance);
-                const accuracyDrop = Math.pow(penaltyRatio, 2) * 100; 
-                
-                const frameAccuracy = Math.max(0, 100 - accuracyDrop);
-                totalAccuracy += frameAccuracy;
-            }
-        });
-
-        const finalScore = totalAccuracy / trackingSamples.current.length;
-        return Math.round(finalScore);
-    };
+    const tracingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+    const [tracingRunning, setTracingRunning] = useState(false);
 
     const panGesture = Gesture.Pan()
         .runOnJS(true)
@@ -200,296 +49,261 @@ export default function ReactionBoardAttemptScreen(){
         })
         .onUpdate((e) => {
             fingerPosition.current = { x: e.x, y: e.y };
-         })
+            })
         .onEnd(() => {
             isTouching.current = false;
         });
 
-    const formatNumber = (s: number) => {
-        const min = Math.floor(s / 60);
-        const sec = s % 60;
-        return `${min}:${sec < 10 ? "0" : ""}${sec}`;
-    };
+  const handleReactionPress = () => {
+      if (reactionChallengeState !== "ready") return;
 
-    const logDesign = () => {
-        setDesigns(prev => {
-            const index = prev.findIndex(d => d.key === presetKey);
+      const endTime = performance.now();
+      const result = endTime - startTime;
+      const rounded = Math.ceil(result * 10) / 10;
+      
+    setFormValues(prev => ({
+      ...prev,
+      measuredReactionTime: String(result)
+    }));
 
-            const newDesign = {
-                id: Date.now() + Math.random(),
-                key: presetKey,
-                tracingAccuracy: accuracy ?? undefined,
-                reactionTime: reactionTime ?? undefined,
-            };
+      setReactionTime(rounded);
+      setReactionChallengeState("idle");
+  };
 
-            if (index === -1) {
-                return [...prev, newDesign];
-            }
+  const startReactionChallenge = () => {
+      setReactionChallengeState("waiting");
+      setReactionTime(null);
+      setReactionTime(0);
+      trackingSamples.current = [];
 
-            return prev.map((design, i) =>
-                i === index ? newDesign : design
-            );
-        });
+      const randomDelay = 1000 + Math.random() * 3000;
+      setButtonLocation({
+          x: Math.random() * ((containerSize.width - buttonSize.current) - 0) + 0,
+          y: Math.random() * ((containerSize.height - buttonSize.current) - 0) + 0
+      });
 
-        setStartTime(0);
-        setTime(10);
-        setAccuracy(0);
-        setChallengeState("idle");
-        setReactionTime(0);
-        trackingSamples.current = [];
-    }
+      setTimeout(() => {  
+          setReactionChallengeState("ready");
+          setStartTime(performance.now());
+      }, randomDelay);
+  };
+
+  const startTracingChallenge = () => {
+      trackingSamples.current = [];
+      setTracingAccuracy(0);
+      setReactionChallengeState("ready");
+
+      setTracingRunning(true);
+
+      const radius = 30;
+      let x = containerSize.width / 2;
+      let y = containerSize.height / 2;
+
+      let directionX = 1;
+      let directionY = 1;
+
+      const speedX = 4;
+      const speedY = 3;
+
+      tracingIntervalRef.current = setInterval(() => {
+          x += speedX * directionX;
+          y += speedY * directionY;
+
+          if (x >= containerSize.width - radius || x <= radius)
+              directionX *= -1;
+
+          if (y >= containerSize.height - radius || y <= radius)
+              directionY *= -1;
+
+          setCirclePosition({ x, y });
+
+          trackingSamples.current.push({
+              fingerX: fingerPosition.current.x,
+              fingerY: fingerPosition.current.y,
+              circleX: x,
+              circleY: y,
+              touching: isTouching.current,
+          });
+      }, 16);
+  };
+
+  const stopTracingChallenge = () => {
+      if (tracingIntervalRef.current) {
+          clearInterval(tracingIntervalRef.current);
+          tracingIntervalRef.current = null;
+      }
+      
+      const score = calculateAccuracy();
+      setTracingAccuracy(score);
+
+      setFormValues(prev => ({
+        ...prev,
+        measuredTracingAccuracy: String(score)
+      }));
+
+      setReactionChallengeState("idle");
+  };
+  
+  const calculateAccuracy = () => {
+      if (trackingSamples.current.length === 0) return 0;
+
+      let totalAccuracy = 0;
+      const targetRadius = 15; 
+      const maxPenaltyDistance = 45; 
+
+      trackingSamples.current.forEach((s) => {
+          if (!s.touching) {
+              totalAccuracy += 0; 
+              return;
+          }
+
+          const dx = s.fingerX - s.circleX;
+          const dy = s.fingerY - s.circleY;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance <= targetRadius) {
+              totalAccuracy += 100;
+          } else {
+              const distanceOutside = distance - targetRadius;
+              const penaltyRatio = Math.min(1, distanceOutside / maxPenaltyDistance);
+              const accuracyDrop = Math.pow(penaltyRatio, 2) * 100; 
+              
+              const frameAccuracy = Math.max(0, 100 - accuracyDrop);
+              totalAccuracy += frameAccuracy;
+          }
+      });
+
+      const finalScore = totalAccuracy / trackingSamples.current.length;
+      return Math.round(finalScore);
+  };
 
     return(
-        <KeyboardAvoidingView style={styles.outerContainer} behavior="height">
-            <ScrollView contentContainerStyle={styles.container}>
-                <View>
-                    <Text style={styles.head}>{activity.name}</Text>
-                    <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
-                        <Text style={styles.sectionHeader}>{t("activities.attempt")}</Text>
-                        {presetKey == "activities.reactionBoardChallenge.tracingChallenge" && (
-                            <View style={styles.timerContainer}>
-                                <Text style={[styles.sectionHeader, {
-                                    lineHeight: 20
-                                }]}>{formatNumber(time)}</Text>
-                            </View>
-                        )}
-                    </View>
-        
-                    <PresetSelector 
-                        designPresets={DESIGN_PRESETS}
-                        onSelect={(preset) => {
-                            setPresetKey(preset.key);
-                        }}
-                    />
-                    <TextInput
-                        style={styles.input}
-                        value={t(presetKey)}
-                        onChangeText={setPresetKey}
-                        placeholder={"Enter Preset Name"}
-                        placeholderTextColor={theme.textMuted}
-                        editable={false}
-                    />
+        <View>
+            {currentStep == 2 && (
+                <CountdownTimer
+                    duration={10}
+                    running={tracingRunning}
+                    onFinish={stopTracingChallenge}
+                />
+            )}
+            <View style={styles.sensorSection}>
+            <Text style={styles.sensorTitle}>
+                {currentStep === 2 ? t("attempt.tracingSensor") : t("attempt.reactionTimer")}
+            </Text>
+            
+            <View style={styles.sensorReading}>
+                <Text style={[styles.sensorValue, { color: theme.tertiary }]}>
+                {currentStep === 2 ? `${(tracingAccuracy || 0)}%`: `${(reactionTime || 0)} ms`}
+                </Text>
+            </View>
 
-                    <Text style={[styles.actionName, {marginTop: 24}]}>{presetKey == "activities.reactionBoardChallenge.tracingChallenge" ? t("activities.reactionBoardChallenge.measureTracingAccuracy"): t("activities.reactionBoardChallenge.recordReactionTime")}</Text>
-                    <View style={styles.cardContainer}>
-                        {presetKey !== "activities.reactionBoardChallenge.tracingChallenge" ? (
-                            <Card metric="ms" value={reactionTime == null ? "0": String(reactionTime)} maximumWidth={true} />
-                        ): (
-                            <Card metric={t("activities.reactionBoardChallenge.accuracyScore")} value={`${accuracy}%`} maximumWidth={true} />
-                        )}
-                    </View>
+            <Pressable
+                style={[styles.sensorButton, {
+                    backgroundColor: reactionChallengeState == "ready" ? theme.textMuted: theme.primary,
+                }]}
+                disabled={tracingRunning}
+                onPress={() => {
+                    if (currentStep == 2){
+                    startTracingChallenge();
+                    }else{
+                    startReactionChallenge();
+                    }
+                }}
+            >
+                <MaterialCommunityIcons
+                    name={tracingRunning ? "timer-outline" : "vibrate"}
+                    size={20}
+                    color="#fff"
+                />
 
-                    <View>
-                        {challengeState == "idle" && (
-                            <Button text={t("buttons.startChallenge")} action={() => {
-                                if (presetKey !== "activities.reactionBoardChallenge.tracingChallenge"){
-                                    startChallenge()
-                                }else{
-                                    trackingSamples.current = [];
-                                    setTime(10);
-                                    setAccuracy(0);
-                                    setChallengeState("ready");
-                                }
-                            }} />
-                        )}
-                        {(challengeState == "waiting" || challengeState == "ready") && (
-                            <Button text={challengeState == "waiting" ? t("buttons.waitForSignal"): t("buttons.tapNow")} action={() => {}} />
-                        )}
-                        {challengeState == "finished" && (
-                            <Button 
-                                text={t("buttons.logTrial")}
-                                action={logDesign}
+                <Text style={styles.sensorButtonText}>
+                    {currentStep === 2 ? (reactionChallengeState == "ready" ? t("buttons.recording"): t("attempt.startTracing")) : (reactionChallengeState == "waiting" ? t("attempt.waitForSignal"): (reactionChallengeState == "ready" ? t("attempt.tap"): t("attempt.startReactionTest")))}
+                </Text>
+            </Pressable>
+            </View>
+            {currentStep === 2 ? (
+            <GestureDetector gesture={panGesture}>
+                <View 
+                    style={styles.reactionBoxContainer}
+                    onLayout={(e) => {
+                        const {width, height} = e.nativeEvent.layout;
+                        setContainerSize({width, height});
+                    }}
+                >
+                    {reactionChallengeState === "ready" ? (
+                        <Svg height={"100%"} width={"100%"}>
+                            <Circle
+                                cx={circlePosition.x}
+                                cy={circlePosition.y}
+                                r={30}
+                                fill={theme.primary}
                             />
-                        )}
-                    </View>
-
-                    <Text style={styles.actionName}>{presetKey == "activities.reactionBoardChallenge.tracingChallenge" ? t("activities.reactionBoardChallenge.tracingZone"): t("activities.reactionBoardChallenge.reactionZone")}</Text>
-                    {presetKey == "activities.reactionBoardChallenge.tracingChallenge" ? (
-                        <GestureDetector gesture={panGesture}>
-                            <View 
-                                style={styles.reactionBoxContainer}
-                                onLayout={(e) => {
-                                    const {width, height} = e.nativeEvent.layout;
-                                    setContainerSize({width, height});
-                                }}
-                            >
-                                {challengeState === "ready" ? (
-                                    <Svg height={"100%"} width={"100%"}>
-                                        <Circle
-                                            cx={circlePosition.x}
-                                            cy={circlePosition.y}
-                                            r={30}
-                                            fill={theme.primary}
-                                        />
-                                    </Svg>
-                                ): (
-                                    <Text style={styles.placeholderText}>{t("activities.reactionBoardChallenge.tracingZonePlaceholder")}</Text>
-                                )}
-                            </View>
-                        </GestureDetector>
+                        </Svg>
                     ): (
-                        <View 
-                            style={styles.reactionBoxContainer}
-                            onLayout={(e) => {
-                                const {width, height} = e.nativeEvent.layout;
-                                setContainerSize({width, height});
-                            }}
-                        >
-                            {challengeState === "ready" ? (
-                                <Pressable 
-                                    style={[styles.button, {
-                                        top: buttonLocation.y,
-                                        left: buttonLocation.x
-                                    }]}
-                                    onPress={handleReactionPress}>
-                                    <Text style={styles.buttonText}>{t("activities.reactionBoardChallenge.tap")}</Text>
-                                </Pressable>
-                            ): (
-                                <Text style={styles.placeholderText}>{t("activities.reactionBoardChallenge.reactionZonePlaceholder")}</Text>
-                            )}
-                        </View>
+                        <Text style={styles.placeholderText}>{t("activities.reactionBoardChallenge.tracingZonePlaceholder")}</Text>
                     )}
                 </View>
-
-                <Text style={styles.actionNameLarge}>{t("attempt.structuralIterations")}</Text>
-
-                {DESIGN_PRESETS.map((design, index) => {
-                    const loggedDesign = designs.find((loggedDesign) => loggedDesign.key == design.key);
-                    return(
-                        <View key={index} style={styles.designCard}>
-                            <View style={styles.designHeader}>
-                                <Text style={styles.designName}>{t(design.key)}</Text>
-                            </View>
-                            {loggedDesign ? (
-                                <Text style={styles.designConfig}>{loggedDesign.key == "activities.reactionBoardChallenge.tracingChallenge" ? `${t("activities.reactionBoardChallenge.tracingAccuracy")}: ${loggedDesign.tracingAccuracy}%`: `${t("activities.reactionBoardChallenge.reactionTime")}: ${loggedDesign.reactionTime} ms`}</Text> 
-                            ): (
-                                <Text style={styles.designConfig}>No Recorded Attempt Yet.</Text>
-                            )}  
-                        </View>
-                    );
-                })}
-            </ScrollView>
-        </KeyboardAvoidingView>
+            </GestureDetector>
+        ): (
+            <View 
+                style={styles.reactionBoxContainer}
+                onLayout={(e) => {
+                    const {width, height} = e.nativeEvent.layout;
+                    setContainerSize({width, height});
+                }}
+            >
+                {reactionChallengeState === "ready" ? (
+                    <Pressable 
+                        style={[styles.button, {
+                            top: buttonLocation.y,
+                            left: buttonLocation.x
+                        }]}
+                        onPress={handleReactionPress}>
+                        <Text style={styles.buttonText}>{t("activities.reactionBoardChallenge.tap")}</Text>
+                    </Pressable>
+                ): (
+                    <Text style={styles.placeholderText}>{t("activities.reactionBoardChallenge.reactionZonePlaceholder")}</Text>
+                )}
+            </View>
+            )}
+        </View>
     ) 
 } 
 
 const createStyles = (colors: ThemeColors) => {
     const styles = StyleSheet.create({
-        outerContainer: {
-            display: "flex",
-            flexDirection: "column",
-            flex: 1,
-            backgroundColor: colors.backgroundColor,
-        },
-        container: {
-            padding: 24,
-            flexGrow: 1
-        },
-        head: {
-          fontFamily: "PoppinsBold",
-          fontSize: 22,
-          color: colors.primary,
-          marginBottom: 24
-        },
-        sectionHeader: {
-            fontFamily: "PoppinsRegular",
-            fontSize: 20,
-            color: colors.secondary,
-        },
-        actionName: {
-            fontFamily: "PoppinsRegular",
-            fontSize: 18,
-            color: colors.secondary,
-            marginVertical: 16,
-            marginTop: 24
-        },
-        cardContainer: {
-            marginBottom: 16
-        },
-        reactionBoxContainer: {
-            borderRadius: 20,
-            backgroundColor: colors.card,
-            height: 320,
-            display: "flex",
-            alignItems: "center",
-            flexDirection: "row",
-            position: "relative"
-        },
-        placeholderText: {
-            fontFamily: "PoppinsRegular",
-            fontSize: 14,
-            color: colors.secondary,
-            textAlign: "center",
-            width: "100%",
-            paddingHorizontal: 24
-        },
-        button: {
-            backgroundColor: colors.primary,
-            width: 80,
-            height: 80,
-            borderRadius: 10,
-            justifyContent: "center",
-            alignItems: "center",
-            display: "flex",
-            position: "absolute",
-        },
-        buttonText: {
-            color: "#FFFFFF",
-            fontFamily: "InterSemiBold",
-            width: "100%",
-            textAlign: "center",
-            lineHeight: 18,
-            fontSize: 16
-        },
-        timerContainer: {
-            padding: 8,
-            borderWidth: 1,
-            borderColor: colors.secondary,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-        },
-        input: {
+         sensorSection: {
             backgroundColor: colors.surfaceContainer,
-            color: colors.secondary, 
-            padding: 12, 
-            borderRadius: 8, 
-            borderWidth: 1, 
-            borderColor: colors.borderColor, 
-            fontSize: 16
-        },
-        actionNameLarge: {
-            fontFamily: "PoppinsRegular",
-            fontSize: 18,
-            color: colors.secondary,
+            borderRadius: 12,
+            padding: 16,
             marginBottom: 16,
-            marginTop: 24
-        },
-        designCard: { backgroundColor: colors.card, padding: 12, borderRadius: 10, marginBottom: 8, borderWidth: 1, borderColor: colors.borderColor },
-        designHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-        designName: { fontFamily: "PoppinsRegular", fontSize: 14, color: colors.secondary },
-        designAccel: { fontWeight: "bold", fontSize: 13 },
-        designConfig: { fontFamily: "InterRegular", fontSize: 11, color: colors.textMuted, marginTop: 2 },
-        designResult: { fontFamily: "InterRegular", fontSize: 11, color: colors.textMuted, marginTop: 2 },
-        skipText: {
-            textAlign: "center",
-            marginTop: 16,
-            color: colors.secondary,
-            fontFamily: "PoppinsRegular",
-            textDecorationLine: "underline",
-            fontSize: 16
-        },
-        emptyState: {
-            backgroundColor: colors.card,
             borderWidth: 1,
             borderColor: colors.borderColor,
-            borderRadius: 10,
-            padding: 16,
-            fontFamily: "InterRegular",
-            fontSize: 14,
-            color: colors.textMuted,
-            textAlign: "center",
+            alignItems: "center",
         },
+        sensorTitle: { fontFamily: "PoppinsMedium", fontSize: 14, color: colors.textMuted, marginBottom: 12 },
+        sensorReading: { flexDirection: "row", alignItems: "baseline", gap: 4, marginBottom: 4 },
+        sensorValue: { fontSize: 48, fontFamily: "InterBold" },
+        sensorUnit: { fontSize: 18, color: colors.textMuted, fontFamily: "InterRegular" },
+        sensorMeta: { fontFamily: "InterRegular", fontSize: 12, color: colors.textMuted, marginBottom: 8 },
+        sensorButton: {
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 8,
+            paddingHorizontal: 20,
+            paddingVertical: 10,
+            borderRadius: 8,
+            marginTop: 4,
+        },
+        sensorButtonText: { color: "#fff", fontFamily: "InterBold", fontSize: 13 },
+        reactionBoxContainer: {
+            borderRadius: 20, backgroundColor: colors.card, height: 200,
+            display: "flex", alignItems: "center", flexDirection: "row",
+            position: "relative", marginBottom: 16,
+        },
+        button: { backgroundColor: colors.primary, width: 80, height: 80, borderRadius: 10, justifyContent: "center", alignItems: "center", display: "flex", position: "absolute" },
+        buttonText: { color: "#FFFFFF", fontFamily: "InterSemiBold", width: "100%", textAlign: "center", lineHeight: 18, fontSize: 16 },
+        placeholderText: { fontFamily: "PoppinsRegular", fontSize: 14, color: colors.secondary, textAlign: "center", width: "100%", paddingHorizontal: 24 },
     });
     return styles;
 }

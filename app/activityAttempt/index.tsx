@@ -8,7 +8,7 @@ import { captureLocation } from "@/utils/location";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from "expo-router";
-import { use, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -81,7 +81,7 @@ const PREDICTION_FIELDS: Record<string, { id: string; label: string; type: "radi
     { id: "reactionTimeDifferenceReason", label: "activities.reactionBoardChallenge.prediction2", type: "text" },
   ],
   "breathing-pace-trainer": [
-    { id: "mostBpm", label: "activities.breathingPaceTrainer.prediction2", type: "text" },
+    { id: "mostBpm", label: "activities.breathingPaceTrainer.prediction1", type: "text" },
     { id: "mostBpmReason", label: "activities.breathingPaceTrainer.prediction2", type: "text" },
   ],
 };
@@ -205,6 +205,14 @@ export default function ActivityAttemptMainScreen(){
       setIsSaving(false);
     }
   };
+
+  useEffect(() => {
+    return () => {
+        if (clearActivityState){
+            clearActivityState();
+        }
+    }
+  }, [])
 
   return (
       <View style={styles.container}>

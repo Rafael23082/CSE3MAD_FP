@@ -144,7 +144,7 @@ export const ACTION_CONFIGS: Record<string, ActionConfig[]> = {
       subtitleKey: "activities.stretchSpeedAndGracefulness.action1.subtitle",
       inputs: [
         { id: "predictedVibrations", labelKey: "activities.stretchSpeedAndGracefulness.inputs.predictedVibrations", type: "number", placeholderKey: "activities.stretchSpeedAndGracefulness.inputs.zero" },
-        { id: "measuredVibrations", labelKey: "activities.stretchSpeedAndGracefulness.inputs.predictedVibrations", type: "number", placeholderKey: "activities.stretchSpeedAndGracefulness.inputs.useMovementTest" },
+        { id: "measuredVibrations", labelKey: "activities.stretchSpeedAndGracefulness.inputs.measuredVibrations", type: "number", placeholderKey: "activities.stretchSpeedAndGracefulness.inputs.useMovementTest" },
         { id: "observation", labelKey: "activities.stretchSpeedAndGracefulness.inputs.observation", type: "text", placeholderKey: "activities.stretchSpeedAndGracefulness.inputs.describeWhatHappened" },
       ],
     },
@@ -154,7 +154,7 @@ export const ACTION_CONFIGS: Record<string, ActionConfig[]> = {
       subtitleKey: "activities.stretchSpeedAndGracefulness.action2.subtitle",
       inputs: [
         { id: "predictedVibrations", labelKey: "activities.stretchSpeedAndGracefulness.inputs.predictedVibrations", type: "number", placeholderKey: "activities.stretchSpeedAndGracefulness.inputs.zero" },
-        { id: "measuredVibrations", labelKey: "activities.stretchSpeedAndGracefulness.inputs.predictedVibrations", type: "number", placeholderKey: "activities.stretchSpeedAndGracefulness.inputs.useMovementTest" },
+        { id: "measuredVibrations", labelKey: "activities.stretchSpeedAndGracefulness.inputs.measuredVibrations", type: "number", placeholderKey: "activities.stretchSpeedAndGracefulness.inputs.useMovementTest" },
         { id: "observation", labelKey: "activities.stretchSpeedAndGracefulness.inputs.observation", type: "text", placeholderKey: "activities.stretchSpeedAndGracefulness.inputs.describeWhatHappened" },
       ],
     },
@@ -164,7 +164,7 @@ export const ACTION_CONFIGS: Record<string, ActionConfig[]> = {
       subtitleKey: "activities.stretchSpeedAndGracefulness.action3.subtitle",
       inputs: [
         { id: "predictedVibrations", labelKey: "activities.stretchSpeedAndGracefulness.inputs.predictedVibrations", type: "number", placeholderKey: "activities.stretchSpeedAndGracefulness.inputs.zero" },
-        { id: "measuredVibrations", labelKey: "activities.stretchSpeedAndGracefulness.inputs.predictedVibrations", type: "number", placeholderKey: "activities.stretchSpeedAndGracefulness.inputs.useMovementTest" },
+        { id: "measuredVibrations", labelKey: "activities.stretchSpeedAndGracefulness.inputs.measuredVibrations", type: "number", placeholderKey: "activities.stretchSpeedAndGracefulness.inputs.useMovementTest" },
         { id: "observation", labelKey: "activities.stretchSpeedAndGracefulness.inputs.observation", type: "text", placeholderKey: "activities.stretchSpeedAndGracefulness.inputs.describeWhatHappened" },
       ],
     }
@@ -176,7 +176,7 @@ export const ACTION_CONFIGS: Record<string, ActionConfig[]> = {
       subtitleKey: "activities.reactionBoardChallenge.action1.subtitle",
       inputs: [
         { id: "predictedReactionTime", labelKey: "activities.reactionBoardChallenge.inputs.predictedReactionTime", type: "number", placeholderKey: "activities.reactionBoardChallenge.inputs.zero" },
-        { id: "measuredReactionTime", labelKey: "activities.reactionBoardChallenge.inputs.measuredReactionTime", type: "number", placeholderKey: "activities.reactionBoardChallenge.inputs.useMovementTest" },
+        { id: "measuredReactionTime", labelKey: "activities.reactionBoardChallenge.inputs.measuredReactionTime", type: "number", placeholderKey: "activities.reactionBoardChallenge.inputs.useReactionTest" },
         { id: "observation", labelKey: "activities.reactionBoardChallenge.inputs.observation", type: "text", placeholderKey: "activities.reactionBoardChallenge.inputs.describeWhatHappened" },
       ],
     },
@@ -186,7 +186,7 @@ export const ACTION_CONFIGS: Record<string, ActionConfig[]> = {
       subtitleKey: "activities.reactionBoardChallenge.action2.subtitle",
       inputs: [
         { id: "predictedReactionTime", labelKey: "activities.reactionBoardChallenge.inputs.predictedReactionTime", type: "number", placeholderKey: "activities.reactionBoardChallenge.inputs.zero" },
-        { id: "measuredReactionTime", labelKey: "activities.reactionBoardChallenge.inputs.measuredReactionTime", type: "number", placeholderKey: "activities.reactionBoardChallenge.inputs.useMovementTest" },
+        { id: "measuredReactionTime", labelKey: "activities.reactionBoardChallenge.inputs.measuredReactionTime", type: "number", placeholderKey: "activities.reactionBoardChallenge.inputs.useReactionTest" },
         { id: "observation", labelKey: "activities.reactionBoardChallenge.inputs.observation", type: "text", placeholderKey: "activities.reactionBoardChallenge.inputs.describeWhatHappened" },
       ],
     },
@@ -195,8 +195,8 @@ export const ACTION_CONFIGS: Record<string, ActionConfig[]> = {
       labelKey: "activities.reactionBoardChallenge.action3.label",
       subtitleKey: "activities.reactionBoardChallenge.action3.subtitle",
       inputs: [
-        { id: "predictedReactionTime", labelKey: "activities.reactionBoardChallenge.inputs.predictedReactionTime", type: "number", placeholderKey: "activities.reactionBoardChallenge.inputs.zero" },
-        { id: "measuredReactionTime", labelKey: "activities.reactionBoardChallenge.inputs.measuredReactionTime", type: "number", placeholderKey: "activities.reactionBoardChallenge.inputs.useMovementTest" },
+        { id: "predictedTracingAccuracy", labelKey: "activities.reactionBoardChallenge.inputs.predictedTracingAccuracy", type: "number", placeholderKey: "activities.reactionBoardChallenge.inputs.zero" },
+        { id: "measuredTracingAccuracy", labelKey: "activities.reactionBoardChallenge.inputs.measuredTracingAccuracy", type: "number", placeholderKey: "activities.reactionBoardChallenge.inputs.useTracingTest" },
         { id: "observation", labelKey: "activities.reactionBoardChallenge.inputs.observation", type: "text", placeholderKey: "activities.reactionBoardChallenge.inputs.describeWhatHappened" },
       ],
     }
