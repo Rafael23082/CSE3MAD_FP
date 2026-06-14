@@ -1,6 +1,7 @@
 import Button from "@/components/button";
 import InputGroup from "@/components/inputGroup";
 import { TeamMember } from "@/constants/types";
+import { auth } from "@/firebase";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { saveUserProfile, updateTeamMembers } from "@/utils/database";
@@ -11,7 +12,6 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { auth } from "../firebase";
 
 const MIN_MEMBERS = 2;
 const MAX_MEMBERS = 4;

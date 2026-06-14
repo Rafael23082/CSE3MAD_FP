@@ -19,7 +19,6 @@ expo-env.d.ts
 *.p12
 *.key
 *.mobileprovision
-firebase.js
 
 google-services.json
 
