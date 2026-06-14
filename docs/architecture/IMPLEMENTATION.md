@@ -208,7 +208,6 @@ iOS builds can be added by extending the profiles.
 | `expo-sensors` | Accelerometer access |
 | `expo-camera` | Video recording for experiments |
 | `expo-location` | GPS for sound map |
-| `react-native-maps` | Sound pollution map display |
 | `react-native-reanimated` | Animations |
 | `expo-haptics` | Haptic feedback (reaction board) |
 | `expo-av` | Audio recording (sound pollution) |

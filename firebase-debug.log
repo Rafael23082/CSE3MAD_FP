@@ -1,0 +1,93 @@
+[debug] [2026-06-12T07:02:31.394Z] ----------------------------------------------------------------------
+[debug] [2026-06-12T07:02:31.395Z] Command:       /usr/local/bin/firebase /Users/matthewstaniswinata/.cache/firebase/tools/lib/node_modules/firebase-tools/lib/bin/firebase init functions
+[debug] [2026-06-12T07:02:31.396Z] CLI Version:   13.34.0
+[debug] [2026-06-12T07:02:31.396Z] Platform:      darwin
+[debug] [2026-06-12T07:02:31.396Z] Node Version:  v18.5.0
+[debug] [2026-06-12T07:02:31.397Z] Time:          Fri Jun 12 2026 14:02:31 GMT+0700 (Indochina Time)
+[debug] [2026-06-12T07:02:31.397Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-06-12T07:02:31.674Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-06-12T07:02:31.676Z] > authorizing via signed-in user (adnielrid42@gmail.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  /Users/matthewstaniswinata/Documents/GitHub/stemm-fp/CSE3MAD_FP
+
+Before we get started, keep in mind:
+
+  * You are initializing within an existing Firebase project directory
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] but for now we'll just set up a default project.
+[info] 
+[debug] [2026-06-12T07:02:31.684Z] Using project from CLI flag: cse3mad-fp-2e58f
+[debug] [2026-06-12T07:02:31.685Z] Checked if tokens are valid: false, expires at: 1781172310013
+[debug] [2026-06-12T07:02:31.687Z] Checked if tokens are valid: false, expires at: 1781172310013
+[debug] [2026-06-12T07:02:31.687Z] > refreshing access token with scopes: []
+[debug] [2026-06-12T07:02:31.688Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-06-12T07:02:31.690Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-12T07:02:31.870Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2026-06-12T07:02:31.874Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-12T07:02:31.892Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/cse3mad-fp-2e58f [none]
+[debug] [2026-06-12T07:02:32.338Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/cse3mad-fp-2e58f 200
+[debug] [2026-06-12T07:02:32.339Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/cse3mad-fp-2e58f {"projectId":"cse3mad-fp-2e58f","projectNumber":"435684681786","displayName":"cse3mad-fp","name":"projects/cse3mad-fp-2e58f","resources":{"hostingSite":"cse3mad-fp-2e58f"},"state":"ACTIVE","etag":"1_b5c7376c-3a02-400f-aa39-e30d27d157a5"}
+[info] i  Using project cse3mad-fp-2e58f (cse3mad-fp) 
+[info] 
+=== Functions Setup
+[debug] [2026-06-12T07:02:32.350Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-06-12T07:02:32.351Z] > authorizing via signed-in user (adnielrid42@gmail.com)
+[debug] [2026-06-12T07:02:32.351Z] [iam] checking project cse3mad-fp-2e58f for permissions ["firebase.projects.get"]
+[debug] [2026-06-12T07:02:32.352Z] Checked if tokens are valid: true, expires at: 1781251350874
+[debug] [2026-06-12T07:02:32.352Z] Checked if tokens are valid: true, expires at: 1781251350874
+[debug] [2026-06-12T07:02:32.352Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/cse3mad-fp-2e58f:testIamPermissions [none]
+[debug] [2026-06-12T07:02:32.352Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/cse3mad-fp-2e58f:testIamPermissions x-goog-quota-user=projects/cse3mad-fp-2e58f
+[debug] [2026-06-12T07:02:32.352Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/cse3mad-fp-2e58f:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2026-06-12T07:02:32.723Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/cse3mad-fp-2e58f:testIamPermissions 200
+[debug] [2026-06-12T07:02:32.724Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/cse3mad-fp-2e58f:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2026-06-12T07:02:32.725Z] Checked if tokens are valid: true, expires at: 1781251350874
+[debug] [2026-06-12T07:02:32.725Z] Checked if tokens are valid: true, expires at: 1781251350874
+[debug] [2026-06-12T07:02:32.725Z] Checked if tokens are valid: true, expires at: 1781251350874
+[debug] [2026-06-12T07:02:32.725Z] Checked if tokens are valid: true, expires at: 1781251350874
+[debug] [2026-06-12T07:02:32.725Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/cse3mad-fp-2e58f/services/cloudfunctions.googleapis.com [none]
+[debug] [2026-06-12T07:02:32.725Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/cse3mad-fp-2e58f/services/cloudfunctions.googleapis.com x-goog-quota-user=projects/cse3mad-fp-2e58f
+[debug] [2026-06-12T07:02:32.732Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/cse3mad-fp-2e58f/services/runtimeconfig.googleapis.com [none]
+[debug] [2026-06-12T07:02:32.732Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/cse3mad-fp-2e58f/services/runtimeconfig.googleapis.com x-goog-quota-user=projects/cse3mad-fp-2e58f
+[debug] [2026-06-12T07:02:34.263Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/cse3mad-fp-2e58f/services/runtimeconfig.googleapis.com 200
+[debug] [2026-06-12T07:02:34.264Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/cse3mad-fp-2e58f/services/runtimeconfig.googleapis.com [omitted]
+[debug] [2026-06-12T07:02:34.436Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/cse3mad-fp-2e58f/services/cloudfunctions.googleapis.com 200
+[debug] [2026-06-12T07:02:34.436Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/cse3mad-fp-2e58f/services/cloudfunctions.googleapis.com [omitted]
+[debug] [2026-06-12T07:02:34.438Z] Checked if tokens are valid: true, expires at: 1781251350874
+[debug] [2026-06-12T07:02:34.438Z] Checked if tokens are valid: true, expires at: 1781251350874
+[debug] [2026-06-12T07:02:34.439Z] >>> [apiv2][query] POST https://serviceusage.googleapis.com/v1/projects/cse3mad-fp-2e58f/services/cloudfunctions.googleapis.com:enable [none]
+[debug] [2026-06-12T07:02:34.439Z] >>> [apiv2][(partial)header] POST https://serviceusage.googleapis.com/v1/projects/cse3mad-fp-2e58f/services/cloudfunctions.googleapis.com:enable x-goog-quota-user=projects/cse3mad-fp-2e58f
+[debug] [2026-06-12T07:02:36.078Z] <<< [apiv2][status] POST https://serviceusage.googleapis.com/v1/projects/cse3mad-fp-2e58f/services/cloudfunctions.googleapis.com:enable 200
+[debug] [2026-06-12T07:02:36.078Z] <<< [apiv2][body] POST https://serviceusage.googleapis.com/v1/projects/cse3mad-fp-2e58f/services/cloudfunctions.googleapis.com:enable [omitted]
+[debug] [2026-06-12T07:02:46.084Z] Checked if tokens are valid: true, expires at: 1781251350874
+[debug] [2026-06-12T07:02:46.098Z] Checked if tokens are valid: true, expires at: 1781251350874
+[debug] [2026-06-12T07:02:46.105Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/cse3mad-fp-2e58f/services/cloudfunctions.googleapis.com [none]
+[debug] [2026-06-12T07:02:46.106Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/cse3mad-fp-2e58f/services/cloudfunctions.googleapis.com x-goog-quota-user=projects/cse3mad-fp-2e58f
+[debug] [2026-06-12T07:02:47.590Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/cse3mad-fp-2e58f/services/cloudfunctions.googleapis.com 200
+[debug] [2026-06-12T07:02:47.598Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/cse3mad-fp-2e58f/services/cloudfunctions.googleapis.com [omitted]
+[info] Let's create a new codebase for your functions.
+[info] A directory corresponding to the codebase will be created in your project
+[info] with sample code pre-configured.
+
+[info] See https://firebase.google.com/docs/functions/organize-functions for
+[info] more information on organizing your functions using codebases.
+
+[info] Functions can be deployed with firebase deploy.
+
+[info] ✔  Wrote functions/package.json 
+[info] ✔  Wrote functions/.eslintrc.js 
+[info] ✔  Wrote functions/index.js 
+[info] ✔  Wrote functions/.gitignore 

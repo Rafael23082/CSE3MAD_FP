@@ -1,8 +1,10 @@
-# Jest Test Source Code Overview
+# How the test suite is organized
+
+This document maps every test file to its source module, describes what each test covers, and shows where coverage gaps remain. Use it when adding new tests or diagnosing failing ones.
 
 ## Configuration
 
-`jest.config.js` uses the `jest-expo` preset with TypeScript support, coverage collection, and `__tests__` convention matching.
+The project runs tests with the `jest-expo` preset, which includes TypeScript support. Coverage is collected automatically and written to `./coverage/` in text and lcov formats.
 
 ```js
 preset: 'jest-expo',
@@ -11,139 +13,131 @@ collectCoverage: true,
 coverageReporters: ['text', 'lcov'],
 ```
 
-Run with: `npm test` (maps to `jest`).
+Run the full suite with `npm test`. To regenerate coverage after changes, run `npx jest --coverage`.
 
-## Test Files (10 total, 181 tests)
+## Test files and what they cover
 
-### 1. `utils/__tests__/physics.test.ts`
+There are 10 test files with 181 total tests. Most tests exercise pure functions without mocking. A few files mock Firebase, SQLite, or Expo modules to test async flows.
 
-Tests all 28 exported functions in `utils/physics.ts`. Combines the original 7 suites with new suites covering the 18 previously-untested functions plus 9 backward-compatible alias checks.
+### Physics and sensor calculations
 
-| Suite | What it tests | Key boundaries |
-|---|---|---|
-| `calculateSafetyScore` | Parachute safety score from velocity, g-force, accuracy | Percent thresholds for Excellent/Good/Fair/Poor ratings; weighted component calculation |
-| `calculateNPI` | Noise Pollution Index = avgDb / 85 | Zero/negative dB, 85 dB boundary, >1 for loud sounds |
-| `getNPILevel` | Categorises NPI into Safe/Warning/Unsafe | 0.5 and 1.0 thresholds |
-| `getFlexibilityLabel` | Hand fan k-value ranges | 0.2 and 1.0 boundaries for High/Medium/Low |
-| `calculateStabilityScore` | Earthquake stability from peak acceleration | Score clamping, pass/fail at 70 boundary, 100 to 0 range |
-| `calculateDampingRatio` | Ratio of final/initial peak readings | Empty arrays, zero readings, amplification (>1), damping (<1) |
-| `getDampingLabel` | Categorises damping ratio | Five-tier scale: Excellent/Good/Moderate/Poor/None |
-| `calculateVelocity` | Distance / time | Zero distance or time returns 0 |
-| `calculateAcceleration` | Velocity / time | Zero velocity or time returns 0 |
-| `calculateWeight` | Mass x gravity | Zero mass returns 0 |
-| `calculateNetForce` | Mass x acceleration | Zero mass or acceleration returns 0 |
-| `calculateDragForce` | Weight minus net force | Net-force clamping, zero weight guard |
-| `calculateGForce` | Delta-V / contact-time / gravity | Zero delta-V or contact-time returns 0 |
-| `calculateReboundVelocity` | Gravity x time | Zero time returns 0 |
-| `GRAVITY_MPS2` | Constant value | Equals 9.8 |
-| `getGForceRisk` | All 5 risk levels | <=5/<=10/<=30/<=50 boundaries |
-| `getParachuteRating` | All 4 rating levels | <20/<40/<60 boundaries |
-| `calculateFanForce` | kValue x angle in radians | Zero kValue or angle returns 0 |
-| `getDecibelRisk` | All 4 risk levels | <=60/<=85/<=100 boundaries |
-| `amplitudeToDb` | Amplitude to decibel conversion | Zero/negative amplitude returns -Infinity |
-| `calcAverageDb` | Average of absolute levels | Empty array returns -Infinity |
-| `degreesToRadians` | Degree to radian conversion | 0 degrees returns 0 |
-| `formatPhysicsValue` | Fixed decimal formatting | Custom decimal places |
-| `getStabilityRating` | All 4 rating levels | >=90/>=70/>=50 boundaries |
-| backward-compatible aliases | 9 alias functions point to correct implementation | Delegation equality checks |
+**File:** `utils/__tests__/physics.test.ts`
 
-### 2. `utils/__tests__/scoring.test.ts`
+Tests all 28 exported functions in `utils/physics.ts`, including 18 that had no coverage before plus 9 backward-compatible alias checks. Each function receives boundary-value tests across its rating or threshold ranges.
 
-Tests all 3 functions in `utils/scoring.ts` — the leaderboard scoring engine.
+Key areas:
 
-- **`calculateCompositeScore`** — all 7 activity branches plus default: parachute (inverted safety), sound (inverse NPI), hand fan (inverse force), earthquake (stability), breathing (proximity to 15 BPM), reaction board (inverse time), stretch (inverse vibration). Tests empty logs, zero-filtering, clamping, `??` fallback precedence, and multi-log averaging.
-- **`calculateOverallScore`** — empty submissions, single submission, multi-submission averaging, multi-activity summation, submissions without `activityKey` skipped.
-- **`getScoreExplanation`** — known activities return descriptive text, unknown returns fallback.
+- **Safety scoring:** `calculateSafetyScore` produces Excellent/Good/Fair/Poor ratings from velocity, g-force, and accuracy inputs. Tests cover percent thresholds and weighted component math.
+- **Noise Pollution Index (NPI):** `calculateNPI` divides average decibels by 85. Tests verify zero/negative dB, the 85 dB boundary, and values above 1 for loud sounds. `getNPILevel` maps NPI to Safe/Warning/Unsafe at 0.5 and 1.0 thresholds.
+- **Earthquake stability:** `calculateStabilityScore` clamps 0–100 and passes or fails at 70. `calculateDampingRatio` handles empty arrays, zero readings, amplification (above 1), and damping (below 1).
+- **Movement formulas:** `calculateVelocity`, `calculateAcceleration`, `calculateWeight`, `calculateNetForce`, `calculateDragForce`, and `calculateGForce` all guard against zero inputs and return 0 when the denominator would be undefined.
+- **Risk ratings:** `getGForceRisk`, `getParachuteRating`, `getDecibelRisk`, and `getStabilityRating` each map numeric ranges to labeled levels.
+- **Formatting and conversion:** `degreesToRadians`, `formatPhysicsValue`, and `amplitudeToDb` round or convert values with expected precision.
 
-### 3. `utils/__tests__/progressCalculation.test.ts`
+### Leaderboard scoring
 
-Tests 5 of 6 functions in `utils/progressCalculation.ts`. Mocks `@/constants/data` (TOTAL_ACTIVITIES=7), `@/firebase`, and `firebase/firestore` so the module loads without real Firebase init.
+**File:** `utils/__tests__/scoring.test.ts`
 
-- **`calculateProgressPercentage`** — 0/1/3.5/7 completed out of 7, rounding behaviour.
-- **`getProgressColor`** — green (>=80%), yellow (50-79%), red (<50%).
-- **`calculateTotalPointsFromProgress`** — sums points across entries; empty array.
-- **`getCompletedActivityCount`** — filters by `isCompleted`; empty array.
-- **`rankTeams`** — single team, duplicate userId aggregation, points-descending sort, tie-breaking by earliest timestamp, `?? 0` fallback for missing timestamps.
-- Not tested: `getProgressionBoardData` (Firestore-dependent, integration-level).
+Covers all 3 functions in `utils/scoring.ts`.
 
-### 4. `utils/__tests__/location.test.ts`
+- **`calculateCompositeScore`** evaluates 7 activity branches (parachute, sound, hand fan, earthquake, breathing, reaction board, stretch) plus a default path. Tests exercise empty logs, zero-filtering, clamping via `Math.max(0, ...)`, the `??` fallback precedence, and multi-log averaging.
+- **`calculateOverallScore`** handles empty submissions, single submissions, multi-submission averaging, multi-activity summation, and submissions without an `activityKey` (which get skipped).
+- **`getScoreExplanation`** returns descriptive text for known activities and a fallback string for unknowns.
 
-Tests all 3 functions in `utils/location.ts`. Mocks `expo-location` for async permission and GPS flows.
+### Progress and ranking
 
-- **`formatCoordinates`** — positive/negative lat/lng, equator/prime-meridian edge case, DMS format structure (degree symbol, minutes, seconds, direction letter).
-- **`requestLocationPermission`** — already-granted (no request call), undetermined then granted, denied.
-- **`captureLocation`** — returns `{latitude, longitude, formatted}` on success, null on permission denied, null on error throw.
+**File:** `utils/__tests__/progressCalculation.test.ts`
 
-### 5. `utils/__tests__/humanPerformance.test.ts` (41 lines)
+Tests 5 of 6 functions in `utils/progressCalculation.ts`. Mocks `@/constants/data` (TOTAL_ACTIVITIES=7), `@/firebase`, and `firebase/firestore` so the module loads without real Firebase initialization.
 
-Tests Activity 5 (Human Performance Lab) functions.
+- **`calculateProgressPercentage`** computes completion ratios for 0, 1, 3.5, and 7 completed activities out of 7, and checks rounding behavior.
+- **`getProgressColor`** returns green (at or above 80%), yellow (50–79%), or red (below 50%).
+- **`calculateTotalPointsFromProgress`** sums points across entries and handles empty arrays.
+- **`getCompletedActivityCount`** filters entries by `isCompleted` and handles empty arrays.
+- **`rankTeams`** sorts by points descending, breaks ties by earliest timestamp using mock `Timestamp` objects with `toMillis`, and applies `?? 0` fallback for missing timestamps.
 
-- `calcAvgVibration` handles absolute values, negative sensor readings, empty arrays
-- `calcSmoothnessScore` standard deviation; returns 0 for <2 readings
-- `rateCoordination` maps smoothness score to Excellence/Practice level labels
+Not tested: `getProgressionBoardData`, which requires Firestore access and belongs in an integration test suite.
 
-### 6. `utils/__tests__/breathing.test.ts` (58 lines)
+### Location services
 
-Tests Activity 7 (Breathing Pace Trainer) functions.
+**File:** `utils/__tests__/location.test.ts`
 
-- `calcBreathsPerMinute` converts ms intervals to BPM; empty array guard
-- `calcBreathingDepth` average absolute chest movement
-- `classifyBreathingRate` Slow/Normal/Rapid labels at 12/20/30 BPM boundaries
-- `calcRecoveryRate` simple subtraction
-- `rateRecovery` string contains "Fast"/"Slow" (uses `toContain` matcher)
+Tests all 3 functions in `utils/location.ts` with a mocked `expo-location` module.
 
-### 7. `utils/__tests__/reactionBoard.test.ts` (31 lines)
+- **`formatCoordinates`** converts latitude and longitude to degrees-minutes-seconds format. Tests cover positive and negative values, equator and prime meridian edge cases, and the presence of the degree symbol and direction letter.
+- **`requestLocationPermission`** exercises three flows: already granted (no request call), undetermined then granted, and denied.
+- **`captureLocation`** returns `{latitude, longitude, formatted}` on success, or null when permission is denied or an error is thrown.
 
-Tests reaction time helpers (co-located in `physics.ts`).
+### Human performance lab
 
-- `calcMeanReactionTime` average of times; empty array returns 0
-- `calcReactionImprovement` percentage change; zero-initial guard
-- `rateReactionTime` Excellent/Needs Practice at 200ms/600ms thresholds
+**File:** `utils/__tests__/humanPerformance.test.ts`
 
-### 8. `utils/__tests__/activityPersistence.test.ts` (71 lines)
+Tests 3 functions for Activity 5 (Human Performance Lab).
 
-Tests data layer contracts (Activity 1-4 assessment activities). No mocking tests pure transformations.
+- `calcAvgVibration` handles absolute values, negative sensor readings, and empty arrays.
+- `calcSmoothnessScore` computes standard deviation and returns 0 when fewer than 2 readings exist.
+- `rateCoordination` maps smoothness scores to Excellence or Practice labels.
 
-- **Contract test:** `REQUIRED_ACTIVITY_KEYS` matches the 4 assessment activities
-- **`buildActivityResultRecord`:** SQLite record shape latitude/longitude/accuracy extracted, logs serialised, timestamp formatted
-- **`buildFirestoreSubmissionPayload`:** Firestore payload shape logCount computed, location preserved, rating nullable
+### Breathing pace trainer
 
-### 9. `components/__tests__/card.test.tsx` (43 lines)
+**File:** `utils/__tests__/breathing.test.ts`
 
-The only React component test. Uses `@testing-library/react-native`.
+Tests 5 functions for Activity 7 (Breathing Pace Trainer).
 
-- Mocks `@/hooks/useTheme` with a static theme object
-- Uses `jest.mock` for the theme hook
-- Lazy-requires the component (`require("../card").default`) to avoid hoisting issues
-- Verifies metric/value text renders via `getByText`
-- Tests `maximumWidth` prop (full-width vs 47% width)
+- `calcBreathsPerMinute` converts millisecond intervals to breaths per minute and guards against empty arrays.
+- `calcBreathingDepth` averages absolute chest movement values.
+- `classifyBreathingRate` labels rates as Slow/Normal/Rapid at 12, 20, and 30 BPM boundaries.
+- `calcRecoveryRate` subtracts the initial rate from the final rate.
+- `rateRecovery` returns a string containing "Fast" or "Slow", verified with `toContain`.
 
-## Testing Patterns Summary
+### Reaction time
 
-| Pattern | Where used |
-|---|---|
-| Pure function testing (no mocking) | `physics.test.ts`, `humanPerformance.test.ts`, `breathing.test.ts`, `reactionBoard.test.ts`, `scoring.test.ts`, `activityPersistence.test.ts` |
-| Boundary value testing | `physics.test.ts` (all suites), `scoring.test.ts` (all branches) |
-| Module mocking (`jest.mock`) | `progressCalculation.test.ts` (constants/firebase), `location.test.ts` (expo-location) |
-| Async function testing | `location.test.ts` (permission flows, GPS), `progressCalculation.test.ts` (rankTeams with Timestamp mocks) |
-| Edge case: empty arrays | `calcAvgVibration`, `calcBreathsPerMinute`, `calcMeanReactionTime`, `calculateDampingRatio`, `calcAverageDb`, `calculateCompositeScore` |
-| Edge case: zero/negative inputs | `calculateNPI`, `calcReactionImprovement`, `calculateDampingRatio`, `calculateCompositeScore` (zero-filtering) |
-| Floating point comparison (`toBeCloseTo`) | `calculateNPI`, `calculateDampingRatio`, `calcReactionImprovement`, `calculateGForce`, `calculateWeight`, `calculateFanForce`, `degreesToRadians` |
-| Range matchers (`toBeGreaterThan`, `toBeLessThan`) | `calcSmoothnessScore`, `calculateStabilityScore` |
-| String content matcher (`toContain`) | `rateRecovery`, `getGForceRisk`, `getScoreExplanation` |
-| Regex matcher (`toMatch`) | `formatCoordinates` DMS output |
-| Object shape matchers (`toEqual`, `toHaveProperty`) | `activityPersistence.test.ts` |
-| React component rendering | `card.test.tsx` render, `getByText` |
-| Theme hook mocking | `card.test.tsx` `jest.mock("@/hooks/useTheme")` |
-| Lazy `require` to avoid hoisting | `card.test.tsx` wraps in `loadCard()` function |
-| Timestamp mock objects (`toMillis`) | `rankTeams` tie-breaking in `progressCalculation.test.ts` |
-| Max/min clamping tests | `calculateCompositeScore` `Math.max(0, ...)` in all 7 branches |
+**File:** `utils/__tests__/reactionBoard.test.ts`
+
+Tests reaction-time helpers that live in `utils/physics.ts`.
+
+- `calcMeanReactionTime` averages an array of times and returns 0 for empty input.
+- `calcReactionImprovement` computes percentage change with a zero-initial guard.
+- `rateReactionTime` labels times as Excellent (at or below 200 ms) or Needs Practice (above 600 ms).
+
+### Activity persistence
+
+**File:** `utils/__tests__/activityPersistence.test.ts`
+
+Tests pure builder functions in `utils/activityPersistence.ts` without mocking.
+
+- A contract test verifies that `REQUIRED_ACTIVITY_KEYS` matches the 4 assessment activities.
+- `buildActivityResultRecord` extracts latitude, longitude, and accuracy from location objects, serializes logs, and formats timestamps.
+- `buildFirestoreSubmissionPayload` builds the submission shape with computed `logCount`, preserved location, and nullable rating.
+
+Functions that touch SQLite or Firestore (`saveActivityResultLocally`, `saveActivityResultToFirestore`, `getPendingSyncResults`, `retryPendingSyncs`) are not covered here and need integration-level tests.
+
+### Card component
+
+**File:** `components/__tests__/card.test.tsx`
+
+The only React component test. It uses `@testing-library/react-native` to render the card and check that metric and value text appears on screen.
+
+A `jest.mock` stub replaces `@/hooks/useTheme` with a static theme object. The component is loaded with `require("../card").default` inside a function to avoid hoisting issues with the mock. Tests also verify that `maximumWidth` controls layout, switching between full width and 47% width.
+
+## Testing patterns
+
+The suite relies on a small set of repeatable patterns:
+
+- **Pure function testing:** Most files test pure functions with no side effects, passing inputs and asserting outputs.
+- **Boundary value testing:** Functions with numeric thresholds receive inputs at and around each boundary (e.g., 70 for stability pass/fail, 85 dB for NPI).
+- **Module mocking:** `jest.mock` replaces Firebase, SQLite, Expo Location, and the theme hook. Mocks are set up before the module under test is required.
+- **Async function testing:** `location.test.ts` and `progressCalculation.test.ts` exercise async flows using mock `Timestamp` objects and permission callbacks.
+- **Edge cases:** Empty arrays, zero and negative inputs, and missing fields are tested across most functions.
+- **Floating-point comparison:** `toBeCloseTo` is used for `calculateNPI`, `calculateDampingRatio`, `calcReactionImprovement`, `calculateGForce`, `calculateWeight`, `calculateFanForce`, and `degreesToRadians`.
+- **String matching:** `toContain` checks for substrings in risk labels and score explanations. `toMatch` validates DMS coordinate format.
+- **Object shape matching:** `toEqual` and `toHaveProperty` verify the structure of persistence records and Firestore payloads.
 
 ## Coverage
 
-Latest run (June 2026):
+Coverage is collected in text and lcov formats on every test run. Here are the latest figures.
 
-| File | Stmts | Branch | Funcs | Lines |
+| File | Statements | Branches | Functions | Lines |
 |---|---|---|---|---|
 | `card.tsx` | 100% | 100% | 100% | 100% |
 | `location.ts` | 100% | 100% | 100% | 100% |
@@ -154,20 +148,20 @@ Latest run (June 2026):
 | `progressCalculation.ts` | 84.4% | 88.2% | 81.8% | 85.2% |
 | `activityPersistence.ts` | 15.2% | 39.3% | 22.2% | 15.6% |
 
-Low coverage in `activityPersistence.ts` and partial coverage in `progressCalculation.ts` is from Firestore/SQLite-dependent functions (`saveActivityResultLocally`, `saveActivityResultToFirestore`, `getPendingSyncResults`, `retryPendingSyncs`, `getProgressionBoardData`) — these are integration-level and require mocking the Firebase/SQLite layer.
+The low coverage in `activityPersistence.ts` and partial coverage in `progressCalculation.ts` stem from Firestore- and SQLite-dependent functions. These require integration tests that mock the full persistence layer.
 
-Collects to `./coverage/` in text and lcov formats. Run `npx jest --coverage` to regenerate.
+## Source map
 
-## Source Map
+This table shows which test file covers which source module and how many functions each test exercises.
 
-| Test file | Source under test |
-|---|---|
-| `utils/__tests__/physics.test.ts` | `utils/physics.ts` (28 functions, all coverage) |
-| `utils/__tests__/scoring.test.ts` | `utils/scoring.ts` (all 3 functions) |
-| `utils/__tests__/progressCalculation.test.ts` | `utils/progressCalculation.ts` (5 of 6 functions; async excluded) |
-| `utils/__tests__/location.test.ts` | `utils/location.ts` (all 3 functions) |
-| `utils/__tests__/humanPerformance.test.ts` | `utils/humanPerformance.ts` (all 3 functions) |
-| `utils/__tests__/breathing.test.ts` | `utils/breathing.ts` (all 5 functions) |
-| `utils/__tests__/reactionBoard.test.ts` | `utils/physics.ts` (reaction-time helpers only) |
-| `utils/__tests__/activityPersistence.test.ts` | `utils/activityPersistence.ts` (pure builders only) |
-| `components/__tests__/card.test.tsx` | `components/card.tsx` |
+| Test file | Source module | Coverage scope |
+|---|---|---|
+| `utils/__tests__/physics.test.ts` | `utils/physics.ts` | 28 functions (all) |
+| `utils/__tests__/scoring.test.ts` | `utils/scoring.ts` | 3 functions (all) |
+| `utils/__tests__/progressCalculation.test.ts` | `utils/progressCalculation.ts` | 5 of 6 functions |
+| `utils/__tests__/location.test.ts` | `utils/location.ts` | 3 functions (all) |
+| `utils/__tests__/humanPerformance.test.ts` | `utils/humanPerformance.ts` | 3 functions (all) |
+| `utils/__tests__/breathing.test.ts` | `utils/breathing.ts` | 5 functions (all) |
+| `utils/__tests__/reactionBoard.test.ts` | `utils/physics.ts` | Reaction-time helpers only |
+| `utils/__tests__/activityPersistence.test.ts` | `utils/activityPersistence.ts` | Pure builders only |
+| `components/__tests__/card.test.tsx` | `components/card.tsx` | Render and layout |

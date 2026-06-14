@@ -9,17 +9,11 @@
       "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal",
-      "android": {
-        "buildType": "apk"
-      },
-      "env": {
-        "API_URL": "AIzaSyDipQOWsouhl5bJPBN71d21ozvy_yh2x7s"
-      }
+      "distribution": "internal"
     },
     "production": {
       "android": {
-        "buildType": "app-bundle"
+        "buildType": "apk"
       }
     }
   },
