@@ -44,7 +44,7 @@ const createStyles = (colors: ThemeColors) => {
         input: {
             borderWidth: 1,
             borderColor: colors.inputBorderColor,
-            color: "#000000",
+            color: colors.secondary,
             backgroundColor: colors.surfaceContainer,
             borderRadius: 5,
             padding: 12,
