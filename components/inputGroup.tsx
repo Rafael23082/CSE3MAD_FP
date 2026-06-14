@@ -25,6 +25,7 @@ export default function InputGroup({first, label, text, setText, placeholder, is
             )}
             <TextInput
                 placeholder={placeholder}
+                placeholderTextColor={theme.secondary}
                 style={[styles.input, {
                     marginTop: isLabeled ? 15: 20,
                 }]}
@@ -44,7 +45,7 @@ const createStyles = (colors: ThemeColors) => {
             borderWidth: 1,
             borderColor: colors.inputBorderColor,
             color: "#000000",
-            backgroundColor: "#FFFFFF",
+            backgroundColor: colors.surfaceContainer,
             borderRadius: 5,
             padding: 12,
             fontSize: 16,

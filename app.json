@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "CSE3MAD_FP",
-    "slug": "CSE3MAD_FP",
+    "slug": "cs3mad-fp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -84,9 +84,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "87eacab1-6c2f-4656-8b19-575489b68b55"
+        "projectId": "b103cee9-5cc8-4306-b596-d26fb3aee8b1"
       }
     },
-    "owner": "matt92stan"
+    "owner": "rafaeeeeeeel"
   }
 }
