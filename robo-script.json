@@ -24,7 +24,7 @@
       },
       {
         "eventType": "VIEW_TEXT_CHANGED",
-        "replacementText": "alpha170@test.com",
+        "replacementText": "alpha621@test.com",
         "elementDescriptors": [
           {
             "contentDescription": "input_email"
@@ -179,37 +179,15 @@
         ]
       },
       {
-        "eventType": "VIEW_TEXT_CHANGED",
-        "replacementText": "Reaction time: 300ms. Successfully tapped hidden button.",
+        "eventType": "ELEMENT_SCROLL_INTO_VIEW",
         "elementDescriptors": [
+          {
+            "contentDescription": "attempt_scrollview"
+          }
+        ],
+        "childElementDescriptors": [
           {
             "contentDescription": "input_observation"
-          }
-        ]
-      },
-      {
-        "eventType": "VIEW_CLICKED",
-        "elementDescriptors": [
-          {
-            "contentDescription": "btn_submit_trial"
-          }
-        ]
-      },
-      {
-        "eventType": "VIEW_TEXT_CHANGED",
-        "replacementText": "200",
-        "elementDescriptors": [
-          {
-            "contentDescription": "input_predicted_reaction_time"
-          }
-        ]
-      },
-      {
-        "eventType": "VIEW_TEXT_CHANGED",
-        "replacementText": "300",
-        "elementDescriptors": [
-          {
-            "contentDescription": "input_measured_reaction_time"
           }
         ]
       },
@@ -223,37 +201,15 @@
         ]
       },
       {
-        "eventType": "VIEW_CLICKED",
+        "eventType": "ELEMENT_SCROLL_INTO_VIEW",
         "elementDescriptors": [
+          {
+            "contentDescription": "attempt_scrollview"
+          }
+        ],
+        "childElementDescriptors": [
           {
             "contentDescription": "btn_submit_trial"
-          }
-        ]
-      },
-      {
-        "eventType": "VIEW_TEXT_CHANGED",
-        "replacementText": "80",
-        "elementDescriptors": [
-          {
-            "contentDescription": "input_predicted_tracing_accuracy"
-          }
-        ]
-      },
-      {
-        "eventType": "VIEW_TEXT_CHANGED",
-        "replacementText": "90",
-        "elementDescriptors": [
-          {
-            "contentDescription": "input_measured_tracing_accuracy"
-          }
-        ]
-      },
-      {
-        "eventType": "VIEW_TEXT_CHANGED",
-        "replacementText": "Tracing accuracy: 90%. Able to trace the moving circle well enough.",
-        "elementDescriptors": [
-          {
-            "contentDescription": "input_observation"
           }
         ]
       },
@@ -297,11 +253,146 @@
         ]
       },
       {
+        "eventType": "ELEMENT_SCROLL_INTO_VIEW",
+        "elementDescriptors": [
+          {
+            "contentDescription": "attempt_scrollview"
+          }
+        ],
+        "childElementDescriptors": [
+          {
+            "contentDescription": "input_surprises"
+          }
+        ]
+      },
+      {
         "eventType": "VIEW_TEXT_CHANGED",
         "replacementText": "The tracing challenge was easier than I thought it would be.",
         "elementDescriptors": [
           {
             "contentDescription": "input_surprises"
+          }
+        ]
+      },
+      {
+        "eventType": "ELEMENT_SCROLL_INTO_VIEW",
+        "elementDescriptors": [
+          {
+            "contentDescription": "attempt_scrollview"
+          }
+        ],
+        "childElementDescriptors": [
+          {
+            "contentDescription": "input_predicted_reaction_time"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_TEXT_CHANGED",
+        "replacementText": "200",
+        "elementDescriptors": [
+          {
+            "contentDescription": "input_predicted_reaction_time"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_TEXT_CHANGED",
+        "replacementText": "300",
+        "elementDescriptors": [
+          {
+            "contentDescription": "input_measured_reaction_time"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_TEXT_CHANGED",
+        "replacementText": "Reaction time: 300ms. Successfully tapped hidden button.",
+        "elementDescriptors": [
+          {
+            "contentDescription": "input_observation"
+          }
+        ]
+      },
+      {
+        "eventType": "ELEMENT_SCROLL_INTO_VIEW",
+        "elementDescriptors": [
+          {
+            "contentDescription": "attempt_scrollview"
+          }
+        ],
+        "childElementDescriptors": [
+          {
+            "contentDescription": "btn_submit_trial"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          {
+            "contentDescription": "btn_submit_trial"
+          }
+        ]
+      },
+      {
+        "eventType": "ELEMENT_SCROLL_INTO_VIEW",
+        "elementDescriptors": [
+          {
+            "contentDescription": "attempt_scrollview"
+          }
+        ],
+        "childElementDescriptors": [
+          {
+            "contentDescription": "input_predicted_tracing_accuracy"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_TEXT_CHANGED",
+        "replacementText": "80",
+        "elementDescriptors": [
+          {
+            "contentDescription": "input_predicted_tracing_accuracy"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_TEXT_CHANGED",
+        "replacementText": "90",
+        "elementDescriptors": [
+          {
+            "contentDescription": "input_measured_tracing_accuracy"
+          }
+        ]
+      },
+      {
+        "eventType": "ELEMENT_SCROLL_INTO_VIEW",
+        "elementDescriptors": [
+          {
+            "contentDescription": "attempt_scrollview"
+          }
+        ],
+        "childElementDescriptors": [
+          {
+            "contentDescription": "btn_submit_trial"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_TEXT_CHANGED",
+        "replacementText": "Tracing accuracy: 90%. Able to trace the moving circle well enough.",
+        "elementDescriptors": [
+          {
+            "contentDescription": "input_observation"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          {
+            "contentDescription": "btn_submit_trial"
           }
         ]
       },
