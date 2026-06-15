@@ -148,6 +148,19 @@
         ]
       },
       {
+        "eventType": "ELEMENT_SCROLL_INTO_VIEW",
+        "elementDescriptors": [
+          {
+            "contentDescription": "attempt_scrollview"
+          }
+        ],
+        "childElementDescriptors": [
+          {
+            "contentDescription": "input_predicted_reaction_time"
+          }
+        ]
+      },
+      {
         "eventType": "VIEW_TEXT_CHANGED",
         "replacementText": "200",
         "elementDescriptors": [
@@ -249,6 +262,19 @@
         "elementDescriptors": [
           {
             "contentDescription": "btn_submit_trial"
+          }
+        ]
+      },
+      {
+        "eventType": "ELEMENT_SCROLL_INTO_VIEW",
+        "elementDescriptors": [
+          {
+            "contentDescription": "attempt_scrollview"
+          }
+        ],
+        "childElementDescriptors": [
+          {
+            "contentDescription": "input_predictions_correct"
           }
         ]
       },

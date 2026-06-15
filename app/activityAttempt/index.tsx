@@ -220,6 +220,9 @@ export default function ActivityAttemptMainScreen(){
           <ScrollView
             contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 100 }]}
             showsVerticalScrollIndicator={false}
+            accessible={true}
+            accessibilityLabel="attempt_scrollview"
+            testID="attempt_scrollview"
           >
               {/* 1. Predictions Section */}
               <View style={styles.section}>
@@ -391,7 +394,7 @@ export default function ActivityAttemptMainScreen(){
                   style={({ pressed }) => [
                       styles.saveBtn,
                       { backgroundColor: isComplete() ? theme.secondary : theme.textMuted },
-                      pressed && { opacity: 0.85 },
+                      pressed && { opacity: 0.85 }, 
                   ]}
                   onPress={handleSave}
                   disabled={!isComplete() || isSaving}
