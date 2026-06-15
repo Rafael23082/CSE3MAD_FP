@@ -10,9 +10,10 @@ type InputProps = {
     placeholder: string;
     isPassword: boolean;
     isLabeled: boolean
+    testID?: string
 };
 
-export default function InputGroup({first, label, text, setText, placeholder, isPassword, isLabeled}: InputProps){
+export default function InputGroup({first, label, text, setText, placeholder, isPassword, isLabeled, testID}: InputProps){
     const {theme} = useTheme();
     const styles = createStyles(theme);
 
@@ -34,6 +35,7 @@ export default function InputGroup({first, label, text, setText, placeholder, is
                 secureTextEntry={isPassword}
                 autoCapitalize="none"
                 autoCorrect={false}
+                testID={testID}
             />
         </View>
     );

@@ -1,0 +1,113 @@
+[
+  {
+    "crawlStage": "crawl",
+    "contextDescriptor": {
+      "condition": "app_under_test_shown"
+    },
+    "actions": [
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          {
+            "resourceId": "com.matt92stan.cse3madfp:id/signup_btn"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_TEXT_CHANGED",
+        "replacementText": "Alpha Team",
+        "elementDescriptors": [
+          {
+            "resourceId": "com.matt92stan.cse3madfp:id/input_team_name"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_TEXT_CHANGED",
+        "replacementText": "alpha@test.com",
+        "elementDescriptors": [
+          {
+            "resourceId": "com.matt92stan.cse3madfp:id/input_email"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_TEXT_CHANGED",
+        "replacementText": "Password123",
+        "elementDescriptors": [
+          {
+            "resourceId": "com.matt92stan.cse3madfp:id/input_password"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          {
+            "resourceId": "com.matt92stan.cse3madfp:id/btn_register"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_TEXT_CHANGED",
+        "replacementText": "John",
+        "elementDescriptors": [
+          {
+            "resourceId": "com.matt92stan.cse3madfp:id/first_name_0"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_TEXT_CHANGED",
+        "replacementText": "Doe",
+        "elementDescriptors": [
+          {
+            "resourceId": "com.matt92stan.cse3madfp:id/last_name_0"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          {
+            "resourceId": "com.matt92stan.cse3madfp:id/btn_add_member"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_TEXT_CHANGED",
+        "replacementText": "Jane",
+        "elementDescriptors": [
+          {
+            "resourceId": "com.matt92stan.cse3madfp:id/first_name_1"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_TEXT_CHANGED",
+        "replacementText": "Smith",
+        "elementDescriptors": [
+          {
+            "resourceId": "com.matt92stan.cse3madfp:id/last_name_1"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          {
+            "resourceId": "com.matt92stan.cse3madfp:id/btn_complete_registration"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          {
+            "resourceId": "com.matt92stan.cse3madfp:id/tab_activities"
+          }
+        ]
+      }
+    ]
+  }
+]

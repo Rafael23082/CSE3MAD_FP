@@ -165,6 +165,7 @@ export default function SignupScreen(){
                                                 isPassword={false}
                                                 placeholder={t("signup.firstNamePlaceholder")}
                                                 isLabeled={true}
+                                                testID={`first_name_${index}`}
                                             />
                                             <InputGroup 
                                                 first={false}
@@ -174,6 +175,7 @@ export default function SignupScreen(){
                                                 isPassword={false}
                                                 placeholder={t("signup.lastNamePlaceholder")}
                                                 isLabeled={true}
+                                                testID={`last_name_${index}`}
                                             />
                                         </View>
                                         {teamMembers.length > MIN_MEMBERS && (
@@ -188,7 +190,7 @@ export default function SignupScreen(){
                                 ))}
 
                                 {teamMembers.length < MAX_MEMBERS && (
-                                    <Pressable style={[styles.addMemberBtn, { borderColor: theme.primary }]} onPress={addMember}>
+                                    <Pressable style={[styles.addMemberBtn, { borderColor: theme.primary }]} onPress={addMember} testID="btn_add_member">
                                         <MaterialCommunityIcons name="plus" size={20} color={theme.primary} />
                                         <Text style={[styles.addMemberText, { color: theme.primary }]}>{t("signup.addMember")}</Text>
                                     </Pressable>
@@ -198,7 +200,7 @@ export default function SignupScreen(){
                                     <Text style={styles.errorMessage}>{error}</Text>
                                 )}
                             </View>
-                            <Button text={t("signup.completeRegistration")} action={handleCompleteRegistration} loading={loading} />
+                            <Button text={t("signup.completeRegistration")} action={handleCompleteRegistration} loading={loading} testID="btn_complete_registration" />
                         </View>
                     </ScrollView>
                 </KeyboardAvoidingView>
@@ -225,6 +227,7 @@ export default function SignupScreen(){
                                 isPassword={false} 
                                 placeholder={t("signup.teamNamePlaceholder")}
                                 isLabeled={true}
+                                testID="input_team_name"
                             />
                             <InputGroup 
                                 first={false} 
@@ -234,6 +237,7 @@ export default function SignupScreen(){
                                 isPassword={false} 
                                 placeholder={t("forms.emailPlaceholder")}
                                 isLabeled={true}
+                                testID="input_email"
                             />
                             <InputGroup 
                                 first={false} 
@@ -243,13 +247,14 @@ export default function SignupScreen(){
                                 isPassword={true} 
                                 placeholder={t("forms.passwordPlaceholder")}
                                 isLabeled={true}
+                                testID="Password123"
                             />
 
                             {error && (
                                 <Text style={styles.errorMessage}>{error}</Text>
                             )}
                         </View>
-                        <Button text={t("buttons.register")} action={handleSignup} loading={loading} />
+                        <Button text={t("buttons.register")} action={handleSignup} loading={loading} testID="btn_register" />
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>

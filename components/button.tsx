@@ -13,6 +13,7 @@ type ButtonProps = {
   action: () => void;
   disabled?: boolean;
   loading?: boolean;
+  testID?: string
 };
 
 export default function Button({
@@ -20,6 +21,7 @@ export default function Button({
   action,
   disabled = false,
   loading = false,
+  testID
 }: ButtonProps) {
   const { theme } = useTheme();
   const styles = createStyles(theme);
@@ -33,6 +35,7 @@ export default function Button({
       disabled={disabled || loading}
       accessibilityRole="button"
       accessibilityLabel={text}
+      testID={testID}
     >
       <View style={styles.buttonContent}>
         {loading ? (
