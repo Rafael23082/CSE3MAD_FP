@@ -23,7 +23,7 @@ export default function Index() {
     const { user, loading } = context;
 
     if (loading) {
-        return (
+    return (
             <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                 <ActivityIndicator />
             </View>

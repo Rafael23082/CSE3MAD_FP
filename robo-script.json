@@ -130,7 +130,7 @@
         "replacementText": "Because faster reaction is linked to better anticipation and focus",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/input_reaction_prediction_reaction_time_difference_reason"
+            "resourceId": "com.matt92stan.cse3madfp:id/input_reaction_time_difference_reason"
           }
         ]
       }
