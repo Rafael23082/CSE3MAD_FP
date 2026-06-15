@@ -190,7 +190,7 @@ export default function SignupScreen(){
                                 ))}
 
                                 {teamMembers.length < MAX_MEMBERS && (
-                                    <Pressable style={[styles.addMemberBtn, { borderColor: theme.primary }]} onPress={addMember} testID="btn_add_member">
+                                    <Pressable style={[styles.addMemberBtn, { borderColor: theme.primary }]} onPress={addMember} testID="btn_add_member" accessible={true} accessibilityLabel="btn_add_member">
                                         <MaterialCommunityIcons name="plus" size={20} color={theme.primary} />
                                         <Text style={[styles.addMemberText, { color: theme.primary }]}>{t("signup.addMember")}</Text>
                                     </Pressable>
@@ -254,7 +254,7 @@ export default function SignupScreen(){
                                 <Text style={styles.errorMessage}>{error}</Text>
                             )}
                         </View>
-                        <Button text={t("buttons.register")} action={handleSignup} loading={loading} testID="btn_register" />
+                        <Button text={t("buttons.register")} action={handleSignup} loading={loading} testID="btn_register_account" />
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>

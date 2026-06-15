@@ -6,28 +6,10 @@
     },
     "actions": [
       {
-        "eventType": "WAIT_FOR_ELEMENT",
-        "delayTime": 60000,
-        "elementDescriptors": [
-          {
-            "resourceId": "com.matt92stan.cse3madfp:id/home_screen"
-          }
-        ]
-      },
-      {
         "eventType": "VIEW_CLICKED",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/signup_btn"
-          }
-        ]
-      },
-      {
-        "eventType": "WAIT_FOR_ELEMENT",
-        "delayTime": 60000,
-        "elementDescriptors": [
-          {
-            "resourceId": "com.matt92stan.cse3madfp:id/signup_screen"
+            "contentDescription": "btn_register"
           }
         ]
       },
@@ -36,7 +18,7 @@
         "replacementText": "Alpha Team",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/input_team_name"
+            "contentDescription": "input_team_name"
           }
         ]
       },
@@ -45,7 +27,7 @@
         "replacementText": "alpha@test.com",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/input_email"
+            "contentDescription": "input_email"
           }
         ]
       },
@@ -54,7 +36,7 @@
         "replacementText": "Password123",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/input_password"
+            "contentDescription": "input_password"
           }
         ]
       },
@@ -62,16 +44,7 @@
         "eventType": "VIEW_CLICKED",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/btn_register"
-          }
-        ]
-      },
-      {
-        "eventType": "WAIT_FOR_ELEMENT",
-        "delayTime": 60000,
-        "elementDescriptors": [
-          {
-            "resourceId": "com.matt92stan.cse3madfp:id/team_initialization_screen"
+            "contentDescription": "btn_register_account"
           }
         ]
       },
@@ -80,7 +53,7 @@
         "replacementText": "John",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/first_name_0"
+            "contentDescription": "first_name_0"
           }
         ]
       },
@@ -89,7 +62,7 @@
         "replacementText": "Doe",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/last_name_0"
+            "contentDescription": "last_name_0"
           }
         ]
       },
@@ -97,7 +70,7 @@
         "eventType": "VIEW_CLICKED",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/btn_add_member"
+            "contentDescription": "btn_add_member"
           }
         ]
       },
@@ -106,7 +79,7 @@
         "replacementText": "Jane",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/first_name_1"
+            "contentDescription": "first_name_1"
           }
         ]
       },
@@ -115,7 +88,7 @@
         "replacementText": "Smith",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/last_name_1"
+            "contentDescription": "last_name_1"
           }
         ]
       },
@@ -123,16 +96,7 @@
         "eventType": "VIEW_CLICKED",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/btn_complete_registration"
-          }
-        ]
-      },
-      {
-        "eventType": "WAIT_FOR_ELEMENT",
-        "delayTime": 60000,
-        "elementDescriptors": [
-          {
-            "resourceId": "com.matt92stan.cse3madfp:id/dashboard_screen"
+            "contentDescription": "btn_complete_registration"
           }
         ]
       },
@@ -140,16 +104,7 @@
         "eventType": "VIEW_CLICKED",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/start_activity_btn"
-          }
-        ]
-      },
-      {
-        "eventType": "WAIT_FOR_ELEMENT",
-        "delayTime": 60000,
-        "elementDescriptors": [
-          {
-            "resourceId": "com.matt92stan.cse3madfp:id/activity_reaction_board_challenge"
+            "contentDescription": "btn_start_activity"
           }
         ]
       },
@@ -157,16 +112,7 @@
         "eventType": "VIEW_CLICKED",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/activity_reaction_board_challenge"
-          }
-        ]
-      },
-      {
-        "eventType": "WAIT_FOR_ELEMENT",
-        "delayTime": 60000,
-        "elementDescriptors": [
-          {
-            "resourceId": "com.matt92stan.cse3madfp:id/input_reaction_time_difference_prediction"
+            "contentDescription": "activity_reaction_board_challenge"
           }
         ]
       },
@@ -175,7 +121,7 @@
         "replacementText": "300ms",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/input_reaction_time_difference_prediction"
+            "contentDescription": "input_reaction_time_difference_prediction"
           }
         ]
       },
@@ -184,7 +130,7 @@
         "replacementText": "Because faster reaction is linked to better anticipation and focus",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/input_reaction_time_difference_reason"
+            "contentDescription": "input_reaction_time_difference_reason"
           }
         ]
       },
@@ -193,7 +139,7 @@
         "replacementText": "200",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/input_predicted_reaction_time"
+            "contentDescription": "input_predicted_reaction_time"
           }
         ]
       },
@@ -202,7 +148,7 @@
         "replacementText": "300",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/input_measured_reaction_time"
+            "contentDescription": "input_measured_reaction_time"
           }
         ]
       },
@@ -211,7 +157,7 @@
         "replacementText": "Reaction time: 300ms. Successfully tapped hidden button.",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/input_observation"
+            "contentDescription": "input_observation"
           }
         ]
       },
@@ -219,7 +165,7 @@
         "eventType": "VIEW_CLICKED",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/btn_submit_trial"
+            "contentDescription": "btn_submit_trial"
           }
         ]
       },
@@ -228,7 +174,7 @@
         "replacementText": "200",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/input_predicted_reaction_time"
+            "contentDescription": "input_predicted_reaction_time"
           }
         ]
       },
@@ -237,7 +183,7 @@
         "replacementText": "300",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/input_measured_reaction_time"
+            "contentDescription": "input_measured_reaction_time"
           }
         ]
       },
@@ -246,7 +192,7 @@
         "replacementText": "Reaction time: 300ms. Successfully tapped hidden button.",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/input_observation"
+            "contentDescription": "input_observation"
           }
         ]
       },
@@ -254,7 +200,7 @@
         "eventType": "VIEW_CLICKED",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/btn_submit_trial"
+            "contentDescription": "btn_submit_trial"
           }
         ]
       },
@@ -263,7 +209,7 @@
         "replacementText": "80",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/input_predicted_tracing_accuracy"
+            "contentDescription": "input_predicted_tracing_accuracy"
           }
         ]
       },
@@ -272,7 +218,7 @@
         "replacementText": "90",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/input_measured_tracing_accuracy"
+            "contentDescription": "input_measured_tracing_accuracy"
           }
         ]
       },
@@ -281,7 +227,7 @@
         "replacementText": "Tracing accuracy: 90%. Able to trace the moving circle well enough.",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/input_observation"
+            "contentDescription": "input_observation"
           }
         ]
       },
@@ -289,7 +235,7 @@
         "eventType": "VIEW_CLICKED",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/btn_submit_trial"
+            "contentDescription": "btn_submit_trial"
           }
         ]
       },
@@ -298,7 +244,7 @@
         "replacementText": "No",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/input_predictions_correct"
+            "contentDescription": "input_predictions_correct"
           }
         ]
       },
@@ -307,7 +253,7 @@
         "replacementText": "The reaction tap challenge was harder.",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/input_harder_challenge"
+            "contentDescription": "input_harder_challenge"
           }
         ]
       },
@@ -316,7 +262,7 @@
         "replacementText": "The tracing challenge was easier than I thought it would be.",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/input_surprises"
+            "contentDescription": "input_surprises"
           }
         ]
       },
@@ -325,7 +271,7 @@
         "replacementText": "My reaction speed improved once I realized where the hidden button tended to appear.",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/input_reflection"
+            "contentDescription": "input_reflection"
           }
         ]
       },
@@ -333,7 +279,7 @@
         "eventType": "VIEW_CLICKED",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/btn_star_4"
+            "contentDescription": "btn_star_4"
           }
         ]
       },
@@ -341,7 +287,7 @@
         "eventType": "VIEW_CLICKED",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/btn_save_attempt"
+            "contentDescription": "btn_save_attempt"
           }
         ]
       }

@@ -256,6 +256,8 @@ export default function ActivityAttemptMainScreen(){
                                     placeholderTextColor={theme.textMuted}
                                     multiline
                                     testID={`input_${normalizeId(field.id)}`}
+                                    accessible={true}
+                                    accessibilityLabel={`input_${normalizeId(field.id)}`}
                             />
                           )}
                           {field.type === "dropdown" && field.options && (
@@ -301,6 +303,8 @@ export default function ActivityAttemptMainScreen(){
                               placeholderTextColor={theme.textMuted}
                               multiline
                               testID={`input_${normalizeId(q.id)}`}
+                              accessible={true}
+                              accessibilityLabel={`input_${normalizeId(q.id)}`}
                             />
                       </View>
                   ))}
@@ -317,6 +321,8 @@ export default function ActivityAttemptMainScreen(){
                       placeholderTextColor={theme.textMuted}
                       multiline
                       testID="input_reflection"
+                      accessible={true}
+                      accessibilityLabel="input_reflection"
                   />
                   <View style={styles.ratingContainer}>
                       <Text style={styles.ratingLabel}>{t("attempt.rateYourExperience")}:</Text>
@@ -326,6 +332,8 @@ export default function ActivityAttemptMainScreen(){
                                   key={star}
                                   onPress={() => setRating?.(star)}
                                   testID={`btn_star_${star}`}
+                                  accessible={true}
+                                  accessibilityLabel={`btn_star_${star}`}
                               >
                                   <MaterialCommunityIcons
                                       name={currentRating && star <= currentRating ? "star" : "star-outline"}
@@ -388,6 +396,8 @@ export default function ActivityAttemptMainScreen(){
                   onPress={handleSave}
                   disabled={!isComplete() || isSaving}
                   testID="btn_save_attempt"
+                  accessible={true}
+                  accessibilityLabel="btn_save_attempt"
               >
                   <MaterialCommunityIcons name="content-save" size={20} color="#fff" />
                   <Text style={styles.saveBtnText}>

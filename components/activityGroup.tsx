@@ -44,6 +44,8 @@ export default function ActivityGroup({activityKey, activityName, description, i
                         router.push("/activityAttempt")
                     }}
                     testID={testID}
+                    accessible={true}
+                    accessibilityLabel={testID}
                 >
                     <Image source={imagePath} style={styles.image} resizeMode="cover" />
                 </Pressable>

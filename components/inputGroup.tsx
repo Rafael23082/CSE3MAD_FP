@@ -36,6 +36,8 @@ export default function InputGroup({first, label, text, setText, placeholder, is
                 autoCapitalize="none"
                 autoCorrect={false}
                 testID={testID}
+                accessible={true}
+                accessibilityLabel={testID}
             />
         </View>
     );

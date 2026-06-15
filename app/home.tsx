@@ -19,8 +19,8 @@ export default function HomeScreen(){
                 <Text style={styles.secondary}>{t("landing.slogan")}</Text>
             </View>
             <View style={styles.buttonContainer}>
-                <Button text={t("buttons.register")} action={()=>{router.push("/signup")}} testID="signup_btn" />
-                <Button text={t("buttons.login")} action={()=>{router.push("/login")}} testID="login_btn" />
+                <Button text={t("buttons.register")} action={()=>{router.push("/signup")}} testID="btn_register" />
+                <Button text={t("buttons.login")} action={()=>{router.push("/login")}} />
             </View>
         </SafeAreaView >
     );

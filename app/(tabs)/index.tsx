@@ -132,7 +132,7 @@ export default function HomeScreen() {
 
           {/* Start Activity Button */}
           <View style={styles.startBtnContainer}>
-            <Button text={t("home.startActivity")} action={() => router.push("/(tabs)/activities")} testID="start_activity_btn" />
+            <Button text={t("home.startActivity")} action={() => router.push("/(tabs)/activities")} testID="btn_start_activity" />
           </View>
         </ScrollView>
   );

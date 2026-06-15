@@ -34,8 +34,9 @@ export default function Button({
       }}
       disabled={disabled || loading}
       accessibilityRole="button"
-      accessibilityLabel={text}
+      accessibilityLabel={testID}
       testID={testID}
+      accessible={true}
     >
       <View style={styles.buttonContent}>
         {loading ? (

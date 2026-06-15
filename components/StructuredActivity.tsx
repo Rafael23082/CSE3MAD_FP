@@ -839,6 +839,8 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
               ]}
               onPress={handleSubmit}
               testID="btn_submit_trial"
+              accessible={true}
+              accessibilityLabel="btn_submit_trial"
             >
               <MaterialCommunityIcons name="check-circle" size={20} color="#fff" />
               <Text style={styles.submitBtnText}>{t("attempt.submitTrial")}</Text>
