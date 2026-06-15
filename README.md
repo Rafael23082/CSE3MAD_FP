@@ -4,36 +4,37 @@ A cross-platform mobile application built with React Native and Expo, featuring 
 
 ## Overview
 
-CSE3MAD_FP is a full-stack mobile application that leverages modern web and mobile technologies. The project is written primarily in TypeScript with additional JavaScript, HTML, and CSS components, providing a modular architecture and a comprehensive testing setup.
+CSE3MAD_FP is a full-stack mobile application that leverages modern web and mobile technologies. The project is written primarily in TypeScript with additional JavaScript, HTML, and CSS components,[...]
 
 ## Technology Stack
 
-- **Framework**: React Native with Expo
-- **Language**: TypeScript (69.3%), JavaScript (23.9%), HTML (5.6%), CSS (1.2%)
-- **Navigation**: React Navigation with Expo Router
-- **State Management**: TanStack React Query
-- **Backend**: Firebase (Firestore, Storage)
-- **Internationalization**: i18next with react-i18next
-- **Testing**: Jest with Testing Library
-- **Linting**: ESLint with Expo config
-- **UI Libraries**: React Native Skia, Victory Native
-- **Icons**: Expo Vector Icons
+- Framework: React Native with Expo
+- Language: TypeScript (74.4%), JavaScript
+- Navigation: Expo Router / React Navigation
+- State management: TanStack React Query + React Context
+- Backend: Firebase (Auth, Firestore, Storage) and SQLite for offline sync
+- Internationalization: i18next + react-i18next
+- Testing: Jest + Testing Library
+- Linting: ESLint (Expo config)
+- UI / Graphics: React Native Skia, Victory Native
+- Icons: Expo Vector Icons
+- CI/CD & Builds: GitHub Actions + EAS Build
 
 ## Project Structure
 
 ```
 CSE3MAD_FP/
-├── app/                    # Expo Router app configuration and screens
-├── components/             # Reusable React components
-├── constants/              # Application constants
-├── context/                # React Context providers
-├── hooks/                  # Custom React hooks
-├── utils/                  # Utility functions
-├── theme/                  # Theme configuration and styling
-├── assets/                 # Images, fonts, and other static assets
+├── app/                    # Expo Router app configuration and screens (tabs, activity attempts, results)
+├── components/             # Reusable React components (buttons, cards, charts, activity UIs)
+├── constants/              # Application constants and activity definitions
+├── context/                # React Context providers (Auth, Activity state, Theme)
+├── hooks/                  # Custom React hooks (e.g. useTheme)
+├── utils/                  # Utility functions (progress calculations, helpers)
+├── theme/                  # Light and dark theme colour definitions
+├── assets/                 # Images, fonts, activity definitions, equipment photos
 ├── scripts/                # Build and utility scripts
 ├── coverage/               # Test coverage reports
-├── package.json            # Dependencies and scripts
+├── package.json            # Dependencies and npm scripts
 ├── tsconfig.json           # TypeScript configuration
 ├── jest.config.js          # Jest testing configuration
 ├── babel.config.js         # Babel transpilation config
@@ -198,7 +199,7 @@ STEMMLAB allows users to create accounts, log in securely, and manage their prof
 
 2. Interactive STEM Activities
 
-STEMMLAB provides a collection of hands-on STEM activities that integrate scientific inquiry, engineering design, and data collection. Current activities include:
+STEMLAB provides a collection of hands-on STEM activities that integrate scientific inquiry, engineering design, and data collection. Current activities include:
 
 - Parachute Drop Challenge: Designing a parachute to minimize impact force and maximize landing safety.
 - Sound Pollution Hunter: Measuring and mapping sound intensity in different environments to understand noise pollution.
@@ -367,13 +368,13 @@ npm start,	Start the Expo development server.
 
 4. Testing & Linting
 
-npm test/npx jest \- Run the Jest test suite.
+npm test/npx jest \\- Run the Jest test suite.
 
-npm run test: watch	 \- Run tests in watch mode.
+npm run test: watch	 \\- Run tests in watch mode.
 
-npm run test:coverage \- Generate a coverage report.
+npm run test:coverage \\- Generate a coverage report.
 
-npm run lint	\- Check code quality with ESLint.
+npm run lint	\\- Check code quality with ESLint.
 
 Security & Data
 
@@ -387,29 +388,10 @@ Authentication is handled entirely by Firebase Auth with standard email/password
 
 Project Structure
 
-| Directory | Contents |
-| :---- | ----: |
-| app/ | All screens and navigation (Expo Router). Includes tabs, activity attempts, and results. |
-| components/ | Reusable UI components: buttons, cards, charts, activity-specific attempt UIs, settings controls. |
-| constants/ | Activity definitions, action configs, mock data, type definitions. |
-| context/ | React Context providers for Auth, Activity state, and Theme. |
-| hooks/ | Custom React hooks (e.g. useTheme). |
-| utils/ | Utility functions including progress calculations. |
-| theme/ | Light and dark theme colour definitions. |
-| assets/ | Images, fonts, activity definitions, and equipment photos. |
+For the project's file layout, see the "Project Structure" section near the top of this README.
 
 Tech Stack
 
-| Layer | Technology |
-| :---- | ----: |
-| Framework | React Native \+ Expo |
-| Language | TypeScript (74.4%), Javascript |
-| Navigation | Expo Router (file-based) |
-| State | TanStack React Query \+ React Context |
-| Backend | SQLite & Firebase (Auth, Firestore, Storage) |
-| i18n | i18next \+ react-i18next |
-| Charts | Victory Native \+ React Native Skia |
-| Testing | Jest \+ Testing Library (181+ tests) |
-| CI/CD | GitHub Actions \+ EAS Build |
+For the technology stack used by this project, see the "Technology Stack" section near the top of this README.
 
 
