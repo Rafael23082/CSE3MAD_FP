@@ -24,7 +24,7 @@
       },
       {
         "eventType": "VIEW_TEXT_CHANGED",
-        "replacementText": "alpha70@test.com",
+        "replacementText": "alpha170@test.com",
         "elementDescriptors": [
           {
             "contentDescription": "input_email"
@@ -302,6 +302,19 @@
         "elementDescriptors": [
           {
             "contentDescription": "input_surprises"
+          }
+        ]
+      },
+      {
+        "eventType": "ELEMENT_SCROLL_INTO_VIEW",
+        "elementDescriptors": [
+          {
+            "contentDescription": "attempt_scrollview"
+          }
+        ],
+        "childElementDescriptors": [
+          {
+            "contentDescription": "input_reflection"
           }
         ]
       },

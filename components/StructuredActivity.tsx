@@ -804,6 +804,8 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
                         keyboardType={input.type === "number" ? "numeric" : "default"}
                         editable={!isActionComplete?.(config.id)}
                         testID={`input_${normalizeId(input.id)}`}
+                        accessible={true}
+                        accessibilityLabel={`input_${normalizeId(input.id)}`}
                       />
                       {isAutoFill && formValues[input.id] && (
                         <Pressable
