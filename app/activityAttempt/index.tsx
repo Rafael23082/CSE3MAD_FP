@@ -256,7 +256,7 @@ export default function ActivityAttemptMainScreen(){
                                     placeholder={t("placeholder.enterYourAnswer")}
                                     placeholderTextColor={theme.textMuted}
                                     multiline
-                                    testID={`reaction_prediction_${normalizeId(field.id)}`}
+                                    testID={`input_${normalizeId(field.id)}`}
                             />
                           )}
                           {field.type === "dropdown" && field.options && (

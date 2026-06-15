@@ -6,14 +6,6 @@
     },
     "actions": [
       {
-        "eventType": "VIEW_SHOWN",
-        "elementDescriptors": [
-          {
-            "resourceId": "home_screen"
-          }
-        ]
-      },
-      {
         "eventType": "VIEW_CLICKED",
         "elementDescriptors": [
           {
@@ -129,7 +121,7 @@
         "replacementText": "300ms",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/reaction_prediction_reactionTimeDifferencePrediction"
+            "resourceId": "com.matt92stan.cse3madfp:id/input_reaction_time_difference_prediction"
           }
         ]
       },
@@ -138,7 +130,7 @@
         "replacementText": "Because faster reaction is linked to better anticipation and focus",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/reaction_prediction_reaction_time_difference_reason"
+            "resourceId": "com.matt92stan.cse3madfp:id/input_reaction_prediction_reaction_time_difference_reason"
           }
         ]
       }
