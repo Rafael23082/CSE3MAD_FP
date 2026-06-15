@@ -303,7 +303,7 @@ export default function JournalScreen() {
                 <>
                     {/* Official Submission */}
                     {officialAttempt && (
-                        <View style={styles.section}>
+                        <View style={styles.section} testID='journal_screen'>
                             <Text style={styles.sectionTitle}>{t("journal.submitted")}</Text>
                             <View style={[styles.attemptCard, styles.officialCard]}>
                                 <View style={styles.attemptHeader}>
@@ -323,20 +323,20 @@ export default function JournalScreen() {
                                     <Text style={styles.metricLabel}>
                                         {getMetricLabel()}: <Text style={styles.metricValue}>{getMetricValue(officialAttempt.logs).toFixed(2)}</Text>
                                     </Text>
-{officialAttempt.location ? (
-    <Pressable style={styles.locationRow} onPress={() => {
-        const url = `https://maps.google.com/?q=${officialAttempt.location!.latitude},${officialAttempt.location!.longitude}`;
-        Linking.openURL(url).catch(() => {});
-    }}>
-        <MaterialCommunityIcons name="map-marker" size={14} color={theme.primary} />
-        <Text style={styles.locationText}>{officialAttempt.location.latitude.toFixed(6)}, {officialAttempt.location.longitude.toFixed(6)}</Text>
-    </Pressable>
-) : (
-    <View style={styles.locationRow}>
-        <MaterialCommunityIcons name="map-marker-off" size={14} color={theme.textMuted} />
-        <Text style={[styles.locationText, { color: theme.textMuted }]}>Location Not Available</Text>
-    </View>
-)}
+                                    {officialAttempt.location ? (
+                                        <Pressable style={styles.locationRow} onPress={() => {
+                                            const url = `https://maps.google.com/?q=${officialAttempt.location!.latitude},${officialAttempt.location!.longitude}`;
+                                            Linking.openURL(url).catch(() => {});
+                                        }}>
+                                            <MaterialCommunityIcons name="map-marker" size={14} color={theme.primary} />
+                                            <Text style={styles.locationText}>{officialAttempt.location.latitude.toFixed(6)}, {officialAttempt.location.longitude.toFixed(6)}</Text>
+                                        </Pressable>
+                                    ) : (
+                                        <View style={styles.locationRow}>
+                                            <MaterialCommunityIcons name="map-marker-off" size={14} color={theme.textMuted} />
+                                            <Text style={[styles.locationText, { color: theme.textMuted }]}>Location Not Available</Text>
+                                        </View>
+                                    )}
                                     {renderAttemptSummary(officialAttempt)}
                                     {officialAttempt.reflection ? (
                                         <Text style={styles.reflectionPreview} numberOfLines={2}>
@@ -373,20 +373,20 @@ export default function JournalScreen() {
                                         <Text style={styles.metricLabel}>
                                             {getMetricLabel()}: <Text style={styles.metricValue}>{getMetricValue(attempt.logs).toFixed(2)}</Text>
                                         </Text>
-{attempt.location ? (
-    <Pressable style={styles.locationRow} onPress={() => {
-        const url = `https://maps.google.com/?q=${attempt.location!.latitude},${attempt.location!.longitude}`;
-        Linking.openURL(url).catch(() => {});
-    }}>
-        <MaterialCommunityIcons name="map-marker" size={14} color={theme.primary} />
-        <Text style={styles.locationText}>{attempt.location.latitude.toFixed(6)}, {attempt.location.longitude.toFixed(6)}</Text>
-    </Pressable>
-) : (
-    <View style={styles.locationRow}>
-        <MaterialCommunityIcons name="map-marker-off" size={14} color={theme.textMuted} />
-        <Text style={[styles.locationText, { color: theme.textMuted }]}>Location Not Available</Text>
-    </View>
-)}
+                                        {attempt.location ? (
+                                            <Pressable style={styles.locationRow} onPress={() => {
+                                                const url = `https://maps.google.com/?q=${attempt.location!.latitude},${attempt.location!.longitude}`;
+                                                Linking.openURL(url).catch(() => {});
+                                            }}>
+                                                <MaterialCommunityIcons name="map-marker" size={14} color={theme.primary} />
+                                                <Text style={styles.locationText}>{attempt.location.latitude.toFixed(6)}, {attempt.location.longitude.toFixed(6)}</Text>
+                                            </Pressable>
+                                        ) : (
+                                            <View style={styles.locationRow}>
+                                                <MaterialCommunityIcons name="map-marker-off" size={14} color={theme.textMuted} />
+                                                <Text style={[styles.locationText, { color: theme.textMuted }]}>Location Not Available</Text>
+                                            </View>
+                                        )}
                                         {renderAttemptSummary(attempt)}
                                         {attempt.reflection ? (
                                             <Text style={styles.reflectionPreview} numberOfLines={2}>

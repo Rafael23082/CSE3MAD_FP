@@ -1,18 +1,17 @@
 import Button from "@/components/button";
-import { ACTIVITIES } from "@/constants/data";
+import { TOTAL_ACTIVITIES } from "@/constants/data";
 import { AuthContext } from "@/context/AuthContext";
 import { db } from "@/firebase";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
-import { TOTAL_ACTIVITIES } from "@/constants/data";
+import { calculateProgressPercentage, getProgressColor } from "@/utils/progressCalculation";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
-import { useCallback, use, useEffect, useState } from "react";
+import { use, useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { calculateProgressPercentage, getProgressColor } from "@/utils/progressCalculation";
 
 export default function HomeScreen() {
   const { theme } = useTheme();
@@ -55,6 +54,7 @@ export default function HomeScreen() {
         contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 24 }]}
         contentInsetAdjustmentBehavior="automatic"
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.primary} />}
+        testID="dashboard_screen"
       >
           {/* User Card */}
           <View style={styles.teamCard}>
@@ -132,7 +132,7 @@ export default function HomeScreen() {
 
           {/* Start Activity Button */}
           <View style={styles.startBtnContainer}>
-            <Button text={t("home.startActivity")} action={() => router.push("/(tabs)/activities")} />
+            <Button text={t("home.startActivity")} action={() => router.push("/(tabs)/activities")} testID="start_activity_btn" />
           </View>
         </ScrollView>
   );

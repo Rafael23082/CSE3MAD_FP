@@ -3,6 +3,7 @@ import { ACTION_CONFIGS } from "@/constants/data";
 import { ActivityContext } from "@/context/ActivityContext";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
+import { normalizeId } from "@/utils/idUtils";
 import { calculateFanForce, degreesToRadians } from "@/utils/physics";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -794,13 +795,15 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
                         style={[
                           styles.textInput,
                           isAutoFill && styles.autoFillInput,
-                        ]}
+                        ]
+                      }
                         value={formValues[input.id] ?? ""}
                         onChangeText={(val) => handleInputChange(input.id, val)}
                         placeholder={t(input.placeholderKey ?? "")}
                         placeholderTextColor={theme.textMuted}
                         keyboardType={input.type === "number" ? "numeric" : "default"}
                         editable={!isActionComplete?.(config.id)}
+                        testID={`input_${normalizeId(input.id)}`}
                       />
                       {isAutoFill && formValues[input.id] && (
                         <Pressable
@@ -835,6 +838,7 @@ export default function StructuredActivity({ activityKey }: { activityKey: strin
                 pressed && { opacity: 0.85 },
               ]}
               onPress={handleSubmit}
+              testID="btn_submit_trial"
             >
               <MaterialCommunityIcons name="check-circle" size={20} color="#fff" />
               <Text style={styles.submitBtnText}>{t("attempt.submitTrial")}</Text>

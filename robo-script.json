@@ -6,10 +6,28 @@
     },
     "actions": [
       {
+        "eventType": "WAIT_FOR_ELEMENT",
+        "delayTime": 60000,
+        "elementDescriptors": [
+          {
+            "resourceId": "my.app.package:id/home_screen"
+          }
+        ]
+      },
+      {
         "eventType": "VIEW_CLICKED",
         "elementDescriptors": [
           {
             "resourceId": "com.matt92stan.cse3madfp:id/signup_btn"
+          }
+        ]
+      },
+      {
+        "eventType": "WAIT_FOR_ELEMENT",
+        "delayTime": 60000,
+        "elementDescriptors": [
+          {
+            "resourceId": "my.app.package:id/signup_screen"
           }
         ]
       },
@@ -45,6 +63,15 @@
         "elementDescriptors": [
           {
             "resourceId": "com.matt92stan.cse3madfp:id/btn_register"
+          }
+        ]
+      },
+      {
+        "eventType": "WAIT_FOR_ELEMENT",
+        "delayTime": 60000,
+        "elementDescriptors": [
+          {
+            "resourceId": "my.app.package:id/team_initialization_screen"
           }
         ]
       },
@@ -101,10 +128,28 @@
         ]
       },
       {
+        "eventType": "WAIT_FOR_ELEMENT",
+        "delayTime": 60000,
+        "elementDescriptors": [
+          {
+            "resourceId": "my.app.package:id/dashboard_screen"
+          }
+        ]
+      },
+      {
         "eventType": "VIEW_CLICKED",
         "elementDescriptors": [
           {
-            "resourceId": "com.matt92stan.cse3madfp:id/tab_activities"
+            "resourceId": "com.matt92stan.cse3madfp:id/start_activity_btn"
+          }
+        ]
+      },
+      {
+        "eventType": "WAIT_FOR_ELEMENT",
+        "delayTime": 60000,
+        "elementDescriptors": [
+          {
+            "resourceId": "my.app.package:id/activity_reaction_board_challenge"
           }
         ]
       },
@@ -113,6 +158,15 @@
         "elementDescriptors": [
           {
             "resourceId": "com.matt92stan.cse3madfp:id/activity_reaction_board_challenge"
+          }
+        ]
+      },
+      {
+        "eventType": "WAIT_FOR_ELEMENT",
+        "delayTime": 60000,
+        "elementDescriptors": [
+          {
+            "resourceId": "my.app.package:id/input_reaction_time_difference_prediction"
           }
         ]
       },
@@ -131,6 +185,163 @@
         "elementDescriptors": [
           {
             "resourceId": "com.matt92stan.cse3madfp:id/input_reaction_time_difference_reason"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_TEXT_CHANGED",
+        "replacementText": "200",
+        "elementDescriptors": [
+          {
+            "resourceId": "com.matt92stan.cse3madfp:id/input_predicted_reaction_time"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_TEXT_CHANGED",
+        "replacementText": "300",
+        "elementDescriptors": [
+          {
+            "resourceId": "com.matt92stan.cse3madfp:id/input_measured_reaction_time"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_TEXT_CHANGED",
+        "replacementText": "Reaction time: 300ms. Successfully tapped hidden button.",
+        "elementDescriptors": [
+          {
+            "resourceId": "com.matt92stan.cse3madfp:id/input_observation"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          {
+            "resourceId": "com.matt92stan.cse3madfp:id/btn_submit_trial"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_TEXT_CHANGED",
+        "replacementText": "200",
+        "elementDescriptors": [
+          {
+            "resourceId": "com.matt92stan.cse3madfp:id/input_predicted_reaction_time"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_TEXT_CHANGED",
+        "replacementText": "300",
+        "elementDescriptors": [
+          {
+            "resourceId": "com.matt92stan.cse3madfp:id/input_measured_reaction_time"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_TEXT_CHANGED",
+        "replacementText": "Reaction time: 300ms. Successfully tapped hidden button.",
+        "elementDescriptors": [
+          {
+            "resourceId": "com.matt92stan.cse3madfp:id/input_observation"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          {
+            "resourceId": "com.matt92stan.cse3madfp:id/btn_submit_trial"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_TEXT_CHANGED",
+        "replacementText": "80",
+        "elementDescriptors": [
+          {
+            "resourceId": "com.matt92stan.cse3madfp:id/input_predicted_tracing_accuracy"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_TEXT_CHANGED",
+        "replacementText": "90",
+        "elementDescriptors": [
+          {
+            "resourceId": "com.matt92stan.cse3madfp:id/input_measured_tracing_accuracy"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_TEXT_CHANGED",
+        "replacementText": "Tracing accuracy: 90%. Able to trace the moving circle well enough.",
+        "elementDescriptors": [
+          {
+            "resourceId": "com.matt92stan.cse3madfp:id/input_observation"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          {
+            "resourceId": "com.matt92stan.cse3madfp:id/btn_submit_trial"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_TEXT_CHANGED",
+        "replacementText": "No",
+        "elementDescriptors": [
+          {
+            "resourceId": "com.matt92stan.cse3madfp:id/input_predictions_correct"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_TEXT_CHANGED",
+        "replacementText": "The reaction tap challenge was harder.",
+        "elementDescriptors": [
+          {
+            "resourceId": "com.matt92stan.cse3madfp:id/input_harder_challenge"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_TEXT_CHANGED",
+        "replacementText": "The tracing challenge was easier than I thought it would be.",
+        "elementDescriptors": [
+          {
+            "resourceId": "com.matt92stan.cse3madfp:id/input_surprises"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_TEXT_CHANGED",
+        "replacementText": "My reaction speed improved once I realized where the hidden button tended to appear.",
+        "elementDescriptors": [
+          {
+            "resourceId": "com.matt92stan.cse3madfp:id/input_reflection"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          {
+            "resourceId": "com.matt92stan.cse3madfp:id/btn_star_4"
+          }
+        ]
+      },
+      {
+        "eventType": "VIEW_CLICKED",
+        "elementDescriptors": [
+          {
+            "resourceId": "com.matt92stan.cse3madfp:id/btn_save_attempt"
           }
         ]
       }

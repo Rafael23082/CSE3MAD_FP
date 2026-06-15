@@ -143,7 +143,7 @@ export default function SignupScreen(){
 
     if (step === 2){
         return(
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView style={styles.container} testID="team_initialization_screen">
                 <KeyboardAvoidingView style={styles.keyboardView} behavior="height">
                     <ScrollView contentContainerStyle={styles.scrollView} keyboardShouldPersistTaps="handled">
                         <View style={styles.top}>
@@ -209,7 +209,7 @@ export default function SignupScreen(){
     }
 
     return(
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={styles.container} testID="signup_screen">
             <KeyboardAvoidingView style={styles.keyboardView} behavior="height">
                 <ScrollView contentContainerStyle={styles.scrollView} keyboardShouldPersistTaps="handled">
                     <View style={styles.top}>

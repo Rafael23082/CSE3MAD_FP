@@ -4,6 +4,7 @@ import { AuthContext } from "@/context/AuthContext";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
 import { createAttempt } from "@/utils/activityAttempts";
+import { normalizeId } from "@/utils/idUtils";
 import { captureLocation } from "@/utils/location";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -205,8 +206,6 @@ export default function ActivityAttemptMainScreen(){
       setIsSaving(false);
     }
   };
-
-  const normalizeId = (id: string) => id.replace(/([A-Z])/g, "_$1").toLowerCase();
   
   useEffect(() => {
     return () => {
@@ -301,6 +300,7 @@ export default function ActivityAttemptMainScreen(){
                               placeholder={t("placeholder.enterYourAnswer")}
                               placeholderTextColor={theme.textMuted}
                               multiline
+                              testID={`input_${normalizeId(q.id)}`}
                             />
                       </View>
                   ))}
@@ -316,6 +316,7 @@ export default function ActivityAttemptMainScreen(){
                       placeholder="What did you learn from this experiment?"
                       placeholderTextColor={theme.textMuted}
                       multiline
+                      testID="input_reflection"
                   />
                   <View style={styles.ratingContainer}>
                       <Text style={styles.ratingLabel}>{t("attempt.rateYourExperience")}:</Text>
@@ -324,6 +325,7 @@ export default function ActivityAttemptMainScreen(){
                               <Pressable
                                   key={star}
                                   onPress={() => setRating?.(star)}
+                                  testID={`btn_star_${star}`}
                               >
                                   <MaterialCommunityIcons
                                       name={currentRating && star <= currentRating ? "star" : "star-outline"}
@@ -385,6 +387,7 @@ export default function ActivityAttemptMainScreen(){
                   ]}
                   onPress={handleSave}
                   disabled={!isComplete() || isSaving}
+                  testID="btn_save_attempt"
               >
                   <MaterialCommunityIcons name="content-save" size={20} color="#fff" />
                   <Text style={styles.saveBtnText}>

@@ -6,7 +6,6 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TabLayout() {
@@ -39,17 +38,6 @@ export default function TabLayout() {
         options={{
           title: t("tabs.home"),
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-          tabBarButton: (props) => {
-            const { onPress, accessibilityRole, accessibilityState } = props;
-            return(
-              <Pressable
-                onPress={onPress}
-                accessibilityRole={accessibilityRole}
-                accessibilityState={accessibilityState} 
-                testID="tab_activities" 
-              />
-            )
-          }
         }}
       />
       <Tabs.Screen
