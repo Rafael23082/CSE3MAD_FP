@@ -10,7 +10,7 @@
         "delayTime": 60000,
         "elementDescriptors": [
           {
-            "resourceId": "my.app.package:id/home_screen"
+            "resourceId": "com.matt92stan.cse3madfp:id/home_screen"
           }
         ]
       },
@@ -27,7 +27,7 @@
         "delayTime": 60000,
         "elementDescriptors": [
           {
-            "resourceId": "my.app.package:id/signup_screen"
+            "resourceId": "com.matt92stan.cse3madfp:id/signup_screen"
           }
         ]
       },
@@ -71,7 +71,7 @@
         "delayTime": 60000,
         "elementDescriptors": [
           {
-            "resourceId": "my.app.package:id/team_initialization_screen"
+            "resourceId": "com.matt92stan.cse3madfp:id/team_initialization_screen"
           }
         ]
       },
@@ -132,7 +132,7 @@
         "delayTime": 60000,
         "elementDescriptors": [
           {
-            "resourceId": "my.app.package:id/dashboard_screen"
+            "resourceId": "com.matt92stan.cse3madfp:id/dashboard_screen"
           }
         ]
       },
@@ -149,7 +149,7 @@
         "delayTime": 60000,
         "elementDescriptors": [
           {
-            "resourceId": "my.app.package:id/activity_reaction_board_challenge"
+            "resourceId": "com.matt92stan.cse3madfp:id/activity_reaction_board_challenge"
           }
         ]
       },
@@ -166,7 +166,7 @@
         "delayTime": 60000,
         "elementDescriptors": [
           {
-            "resourceId": "my.app.package:id/input_reaction_time_difference_prediction"
+            "resourceId": "com.matt92stan.cse3madfp:id/input_reaction_time_difference_prediction"
           }
         ]
       },
