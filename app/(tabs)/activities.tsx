@@ -23,6 +23,9 @@ export default function ActivitiesScreen() {
       style={styles.outerContainer}
       contentContainerStyle={[styles.container, { paddingTop: insets.top + 24 }]}
       contentInsetAdjustmentBehavior="automatic"
+      accessibilityLabel="activities_scrollview"
+      testID="activities_scrollview"
+      accessible={true}
     >
       <Text style={styles.welcomeMessage}>
         {t("activities.selectActivity")}
