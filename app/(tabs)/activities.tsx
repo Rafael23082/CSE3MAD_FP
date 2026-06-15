@@ -3,6 +3,7 @@ import ActivityGroup from "@/components/activityGroup";
 import Button from "@/components/button";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeColors } from "@/theme/colors";
+import { kebabToSnake } from "@/utils/idUtils";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
@@ -44,7 +45,7 @@ export default function ActivitiesScreen() {
           description={activity.description}
           imagePath={activity.image}
           onlyImage={false}
-          testID={`activity_${key}`}
+          testID={`activity_${kebabToSnake(key)}`}
         />
       ))}
     </ScrollView>
