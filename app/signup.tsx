@@ -247,7 +247,7 @@ export default function SignupScreen(){
                                 isPassword={true} 
                                 placeholder={t("forms.passwordPlaceholder")}
                                 isLabeled={true}
-                                testID="Password123"
+                                testID="input_password"
                             />
 
                             {error && (
