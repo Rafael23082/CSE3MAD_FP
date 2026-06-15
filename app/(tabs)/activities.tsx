@@ -44,6 +44,7 @@ export default function ActivitiesScreen() {
           description={activity.description}
           imagePath={activity.image}
           onlyImage={false}
+          testID={`activity_${key}`}
         />
       ))}
     </ScrollView>

@@ -13,7 +13,7 @@ export default function HomeScreen(){
     const {t} = useTranslation();
     
     return(
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView testID="home_screen" style={styles.container}>
             <View style={styles.top}>
                 <Text style={styles.title}>STEMMLAB</Text>
                 <Text style={styles.secondary}>{t("landing.slogan")}</Text>

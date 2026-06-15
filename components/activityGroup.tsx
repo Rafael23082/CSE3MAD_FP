@@ -12,10 +12,11 @@ type activityScreenProps = {
     activityName: string,
     description: string,
     imagePath: any,
-    onlyImage: boolean
+    onlyImage: boolean,
+    testID?: string
 }
 
-export default function ActivityGroup({activityKey, activityName, description, imagePath, onlyImage}: activityScreenProps){
+export default function ActivityGroup({activityKey, activityName, description, imagePath, onlyImage, testID}: activityScreenProps){
     const router = useRouter(); 
     const {theme} = useTheme();
     const styles = createStyles(theme);
@@ -33,19 +34,20 @@ export default function ActivityGroup({activityKey, activityName, description, i
             </View>
         ) : (
             <View style={styles.activityContainer}>
-            <Text style={styles.sectionHeader}>{activityName}</Text>
-            <Pressable
-                style={[styles.activityBox, {
-                    marginVertical: 16
-                }]}
-                onPress={() => {
-                    setActivity(activities[activityKey]);
-                    router.push("/activityAttempt")
-                }}
-            >
-                <Image source={imagePath} style={styles.image} resizeMode="cover" />
-            </Pressable>
-            <Text style={styles.body}>{description}</Text>
+                <Text style={styles.sectionHeader}>{activityName}</Text>
+                <Pressable
+                    style={[styles.activityBox, {
+                        marginVertical: 16
+                    }]}
+                    onPress={() => {
+                        setActivity(activities[activityKey]);
+                        router.push("/activityAttempt")
+                    }}
+                    testID={testID}
+                >
+                    <Image source={imagePath} style={styles.image} resizeMode="cover" />
+                </Pressable>
+                <Text style={styles.body}>{description}</Text>
             </View>
         )
     );

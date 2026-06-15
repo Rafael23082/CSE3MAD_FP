@@ -206,6 +206,8 @@ export default function ActivityAttemptMainScreen(){
     }
   };
 
+  const normalizeId = (id: string) => id.replace(/([A-Z])/g, "_$1").toLowerCase();
+  
   useEffect(() => {
     return () => {
         if (clearActivityState){
@@ -254,6 +256,7 @@ export default function ActivityAttemptMainScreen(){
                                     placeholder={t("placeholder.enterYourAnswer")}
                                     placeholderTextColor={theme.textMuted}
                                     multiline
+                                    testID={`reaction_prediction_${normalizeId(field.id)}`}
                             />
                           )}
                           {field.type === "dropdown" && field.options && (
